@@ -11,118 +11,27 @@ export declare class SubmissionsController {
     }): Promise<{
         success: boolean;
         message: string;
-        submission: {
-            id: string;
-            email: string;
-            name: string;
-            courseId: string;
-            status: string;
-            userId: string;
-            adminNote: string | null;
-            reviewedAt: Date | null;
-            batch: string;
-            projectName: string;
-            gitRepoUrl: string;
-            linkedinPostUrl: string;
-            submittedAt: Date;
-        };
+        submission: any;
     }>;
-    getMySubmissions(userId: string): Promise<({
-        course: {
-            slug: string;
-            title: string;
-            type: string;
-        };
-    } & {
-        id: string;
-        email: string;
-        name: string;
-        courseId: string;
-        status: string;
-        userId: string;
-        adminNote: string | null;
-        reviewedAt: Date | null;
-        batch: string;
-        projectName: string;
-        gitRepoUrl: string;
-        linkedinPostUrl: string;
-        submittedAt: Date;
-    })[]>;
-    getAllSubmissions(status?: string): Promise<({
-        user: {
-            id: string;
-            email: string;
-            name: string;
-            phone: string;
-            degree: string;
-            college: string;
-        };
-        course: {
-            id: string;
-            slug: string;
-            title: string;
-            type: string;
-        };
-    } & {
-        id: string;
-        email: string;
-        name: string;
-        courseId: string;
-        status: string;
-        userId: string;
-        adminNote: string | null;
-        reviewedAt: Date | null;
-        batch: string;
-        projectName: string;
-        gitRepoUrl: string;
-        linkedinPostUrl: string;
-        submittedAt: Date;
-    })[]>;
+    getMySubmissions(userId: string): Promise<any>;
+    getAllSubmissions(status?: string): Promise<any>;
     approveSubmission(id: string, adminNote?: string): Promise<{
         success: boolean;
         message: string;
-        submission: {
-            id: string;
-            email: string;
-            name: string;
-            courseId: string;
-            status: string;
-            userId: string;
-            adminNote: string | null;
-            reviewedAt: Date | null;
-            batch: string;
-            projectName: string;
-            gitRepoUrl: string;
-            linkedinPostUrl: string;
-            submittedAt: Date;
-        };
+        submission: any;
         certificate: {
-            certId: string;
-            sha256Hash: string;
-            recipientName: string;
-            courseTitle: string;
-            issuedAt: string;
+            certId: any;
+            sha256Hash: any;
+            recipientName: any;
+            courseTitle: any;
+            issuedAt: any;
             verifyUrl: string;
-            grade: string;
+            grade: any;
         };
     }>;
     rejectSubmission(id: string, reason: string): Promise<{
         success: boolean;
         message: string;
-        submission: {
-            id: string;
-            email: string;
-            name: string;
-            courseId: string;
-            status: string;
-            userId: string;
-            adminNote: string | null;
-            reviewedAt: Date | null;
-            batch: string;
-            projectName: string;
-            gitRepoUrl: string;
-            linkedinPostUrl: string;
-            submittedAt: Date;
-        };
+        submission: any;
     }>;
 }

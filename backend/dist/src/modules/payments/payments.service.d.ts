@@ -6,25 +6,25 @@ export declare class PaymentsService {
     createOrder(userId: string, courseId: string, couponCode?: string): Promise<{
         razorpayOrderId: string;
         razorpayKeyId: string;
-        amountInPaise: number;
+        amountInPaise: any;
         currency: string;
         prefill: {
-            name: string;
-            email: string;
-            contact: string;
+            name: any;
+            email: any;
+            contact: any;
         };
         notes: {
             courseId: string;
             userId: string;
-            courseTitle: string;
+            courseTitle: any;
         };
     }>;
     verifyPayment(userId: string, razorpayOrderId: string, razorpayPaymentId: string, razorpaySignature: string): Promise<{
         success: boolean;
         enrollment: {
-            id: string;
-            courseId: string;
-            status: string;
+            id: any;
+            courseId: any;
+            status: any;
         };
         invoiceUrl: string;
     }>;

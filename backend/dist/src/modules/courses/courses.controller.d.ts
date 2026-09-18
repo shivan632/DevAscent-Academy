@@ -4,152 +4,21 @@ export declare class CoursesController {
     private coursesService;
     constructor(coursesService: CoursesService);
     getCourses(domain?: string, level?: string, search?: string, type?: string): Promise<{
-        courses: {
-            level: string;
-            id: string;
-            slug: string;
-            title: string;
-            description: string;
-            priceInPaise: number;
-            earlyBirdPriceInPaise: number;
-            domain: string;
-            thumbnail: string;
-            cohortNumber: number;
-            seatsRemaining: number;
-            totalSeats: number;
-            cohortStartsOn: Date;
-            type: string;
-            isFree: boolean;
-            durationWeeks: number;
-            isPaidInternship: boolean;
-            stipendDetails: string;
-            requiresApproval: boolean;
-        }[];
+        courses: any;
     }>;
     getFeatured(): Promise<{
-        course: {
-            modules: ({
-                lessons: {
-                    id: string;
-                    title: string;
-                    lessonNumber: number;
-                    durationMinutes: number;
-                    isFreePreview: boolean;
-                }[];
-            } & {
-                id: string;
-                title: string;
-                description: string | null;
-                moduleNumber: number;
-                courseId: string;
-            })[];
-        } & {
-            level: string;
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            slug: string;
-            title: string;
-            description: string;
-            priceInPaise: number;
-            earlyBirdPriceInPaise: number;
-            domain: string;
-            thumbnail: string;
-            cohortNumber: number;
-            seatsRemaining: number;
-            totalSeats: number;
-            cohortStartsOn: Date | null;
-            isPublished: boolean;
-            type: string;
-            isFree: boolean;
-            objectives: string;
-            projects: string;
-            assignments: string;
-            requirements: string;
-            durationWeeks: number | null;
-            isPaidInternship: boolean;
-            stipendDetails: string | null;
-            requiresApproval: boolean;
-        };
+        course: any;
         cohortStatus: {
             filled: number;
-            total: number;
-            seatsRemaining: number;
-            startsOn: Date;
-            cohortNumber: number;
+            total: any;
+            seatsRemaining: any;
+            startsOn: any;
+            cohortNumber: any;
         };
     }>;
     getCourseBySlug(slug: string, req: Request): Promise<{
-        course: {
-            objectives: string[];
-            projects: string[];
-            assignments: string[];
-            requirements: string[];
-            modules: ({
-                lessons: {
-                    id: string;
-                    title: string;
-                    lessonNumber: number;
-                    durationMinutes: number;
-                    isFreePreview: boolean;
-                    summary: string;
-                }[];
-                quiz: {
-                    id: string;
-                    title: string;
-                    passingScore: number;
-                };
-            } & {
-                id: string;
-                title: string;
-                description: string | null;
-                moduleNumber: number;
-                courseId: string;
-            })[];
-            level: string;
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            slug: string;
-            title: string;
-            description: string;
-            priceInPaise: number;
-            earlyBirdPriceInPaise: number;
-            domain: string;
-            thumbnail: string;
-            cohortNumber: number;
-            seatsRemaining: number;
-            totalSeats: number;
-            cohortStartsOn: Date | null;
-            isPublished: boolean;
-            type: string;
-            isFree: boolean;
-            durationWeeks: number | null;
-            isPaidInternship: boolean;
-            stipendDetails: string | null;
-            requiresApproval: boolean;
-        };
-        modules: ({
-            lessons: {
-                id: string;
-                title: string;
-                lessonNumber: number;
-                durationMinutes: number;
-                isFreePreview: boolean;
-                summary: string;
-            }[];
-            quiz: {
-                id: string;
-                title: string;
-                passingScore: number;
-            };
-        } & {
-            id: string;
-            title: string;
-            description: string | null;
-            moduleNumber: number;
-            courseId: string;
-        })[];
+        course: any;
+        modules: any;
         enrollment: any;
         application: any;
         submission: any;
@@ -158,54 +27,33 @@ export declare class CoursesController {
     enrollFree(slug: string, user: any): Promise<{
         success: boolean;
         message: string;
-        enrollment: {
-            id: string;
-            courseId: string;
-            progressPct: number;
-            status: string;
-            enrolledAt: Date;
-            userId: string;
-        };
+        enrollment: any;
     }>;
     applyCohort(slug: string, user: any, note?: string): Promise<{
         success: boolean;
         message: string;
-        application: {
-            id: string;
-            courseId: string;
-            status: string;
-            userId: string;
-            adminNote: string | null;
-            appliedAt: Date;
-            reviewedAt: Date | null;
-        };
+        application: any;
     }>;
     getLesson(slug: string, lessonId: string, req: Request): Promise<{
         lesson: {
-            id: string;
-            lessonNumber: number;
-            title: string;
-            durationMinutes: number;
-            summary: string;
-            isFreePreview: boolean;
+            id: any;
+            lessonNumber: any;
+            title: any;
+            durationMinutes: any;
+            summary: any;
+            isFreePreview: any;
             isLocked: boolean;
-            videoUrl: string;
+            videoUrl: any;
         };
         module: {
-            id: string;
-            title: string;
-            lessons: {
-                id: string;
-                title: string;
-                lessonNumber: number;
-                durationMinutes: number;
-                isFreePreview: boolean;
-            }[];
+            id: any;
+            title: any;
+            lessons: any;
         };
         course: {
-            id: string;
-            slug: string;
-            title: string;
+            id: any;
+            slug: any;
+            title: any;
         };
     }>;
 }

@@ -3,24 +3,16 @@ import { CertificatesService } from './certificates.service';
 export declare class CertificatesController {
     private certificatesService;
     constructor(certificatesService: CertificatesService);
-    getMyCertificates(user: any): Promise<{
-        certId: string;
-        sha256Hash: string;
-        recipientName: string;
-        courseTitle: string;
-        issuedAt: string;
-        verifyUrl: string;
-        grade: string;
-    }[]>;
+    getMyCertificates(user: any): Promise<any>;
     getMyCertificate(user: any, courseId: string): Promise<{
         certificate: {
-            certId: string;
-            sha256Hash: string;
-            recipientName: string;
-            courseTitle: string;
-            issuedAt: string;
+            certId: any;
+            sha256Hash: any;
+            recipientName: any;
+            courseTitle: any;
+            issuedAt: any;
             verifyUrl: string;
-            grade: string;
+            grade: any;
         };
     }>;
     downloadCertificate(certId: string, res: Response): Promise<void>;
@@ -36,19 +28,19 @@ export declare class CertificatesController {
     } | {
         verified: boolean;
         recipient: {
-            name: string;
-            degree: string;
-            college: string;
+            name: any;
+            degree: any;
+            college: any;
         };
         course: {
-            title: string;
-            completedAt: string;
-            grade: string;
+            title: any;
+            completedAt: any;
+            grade: any;
         };
-        hash: string;
+        hash: any;
         issuedBy: string;
         instructor: string;
-        ledgerTimestamp: string;
+        ledgerTimestamp: any;
         message?: undefined;
     }>;
 }

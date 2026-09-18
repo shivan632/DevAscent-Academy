@@ -7,16 +7,16 @@ export declare class RefundsService {
         message: string;
         refundId?: undefined;
     } | {
-        refundId: string;
+        refundId: any;
         status: string;
         message: string;
     }>;
     getStatus(refundId: string): Promise<{
-        refundId: string;
-        status: string;
-        amountInPaise: number;
-        createdAt: Date;
-        processedAt: Date;
-        rejectionReason: string;
+        refundId: any;
+        status: any;
+        amountInPaise: any;
+        createdAt: any;
+        processedAt: any;
+        rejectionReason: any;
     }>;
 }

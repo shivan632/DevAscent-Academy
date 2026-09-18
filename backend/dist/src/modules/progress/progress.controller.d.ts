@@ -3,25 +3,12 @@ export declare class ProgressController {
     private progressService;
     constructor(progressService: ProgressService);
     getMyEnrollments(userId: string): Promise<{
-        enrollments: {
-            id: string;
-            courseId: string;
-            courseSlug: string;
-            courseTitle: string;
-            thumbnail: string;
-            progressPct: number;
-            enrolledAt: Date;
-            status: string;
-            nextLesson: {
-                id: string;
-                title: string;
-            };
-        }[];
+        enrollments: any;
     }>;
     getMyStats(userId: string): Promise<{
-        enrolled: number;
-        inProgress: number;
-        completed: number;
+        enrolled: any;
+        inProgress: any;
+        completed: any;
         totalStudyMinutes: number;
     }>;
     trackProgress(userId: string, lessonId: string, watchSeconds: number): Promise<{
@@ -31,24 +18,11 @@ export declare class ProgressController {
     }>;
     getQuiz(quizId: string): Promise<{
         quiz: {
-            id: string;
-            title: string;
-            passingScore: number;
-            module: {
-                id: string;
-                title: string;
-                course: {
-                    id: string;
-                    slug: string;
-                    title: string;
-                };
-            };
-            questions: {
-                id: string;
-                question: string;
-                options: any;
-                codeSnippet: string;
-            }[];
+            id: any;
+            title: any;
+            passingScore: any;
+            module: any;
+            questions: any;
         };
     }>;
     submitQuiz(userId: string, quizId: string, answers: {
@@ -57,12 +31,7 @@ export declare class ProgressController {
     }[]): Promise<{
         scorePct: number;
         passed: boolean;
-        passingScore: number;
-        feedback: {
-            questionId: string;
-            isCorrect: boolean;
-            correctOptionIndex: number;
-            explanation: string;
-        }[];
+        passingScore: any;
+        feedback: any;
     }>;
 }
