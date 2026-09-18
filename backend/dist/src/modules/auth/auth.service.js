@@ -336,6 +336,123 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Invalid or expired refresh token.');
         }
     }
+    async getFullProfile(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                phone: true,
+                degree: true,
+                college: true,
+                avatarUrl: true,
+                bio: true,
+                city: true,
+                graduationYear: true,
+                githubUrl: true,
+                linkedinUrl: true,
+                portfolioUrl: true,
+                isEmailVerified: true,
+                createdAt: true,
+                updatedAt: true,
+                _count: {
+                    select: {
+                        enrollments: true,
+                        certificates: true,
+                        completionSubmissions: true,
+                    },
+                },
+            },
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found.');
+        }
+        return {
+            user: {
+                ...user,
+                enrollmentsCount: user._count.enrollments,
+                certificatesCount: user._count.certificates,
+                submissionsCount: user._count.completionSubmissions,
+            },
+        };
+    }
+    async updateProfile(userId, dto) {
+        const dataToUpdate = {};
+        if (dto.name !== undefined)
+            dataToUpdate.name = dto.name.trim();
+        if (dto.phone !== undefined)
+            dataToUpdate.phone = dto.phone ? dto.phone.trim() : null;
+        if (dto.degree !== undefined)
+            dataToUpdate.degree = dto.degree ? dto.degree.trim() : null;
+        if (dto.college !== undefined)
+            dataToUpdate.college = dto.college ? dto.college.trim() : null;
+        if (dto.avatarUrl !== undefined)
+            dataToUpdate.avatarUrl = dto.avatarUrl ? dto.avatarUrl.trim() : null;
+        if (dto.bio !== undefined)
+            dataToUpdate.bio = dto.bio ? dto.bio.trim() : null;
+        if (dto.city !== undefined)
+            dataToUpdate.city = dto.city ? dto.city.trim() : null;
+        if (dto.graduationYear !== undefined)
+            dataToUpdate.graduationYear = dto.graduationYear ? dto.graduationYear.trim() : null;
+        if (dto.githubUrl !== undefined)
+            dataToUpdate.githubUrl = dto.githubUrl ? dto.githubUrl.trim() : null;
+        if (dto.linkedinUrl !== undefined)
+            dataToUpdate.linkedinUrl = dto.linkedinUrl ? dto.linkedinUrl.trim() : null;
+        if (dto.portfolioUrl !== undefined)
+            dataToUpdate.portfolioUrl = dto.portfolioUrl ? dto.portfolioUrl.trim() : null;
+        const updatedUser = await this.prisma.user.update({
+            where: { id: userId },
+            data: dataToUpdate,
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                phone: true,
+                degree: true,
+                college: true,
+                avatarUrl: true,
+                bio: true,
+                city: true,
+                graduationYear: true,
+                githubUrl: true,
+                linkedinUrl: true,
+                portfolioUrl: true,
+                isEmailVerified: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+        return {
+            message: 'Profile updated successfully',
+            user: updatedUser,
+        };
+    }
+    async changePassword(userId, currentPassword, newPassword) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found.');
+        }
+        const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+        if (!isMatch) {
+            throw new common_1.BadRequestException('Current password does not match.');
+        }
+        if (newPassword.length < 6) {
+            throw new common_1.BadRequestException('New password must be at least 6 characters long.');
+        }
+        const passwordHash = await bcrypt.hash(newPassword, 12);
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { passwordHash },
+        });
+        return {
+            message: 'Password updated successfully.',
+        };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

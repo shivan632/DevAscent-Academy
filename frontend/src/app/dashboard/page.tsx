@@ -48,7 +48,7 @@ import {
 } from 'lucide-react';
 
 export default function StudentDashboardPage() {
-  const { user, logout } = useAuthStore();
+  const { user, logout, updateUser } = useAuthStore();
   const { theme, setTheme } = useTheme();
   
   const [activeTab, setActiveTab] = useState<'overview' | 'certificates' | 'submissions' | 'profile' | 'settings' | 'support'>('overview');
@@ -64,19 +64,36 @@ export default function StudentDashboardPage() {
   // Profile Form state
   const [profileName, setProfileName] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
+  const [profileDegree, setProfileDegree] = useState('');
   const [profileCollege, setProfileCollege] = useState('');
+  const [profileCity, setProfileCity] = useState('');
+  const [profileGraduationYear, setProfileGraduationYear] = useState('');
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState('');
   const [profileGithub, setProfileGithub] = useState('');
   const [profileLinkedin, setProfileLinkedin] = useState('');
+  const [profilePortfolio, setProfilePortfolio] = useState('');
   const [profileBio, setProfileBio] = useState('');
-  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileMsg, setProfileMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Password Form state
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+  const [passwordUpdating, setPasswordUpdating] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     if (user) {
       setProfileName(user.name || '');
+      setProfilePhone(user.phone || '');
+      setProfileDegree(user.degree || '');
+      setProfileCollege(user.college || '');
+      setProfileCity(user.city || '');
+      setProfileGraduationYear(user.graduationYear || '');
+      setProfileAvatarUrl(user.avatarUrl || '');
+      setProfileGithub(user.githubUrl || '');
+      setProfileLinkedin(user.linkedinUrl || '');
+      setProfilePortfolio(user.portfolioUrl || '');
+      setProfileBio(user.bio || '');
     }
   }, [user]);
 
@@ -84,11 +101,20 @@ export default function StudentDashboardPage() {
     async function loadDashboardData() {
       setLoading(true);
       try {
-        const [certsRes, subsRes, coursesRes] = await Promise.allSettled([
+        const [certsRes, subsRes, coursesRes, profileRes] = await Promise.allSettled([
           api.getMyCertificates(),
           api.getMySubmissions(),
           api.getCourses(),
+          api.getProfile(),
         ]);
+
+        if (profileRes.status === 'fulfilled' && profileRes.value) {
+          const raw = profileRes.value;
+          const u = raw?.user || raw;
+          if (u && u.id) {
+            updateUser(u);
+          }
+        }
 
         if (certsRes.status === 'fulfilled' && certsRes.value) {
           const val = certsRes.value;
@@ -137,7 +163,7 @@ export default function StudentDashboardPage() {
       }
     }
     loadDashboardData();
-  }, [user]);
+  }, []);
 
   const safeCertificates = Array.isArray(certificates) ? certificates : [];
   const safeSubmissions = Array.isArray(submissions) ? submissions : [];
@@ -146,13 +172,39 @@ export default function StudentDashboardPage() {
   const studentName = user?.name || profileName || 'Student';
   const studentEmail = user?.email || 'student@devascent.io';
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setProfileSaved(true);
-    setTimeout(() => setProfileSaved(false), 3000);
+    setProfileSaving(true);
+    setProfileMsg(null);
+    try {
+      const payload = {
+        name: profileName.trim(),
+        phone: profilePhone.trim() || undefined,
+        degree: profileDegree.trim() || undefined,
+        college: profileCollege.trim() || undefined,
+        city: profileCity.trim() || undefined,
+        graduationYear: profileGraduationYear.trim() || undefined,
+        avatarUrl: profileAvatarUrl.trim() || undefined,
+        githubUrl: profileGithub.trim() || undefined,
+        linkedinUrl: profileLinkedin.trim() || undefined,
+        portfolioUrl: profilePortfolio.trim() || undefined,
+        bio: profileBio.trim() || undefined,
+      };
+
+      const res = await api.updateProfile(payload);
+      if (res && res.user) {
+        updateUser(res.user);
+      }
+      setProfileMsg({ type: 'success', text: 'Profile details saved and updated successfully!' });
+      setTimeout(() => setProfileMsg(null), 4000);
+    } catch (err: any) {
+      setProfileMsg({ type: 'error', text: err?.message || 'Failed to update profile. Please try again.' });
+    } finally {
+      setProfileSaving(false);
+    }
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwords.new !== passwords.confirm) {
       setPasswordMsg({ type: 'error', text: 'New passwords do not match.' });
@@ -162,9 +214,21 @@ export default function StudentDashboardPage() {
       setPasswordMsg({ type: 'error', text: 'Password must be at least 6 characters long.' });
       return;
     }
-    setPasswordMsg({ type: 'success', text: 'Password updated successfully!' });
-    setPasswords({ current: '', new: '', confirm: '' });
-    setTimeout(() => setPasswordMsg(null), 3000);
+    setPasswordUpdating(true);
+    setPasswordMsg(null);
+    try {
+      await api.changePassword({
+        currentPassword: passwords.current,
+        newPassword: passwords.new,
+      });
+      setPasswordMsg({ type: 'success', text: 'Your password has been changed successfully!' });
+      setPasswords({ current: '', new: '', confirm: '' });
+      setTimeout(() => setPasswordMsg(null), 4000);
+    } catch (err: any) {
+      setPasswordMsg({ type: 'error', text: err?.message || 'Current password incorrect or update failed.' });
+    } finally {
+      setPasswordUpdating(false);
+    }
   };
 
   return (
@@ -679,142 +743,302 @@ export default function StudentDashboardPage() {
 
               {/* TAB 4: STUDENT PROFILE */}
               {activeTab === 'profile' && (
-                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm space-y-6">
-                  <div>
-                    <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-                      <User className="w-6 h-6" />
-                      <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Student Profile Details</h2>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      Manage your profile information printed on your verifiable graduation certificates.
-                    </p>
-                  </div>
-
-                  {profileSaved && (
-                    <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-600" />
-                      <span>Profile information saved successfully!</span>
-                    </div>
-                  )}
-
-                  <form onSubmit={handleSaveProfile} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          Full Name (Prints on Certificate)
-                        </label>
+                <div className="space-y-6">
+                  
+                  {/* Profile Header Card */}
+                  <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-4">
                         <div className="relative">
-                          <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                          <input
-                            type="text"
-                            value={profileName}
-                            onChange={(e) => setProfileName(e.target.value)}
-                            required
-                            className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
+                          {profileAvatarUrl ? (
+                            <img
+                              src={profileAvatarUrl}
+                              alt={studentName}
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-indigo-500 shadow-md shadow-indigo-500/20"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 text-white flex items-center justify-center font-extrabold text-2xl sm:text-3xl shadow-lg shadow-indigo-600/30">
+                              {studentName.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full flex items-center justify-center" title="Verified Account">
+                            <Check className="w-3 h-3 text-white stroke-[3]" />
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                              {studentName}
+                            </h2>
+                            <span className="inline-flex items-center px-2.5 py-0.5 text-[10px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 rounded-full border border-indigo-200 dark:border-indigo-800 uppercase tracking-wider">
+                              {user?.role === 'ADMIN' ? 'Administrator' : 'Verified Student'}
+                            </span>
+                          </div>
+                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            {studentEmail}
+                          </p>
+                          {(profileDegree || profileCollege) && (
+                            <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                              {[profileDegree, profileCollege].filter(Boolean).join(' • ')}
+                            </p>
+                          )}
                         </div>
                       </div>
 
+                      {/* Quick Profile Stats Badges */}
+                      <div className="flex items-center gap-2 self-stretch sm:self-auto justify-around sm:justify-start bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 text-center">
+                        <div className="px-3">
+                          <p className="text-lg font-black text-slate-900 dark:text-white">{safeCertificates.length}</p>
+                          <p className="text-[10px] uppercase font-bold text-slate-400">Certificates</p>
+                        </div>
+                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
+                        <div className="px-3">
+                          <p className="text-lg font-black text-slate-900 dark:text-white">{safeSubmissions.length}</p>
+                          <p className="text-[10px] uppercase font-bold text-slate-400">Submissions</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notification Messages */}
+                    {profileMsg && (
+                      <div className={`mt-6 p-4 rounded-2xl text-xs font-semibold flex items-center gap-3 ${
+                        profileMsg.type === 'success'
+                          ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                          : 'bg-rose-50 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                      }`}>
+                        {profileMsg.type === 'success' ? (
+                          <Check className="w-5 h-5 text-emerald-600 shrink-0" />
+                        ) : (
+                          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                        )}
+                        <span>{profileMsg.text}</span>
+                      </div>
+                    )}
+
+                    {/* Edit Profile Form */}
+                    <form onSubmit={handleSaveProfile} className="mt-6 space-y-6">
+                      
+                      {/* SECTION 1: BASIC INFORMATION */}
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          Registered Email Address
-                        </label>
-                        <div className="relative">
-                          <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                          <input
-                            type="email"
-                            value={studentEmail}
-                            disabled
-                            className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/50 text-slate-500 cursor-not-allowed"
-                          />
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                          <User className="w-3.5 h-3.5 text-indigo-500" />
+                          <span>Basic & Personal Details</span>
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Full Name (Prints on Official Certificates) *
+                            </label>
+                            <div className="relative">
+                              <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                              <input
+                                type="text"
+                                value={profileName}
+                                onChange={(e) => setProfileName(e.target.value)}
+                                required
+                                placeholder="e.g. Shivan Mishra"
+                                className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Registered Email (Primary Identity)
+                            </label>
+                            <div className="relative">
+                              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                              <input
+                                type="email"
+                                value={studentEmail}
+                                disabled
+                                className="w-full pl-9 pr-24 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 cursor-not-allowed font-medium"
+                              />
+                              <span className="absolute right-3 top-2.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                                Verified
+                              </span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Phone / WhatsApp Contact
+                            </label>
+                            <input
+                              type="tel"
+                              value={profilePhone}
+                              onChange={(e) => setProfilePhone(e.target.value)}
+                              placeholder="+91 99358 06722"
+                              className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              City & State / Location
+                            </label>
+                            <input
+                              type="text"
+                              value={profileCity}
+                              onChange={(e) => setProfileCity(e.target.value)}
+                              placeholder="e.g. Lucknow, Uttar Pradesh"
+                              className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      <div>
+                      {/* SECTION 2: ACADEMIC & EDUCATION */}
+                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                          <Building className="w-3.5 h-3.5 text-indigo-500" />
+                          <span>Academic & College Background</span>
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Degree / Field of Study
+                            </label>
+                            <select
+                              value={profileDegree}
+                              onChange={(e) => setProfileDegree(e.target.value)}
+                              className="w-full px-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                            >
+                              <option value="">Select Degree / Qualification</option>
+                              <option value="BCA">BCA (Bachelor of Computer Applications)</option>
+                              <option value="MCA">MCA (Master of Computer Applications)</option>
+                              <option value="BTECH_CS">B.Tech / B.E (Computer Science / IT)</option>
+                              <option value="BTECH_OTHER">B.Tech / B.E (Other Engineering)</option>
+                              <option value="BSC_CS">B.Sc (Computer Science / IT)</option>
+                              <option value="MSC_CS">M.Sc (Computer Science / IT)</option>
+                              <option value="DIPLOMA">Diploma in CS / IT</option>
+                              <option value="WORKING_PROFESSIONAL">Working Professional</option>
+                              <option value="OTHER">Other Qualification</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              College / University Name
+                            </label>
+                            <input
+                              type="text"
+                              value={profileCollege}
+                              onChange={(e) => setProfileCollege(e.target.value)}
+                              placeholder="e.g. AKTU / Amity / Delhi University"
+                              className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Graduation Year
+                            </label>
+                            <select
+                              value={profileGraduationYear}
+                              onChange={(e) => setProfileGraduationYear(e.target.value)}
+                              className="w-full px-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                            >
+                              <option value="">Select Year</option>
+                              <option value="2022">2022 or earlier</option>
+                              <option value="2023">2023</option>
+                              <option value="2024">2024</option>
+                              <option value="2025">2025</option>
+                              <option value="2026">2026 (Final Year)</option>
+                              <option value="2027">2027</option>
+                              <option value="2028">2028+</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* SECTION 3: SOCIAL LINKS & PORTFOLIO */}
+                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                          <Code2 className="w-3.5 h-3.5 text-indigo-500" />
+                          <span>Professional Links & Profiles</span>
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              GitHub Profile URL
+                            </label>
+                            <div className="relative">
+                              <GithubIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                              <input
+                                type="url"
+                                value={profileGithub}
+                                onChange={(e) => setProfileGithub(e.target.value)}
+                                placeholder="https://github.com/shivan632"
+                                className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-[11px]"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              LinkedIn Profile URL
+                            </label>
+                            <div className="relative">
+                              <LinkedinIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                              <input
+                                type="url"
+                                value={profileLinkedin}
+                                onChange={(e) => setProfileLinkedin(e.target.value)}
+                                placeholder="https://linkedin.com/in/shivan"
+                                className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-[11px]"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Portfolio / Personal Website
+                            </label>
+                            <div className="relative">
+                              <ExternalLink className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                              <input
+                                type="url"
+                                value={profilePortfolio}
+                                onChange={(e) => setProfilePortfolio(e.target.value)}
+                                placeholder="https://yourportfolio.dev"
+                                className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-[11px]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* SECTION 4: BIO & HEADLINE */}
+                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                         <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          Phone / WhatsApp Number
+                          Technical Bio / Headline (Optional)
                         </label>
-                        <input
-                          type="text"
-                          value={profilePhone}
-                          onChange={(e) => setProfilePhone(e.target.value)}
-                          placeholder="+91 9876543210"
-                          className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        <textarea
+                          rows={3}
+                          value={profileBio}
+                          onChange={(e) => setProfileBio(e.target.value)}
+                          placeholder="Passionate Full Stack Developer specializing in React, Next.js, and Node.js backend architectures..."
+                          className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          College / University / Organization
-                        </label>
-                        <div className="relative">
-                          <Building className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                          <input
-                            type="text"
-                            value={profileCollege}
-                            onChange={(e) => setProfileCollege(e.target.value)}
-                            placeholder="e.g. IIT Delhi / BCA 3rd Year"
-                            className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
-                        </div>
+                      {/* Submit Action Button */}
+                      <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <p className="text-[11px] text-slate-400">
+                          Last updated: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active'}
+                        </p>
+                        <button
+                          type="submit"
+                          disabled={profileSaving}
+                          className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold text-xs rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center gap-2"
+                        >
+                          <Save className="w-4 h-4" />
+                          <span>{profileSaving ? 'Saving Changes...' : 'Save Profile Details'}</span>
+                        </button>
                       </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          GitHub Username or Profile URL
-                        </label>
-                        <div className="relative">
-                          <GithubIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                          <input
-                            type="text"
-                            value={profileGithub}
-                            onChange={(e) => setProfileGithub(e.target.value)}
-                            placeholder="https://github.com/username"
-                            className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          LinkedIn Profile URL
-                        </label>
-                        <div className="relative">
-                          <LinkedinIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                          <input
-                            type="text"
-                            value={profileLinkedin}
-                            onChange={(e) => setProfileLinkedin(e.target.value)}
-                            placeholder="https://linkedin.com/in/username"
-                            className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                        Technical Background / Bio
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={profileBio}
-                        onChange={(e) => setProfileBio(e.target.value)}
-                        placeholder="Briefly describe your stack, goals, or target engineering role..."
-                        className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                    </div>
-
-                    <div className="pt-2">
-                      <button
-                        type="submit"
-                        className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
-                      >
-                        <Save className="w-4 h-4" />
-                        <span>Save Profile Changes</span>
-                      </button>
-                    </div>
-                  </form>
+                    </form>
+                  </div>
                 </div>
               )}
 

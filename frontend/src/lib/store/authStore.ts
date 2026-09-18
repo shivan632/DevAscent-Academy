@@ -9,6 +9,18 @@ export interface User {
   degree?: string;
   college?: string;
   phone?: string;
+  avatarUrl?: string;
+  bio?: string;
+  city?: string;
+  graduationYear?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  portfolioUrl?: string;
+  isEmailVerified?: boolean;
+  createdAt?: string;
+  enrollmentsCount?: number;
+  certificatesCount?: number;
+  submissionsCount?: number;
 }
 
 interface AuthState {
@@ -16,6 +28,7 @@ interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
+  updateUser: (data: Partial<User>) => void;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -25,6 +38,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: true,
   isAuthenticated: false,
   setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
+  updateUser: (data) =>
+    set((state) => ({
+      user: state.user ? { ...state.user, ...data } : null,
+    })),
   checkAuth: async () => {
     try {
       const response = await api.getProfile();

@@ -17,6 +17,13 @@ model User {
   role            String    @default("STUDENT") // "STUDENT" | "ADMIN" | "INSTRUCTOR"
   degree          String?   // "BCA" | "MCA" | "BTECH" | "OTHER"
   college         String?
+  avatarUrl       String?
+  bio             String?
+  city            String?
+  graduationYear  String?
+  githubUrl       String?
+  linkedinUrl     String?
+  portfolioUrl    String?
   isEmailVerified Boolean   @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

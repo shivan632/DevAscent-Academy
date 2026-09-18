@@ -33,6 +33,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         degree: true,
         college: true,
         phone: true,
+        avatarUrl: true,
+        bio: true,
+        city: true,
+        graduationYear: true,
+        githubUrl: true,
+        linkedinUrl: true,
+        portfolioUrl: true,
+        isEmailVerified: true,
+        createdAt: true,
       },
     });
 

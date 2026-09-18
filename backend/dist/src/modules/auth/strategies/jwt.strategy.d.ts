@@ -16,6 +16,15 @@ export declare class JwtStrategy extends JwtStrategy_base {
         role: string;
         degree: string;
         college: string;
+        avatarUrl: string;
+        bio: string;
+        city: string;
+        graduationYear: string;
+        githubUrl: string;
+        linkedinUrl: string;
+        portfolioUrl: string;
+        isEmailVerified: boolean;
+        createdAt: Date;
     }>;
 }
 export {};

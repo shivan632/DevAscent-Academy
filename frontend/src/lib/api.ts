@@ -40,6 +40,8 @@ export const api = {
   googleAuth: (tokenOrCredential: string) => fetchApi('/auth/google', { method: 'POST', body: JSON.stringify({ token: tokenOrCredential, credential: tokenOrCredential }) }),
   logout: () => fetchApi('/auth/logout', { method: 'POST' }),
   getProfile: () => fetchApi('/auth/profile'),
+  updateProfile: (data: any) => fetchApi('/auth/profile', { method: 'PUT', body: JSON.stringify(data) }),
+  changePassword: (data: { currentPassword: string; newPassword: string }) => fetchApi('/auth/change-password', { method: 'POST', body: JSON.stringify(data) }),
 
   // Courses & Internships
   getCourses: (params?: { domain?: string; type?: string; search?: string }) => {

@@ -74,4 +74,58 @@ export declare class AuthService {
     refreshToken(refreshToken: string, res: Response): Promise<{
         accessToken: string;
     }>;
+    getFullProfile(userId: string): Promise<{
+        user: {
+            enrollmentsCount: number;
+            certificatesCount: number;
+            submissionsCount: number;
+            id: string;
+            email: string;
+            name: string;
+            phone: string;
+            role: string;
+            degree: string;
+            college: string;
+            avatarUrl: string;
+            bio: string;
+            city: string;
+            graduationYear: string;
+            githubUrl: string;
+            linkedinUrl: string;
+            portfolioUrl: string;
+            isEmailVerified: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+            _count: {
+                enrollments: number;
+                certificates: number;
+                completionSubmissions: number;
+            };
+        };
+    }>;
+    updateProfile(userId: string, dto: any): Promise<{
+        message: string;
+        user: {
+            id: string;
+            email: string;
+            name: string;
+            phone: string;
+            role: string;
+            degree: string;
+            college: string;
+            avatarUrl: string;
+            bio: string;
+            city: string;
+            graduationYear: string;
+            githubUrl: string;
+            linkedinUrl: string;
+            portfolioUrl: string;
+            isEmailVerified: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+    }>;
+    changePassword(userId: string, currentPassword: string, newPassword: string): Promise<{
+        message: string;
+    }>;
 }

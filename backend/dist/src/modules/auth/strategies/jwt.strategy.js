@@ -42,6 +42,15 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
                 degree: true,
                 college: true,
                 phone: true,
+                avatarUrl: true,
+                bio: true,
+                city: true,
+                graduationYear: true,
+                githubUrl: true,
+                linkedinUrl: true,
+                portfolioUrl: true,
+                isEmailVerified: true,
+                createdAt: true,
             },
         });
         if (!user) {
