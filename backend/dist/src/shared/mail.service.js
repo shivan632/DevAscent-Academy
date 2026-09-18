@@ -13,17 +13,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailService = void 0;
 const common_1 = require("@nestjs/common");
 const resend_1 = require("resend");
+const nodemailer = require("nodemailer");
 let MailService = MailService_1 = class MailService {
     constructor() {
         this.logger = new common_1.Logger(MailService_1.name);
         this.resend = null;
-        this.fromEmail = process.env.EMAIL_FROM || 'DevAscent Academy <onboarding@resend.dev>';
-        const apiKey = process.env.RESEND_API_KEY;
-        if (apiKey) {
-            this.resend = new resend_1.Resend(apiKey);
+        this.transporter = null;
+        this.fromEmail = process.env.EMAIL_FROM || 'DevAscent Academy <shivrom.2020@gmail.com>';
+        const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
+        const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
+        if (smtpUser && smtpPass) {
+            this.transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: smtpUser,
+                    pass: smtpPass.replace(/\s+/g, ''),
+                },
+            });
+            this.fromEmail = `"DevAscent Academy" <${smtpUser}>`;
+            this.logger.log(`📧 Gmail SMTP Mailer initialized for: ${smtpUser}`);
         }
         else {
-            this.logger.warn('RESEND_API_KEY not configured. Outgoing emails will be logged to console.');
+            const apiKey = process.env.RESEND_API_KEY;
+            if (apiKey) {
+                this.resend = new resend_1.Resend(apiKey);
+                this.logger.log('📧 Resend Mailer initialized.');
+            }
+            else {
+                this.logger.warn('No SMTP or Resend credentials configured. Emails will be logged to console.');
+            }
         }
     }
     async sendOtpEmail(toEmail, name, otpCode) {
@@ -52,30 +70,45 @@ let MailService = MailService_1 = class MailService {
         </p>
       </div>
     `;
-        if (!this.resend) {
-            this.logger.log(`[SIMULATED EMAIL] To: ${toEmail} | OTP: ${otpCode}`);
-            return true;
+        if (this.transporter) {
+            try {
+                await this.transporter.sendMail({
+                    from: this.fromEmail,
+                    to: toEmail,
+                    subject,
+                    html,
+                });
+                this.logger.log(`✅ OTP email delivered to ${toEmail} via Gmail SMTP`);
+                return true;
+            }
+            catch (err) {
+                this.logger.error(`Gmail SMTP OTP send failed: ${err.message}`);
+            }
         }
-        try {
-            const response = await this.resend.emails.send({
-                from: this.fromEmail,
-                to: toEmail,
-                subject,
-                html,
-            });
-            if (response.error) {
-                this.logger.error(`Resend email error: ${JSON.stringify(response.error)}`);
+        if (this.resend) {
+            try {
+                const response = await this.resend.emails.send({
+                    from: this.fromEmail,
+                    to: toEmail,
+                    subject,
+                    html,
+                });
+                if (response.error) {
+                    this.logger.error(`Resend email error: ${JSON.stringify(response.error)}`);
+                    return false;
+                }
+                return true;
+            }
+            catch (err) {
+                this.logger.error(`Failed to send OTP email via Resend: ${err.message}`);
                 return false;
             }
-            return true;
         }
-        catch (err) {
-            this.logger.error(`Failed to send OTP email: ${err.message}`);
-            return false;
-        }
+        this.logger.log(`[SIMULATED EMAIL] To: ${toEmail} | OTP: ${otpCode}`);
+        return true;
     }
     async sendCertificateEmail(toEmail, name, courseTitle, certId, pdfBuffer) {
-        const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify/${certId}`;
+        const verifyUrl = `${process.env.FRONTEND_URL || 'https://dev-ascent-academy.vercel.app'}/verify/${certId}`;
         const subject = `🎉 Congratulations ${name}! Your Official Certificate for ${courseTitle}`;
         const html = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
@@ -104,33 +137,54 @@ let MailService = MailService_1 = class MailService {
         </div>
       </div>
     `;
-        if (!this.resend) {
-            this.logger.log(`[SIMULATED EMAIL] To: ${toEmail} | Certificate: ${certId} attached (${pdfBuffer.length} bytes)`);
-            return true;
+        if (this.transporter) {
+            try {
+                await this.transporter.sendMail({
+                    from: this.fromEmail,
+                    to: toEmail,
+                    subject,
+                    html,
+                    attachments: [
+                        {
+                            filename: `${certId}.pdf`,
+                            content: pdfBuffer,
+                        },
+                    ],
+                });
+                this.logger.log(`✅ Certificate email delivered to ${toEmail} via Gmail SMTP`);
+                return true;
+            }
+            catch (err) {
+                this.logger.error(`Gmail SMTP Certificate send failed: ${err.message}`);
+            }
         }
-        try {
-            const response = await this.resend.emails.send({
-                from: this.fromEmail,
-                to: toEmail,
-                subject,
-                html,
-                attachments: [
-                    {
-                        filename: `${certId}.pdf`,
-                        content: pdfBuffer,
-                    },
-                ],
-            });
-            if (response.error) {
-                this.logger.error(`Resend certificate email error: ${JSON.stringify(response.error)}`);
+        if (this.resend) {
+            try {
+                const response = await this.resend.emails.send({
+                    from: this.fromEmail,
+                    to: toEmail,
+                    subject,
+                    html,
+                    attachments: [
+                        {
+                            filename: `${certId}.pdf`,
+                            content: pdfBuffer,
+                        },
+                    ],
+                });
+                if (response.error) {
+                    this.logger.error(`Resend certificate email error: ${JSON.stringify(response.error)}`);
+                    return false;
+                }
+                return true;
+            }
+            catch (err) {
+                this.logger.error(`Failed to send certificate email via Resend: ${err.message}`);
                 return false;
             }
-            return true;
         }
-        catch (err) {
-            this.logger.error(`Failed to send certificate email: ${err.message}`);
-            return false;
-        }
+        this.logger.log(`[SIMULATED EMAIL] To: ${toEmail} | Certificate: ${certId} attached (${pdfBuffer.length} bytes)`);
+        return true;
     }
 };
 exports.MailService = MailService;

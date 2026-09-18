@@ -1,6 +1,7 @@
 export declare class MailService {
     private readonly logger;
     private resend;
+    private transporter;
     private fromEmail;
     constructor();
     sendOtpEmail(toEmail: string, name: string, otpCode: string): Promise<boolean>;
