@@ -16,7 +16,21 @@ async function bootstrap() {
     app.use(cookieParser());
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     app.enableCors({
-        origin: [frontendUrl, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+        origin: (origin, callback) => {
+            if (!origin)
+                return callback(null, true);
+            const allowedOrigins = [
+                frontendUrl,
+                'http://localhost:3000',
+                'http://127.0.0.1:3000',
+                'https://dev-ascent-academy.vercel.app',
+            ];
+            if (allowedOrigins.includes(origin) ||
+                origin.endsWith('.vercel.app')) {
+                return callback(null, true);
+            }
+            callback(new Error(`Origin ${origin} not allowed by CORS`));
+        },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-razorpay-signature'],
