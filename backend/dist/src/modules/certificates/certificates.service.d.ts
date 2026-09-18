@@ -10,25 +10,33 @@ export declare class CertificatesService {
     computeHash(certId: string, name: string, courseTitle: string, issuedAt: string): string;
     issueAndEmailCertificate(userId: string, courseId: string, grade?: string): Promise<{
         certificate: {
-            certId: any;
-            sha256Hash: any;
-            recipientName: any;
-            courseTitle: any;
-            issuedAt: any;
+            certId: string;
+            sha256Hash: string;
+            recipientName: string;
+            courseTitle: string;
+            issuedAt: string;
             verifyUrl: string;
-            grade: any;
+            grade: string;
         };
     }>;
-    getMyCertificates(userId: string): Promise<any>;
+    getMyCertificates(userId: string): Promise<{
+        certId: string;
+        sha256Hash: string;
+        recipientName: string;
+        courseTitle: string;
+        issuedAt: string;
+        verifyUrl: string;
+        grade: string;
+    }[]>;
     getMyCertificate(userId: string, courseId: string): Promise<{
         certificate: {
-            certId: any;
-            sha256Hash: any;
-            recipientName: any;
-            courseTitle: any;
-            issuedAt: any;
+            certId: string;
+            sha256Hash: string;
+            recipientName: string;
+            courseTitle: string;
+            issuedAt: string;
             verifyUrl: string;
-            grade: any;
+            grade: string;
         };
     }>;
     downloadCertificatePdf(certId: string): Promise<{
@@ -47,19 +55,19 @@ export declare class CertificatesService {
     } | {
         verified: boolean;
         recipient: {
-            name: any;
-            degree: any;
-            college: any;
+            name: string;
+            degree: string;
+            college: string;
         };
         course: {
-            title: any;
-            completedAt: any;
-            grade: any;
+            title: string;
+            completedAt: string;
+            grade: string;
         };
-        hash: any;
+        hash: string;
         issuedBy: string;
         instructor: string;
-        ledgerTimestamp: any;
+        ledgerTimestamp: string;
         message?: undefined;
     }>;
 }

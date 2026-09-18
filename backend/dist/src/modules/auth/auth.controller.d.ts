@@ -17,7 +17,15 @@ export declare class AuthController {
     }, res: Response): Promise<{
         success: boolean;
         message: string;
-        user: any;
+        user: {
+            id: string;
+            email: string;
+            name: string;
+            phone: string;
+            role: string;
+            degree: string;
+            college: string;
+        };
         accessToken: string;
     }>;
     sendOtp(body: {
@@ -31,26 +39,26 @@ export declare class AuthController {
     }>;
     login(dto: LoginDto, res: Response): Promise<{
         user: {
-            id: any;
-            email: any;
-            name: any;
-            role: any;
-            degree: any;
-            college: any;
-            phone: any;
+            id: string;
+            email: string;
+            name: string;
+            role: string;
+            degree: string;
+            college: string;
+            phone: string;
         };
         accessToken: string;
     }>;
     googleAuth(token: string, credential: string, res: Response): Promise<{
         success: boolean;
         user: {
-            id: any;
-            email: any;
-            name: any;
-            role: any;
-            degree: any;
-            college: any;
-            phone: any;
+            id: string;
+            email: string;
+            name: string;
+            role: string;
+            degree: string;
+            college: string;
+            phone: string;
         };
         accessToken: string;
     }>;

@@ -27,18 +27,26 @@ export declare class AuthService {
     verifyOtp(email: string, code: string, res: Response): Promise<{
         success: boolean;
         message: string;
-        user: any;
+        user: {
+            id: string;
+            email: string;
+            name: string;
+            phone: string;
+            role: string;
+            degree: string;
+            college: string;
+        };
         accessToken: string;
     }>;
     login(dto: LoginDto, res: Response): Promise<{
         user: {
-            id: any;
-            email: any;
-            name: any;
-            role: any;
-            degree: any;
-            college: any;
-            phone: any;
+            id: string;
+            email: string;
+            name: string;
+            role: string;
+            degree: string;
+            college: string;
+            phone: string;
         };
         accessToken: string;
     }>;
@@ -49,13 +57,13 @@ export declare class AuthService {
     googleAuth(token: string, res: Response): Promise<{
         success: boolean;
         user: {
-            id: any;
-            email: any;
-            name: any;
-            role: any;
-            degree: any;
-            college: any;
-            phone: any;
+            id: string;
+            email: string;
+            name: string;
+            role: string;
+            degree: string;
+            college: string;
+            phone: string;
         };
         accessToken: string;
     }>;

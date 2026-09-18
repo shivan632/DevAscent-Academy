@@ -3,12 +3,25 @@ export declare class ProgressController {
     private progressService;
     constructor(progressService: ProgressService);
     getMyEnrollments(userId: string): Promise<{
-        enrollments: any;
+        enrollments: {
+            id: string;
+            courseId: string;
+            courseSlug: string;
+            courseTitle: string;
+            thumbnail: string;
+            progressPct: number;
+            enrolledAt: Date;
+            status: string;
+            nextLesson: {
+                id: string;
+                title: string;
+            };
+        }[];
     }>;
     getMyStats(userId: string): Promise<{
-        enrolled: any;
-        inProgress: any;
-        completed: any;
+        enrolled: number;
+        inProgress: number;
+        completed: number;
         totalStudyMinutes: number;
     }>;
     trackProgress(userId: string, lessonId: string, watchSeconds: number): Promise<{
@@ -18,11 +31,24 @@ export declare class ProgressController {
     }>;
     getQuiz(quizId: string): Promise<{
         quiz: {
-            id: any;
-            title: any;
-            passingScore: any;
-            module: any;
-            questions: any;
+            id: string;
+            title: string;
+            passingScore: number;
+            module: {
+                id: string;
+                title: string;
+                course: {
+                    id: string;
+                    slug: string;
+                    title: string;
+                };
+            };
+            questions: {
+                id: string;
+                question: string;
+                options: any;
+                codeSnippet: string;
+            }[];
         };
     }>;
     submitQuiz(userId: string, quizId: string, answers: {
@@ -31,7 +57,12 @@ export declare class ProgressController {
     }[]): Promise<{
         scorePct: number;
         passed: boolean;
-        passingScore: any;
-        feedback: any;
+        passingScore: number;
+        feedback: {
+            questionId: string;
+            isCorrect: boolean;
+            correctOptionIndex: number;
+            explanation: string;
+        }[];
     }>;
 }
