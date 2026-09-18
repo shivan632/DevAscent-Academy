@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary": "#006c49", "on-error-container": "#93000a", "secondary-fixed": "#6ffbbe", "tertiary": "#454854", "surface-container-low": "#eff4ff", "surface": "#f8f9ff", "on-primary-container": "#dad7ff", "on-error": "#ffffff", "on-background": "#0b1c30", "error": "#ba1a1a", "surface-dim": "#cbdbf5", "on-primary": "#ffffff", "on-secondary": "#ffffff", "on-secondary-fixed": "#002113", "primary-fixed": "#e2dfff", "secondary-container": "#6cf8bb", "background": "#f8f9ff", "surface-container-lowest": "#ffffff", "tertiary-container": "#5c606c", "on-tertiary": "#ffffff", "on-tertiary-fixed": "#171b26", "surface-container-high": "#dce9ff", "on-tertiary-fixed-variant": "#434652", "primary-fixed-dim": "#c3c0ff", "outline": "#777587", "tertiary-fixed": "#dfe2f1", "tertiary-fixed-dim": "#c3c6d4", "primary": "#3525cd", "inverse-primary": "#c3c0ff", "on-surface": "#0b1c30", "outline-variant": "#c7c4d8", "on-primary-fixed-variant": "#3323cc", "on-primary-fixed": "#0f0069", "surface-tint": "#4d44e3", "surface-variant": "#d3e4fe", "on-surface-variant": "#464555", "on-secondary-container": "#00714d", "surface-container": "#e5eeff", "secondary-fixed-dim": "#4edea3", "inverse-surface": "#213145", "error-container": "#ffdad6", "on-tertiary-container": "#d8dbea", "surface-container-highest": "#d3e4fe", "inverse-on-surface": "#eaf1ff", "on-secondary-fixed-variant": "#005236", "surface-bright": "#f8f9ff", "primary-container": "#4f46e5" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-2xl": "4rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-md": "1rem", "margin": "2rem", "gutter": "1.5rem", "space-xs": "0.25rem", "space-xl": "2.5rem", "gutter-sm": "1rem", "margin-sm": "1rem" }, "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "label-md": ["Inter"], "body-sm": ["Inter"], "price-hero": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"] }, "fontSize": { "headline-lg": ["40px", { "lineHeight": "48px", "fontWeight": "700" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "price-hero": ["48px", { "lineHeight": "52px", "fontWeight": "800" }], "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "600" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "fontWeight": "800" }], "display-hero": ["56px", { "lineHeight": "64px", "fontWeight": "800" }] } } } }</script></head><body class="bg-background font-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm shrink-0"><a class="flex items-center gap-space-sm" data-path="courses" href="#"><img alt="DevAscent Academy Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface leading-none">DevAscent</span><span class="font-label-sm text-label-sm text-primary tracking-wide leading-tight uppercase">Academy</span></div></a></div><nav class="hidden xl:flex items-center gap-space-lg" data-active-classes="text-primary font-bold"><a aria-current="page" class="transition-colors text-primary font-bold" data-path="courses" href="#">Courses</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="curriculum" href="#">Curriculum</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="certificate-demo" href="#">Certificate Demo</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="pricing" href="#">Pricing</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="faq" href="#">FAQ</a></nav><div class="flex items-center gap-space-md shrink-0"><a class="hidden lg:flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-surface-container-low hover:bg-surface-container transition-colors text-secondary" data-path="verify-certificate" href="#"><span class="material-symbols-outlined text-[18px]">verified</span><span class="font-label-sm text-label-sm text-secondary font-semibold">Verify Certificate</span></a><a class="hidden sm:inline-flex font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors px-space-sm py-space-xs" data-path="login" href="#">Sign In</a><div class="relative flex flex-col items-end"><span class="hidden md:inline-block px-2 py-0.5 mb-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm text-[10px] uppercase font-bold tracking-wider">Batch Starts Monday</span><a class="flex items-center gap-space-xs bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md px-space-md py-space-sm rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition-all" data-path="pricing" href="#"><span>Enroll Now (₹1,499)</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span></a></div><div class="relative group flex items-center pl-space-xs"><button class="flex items-center gap-1.5 focus:outline-none p-1 rounded-full hover:bg-surface-container-high transition-colors" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyuN7Ngh2YgpmPsJ3RuKZX9aFSINrfY7yuH2KNnvetZV8uAKXG2eOcTspJr1-afr2xk9Xi0uHHeJCQ5kmY60aVLhKisE4fFZveYafG3eVTKmVcbdyhpdp0ekSUpJRcov2JlEWFmCoyIKIH3eh_b1HqvLPSRP62IdBftRqHstqNnE9WFLbhYegxncQ-Kc6a34eaG04fizRe2-U4T8GE6yUynrSdAlX4VxK4J-eiCFn2tn0o4haZsog"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></button><div class="absolute right-0 top-full mt-2 w-48 py-2 bg-surface-container-lowest rounded-xl shadow-[0_10px_15px_-3px_rgba(15,23,42,0.08),0_4px_6px_-4px_rgba(15,23,42,0.04)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col z-50"><div class="px-4 py-2 bg-surface-container-low mx-2 rounded-lg mb-1"><p class="font-label-sm text-label-sm text-on-surface font-semibold truncate">Dev Student</p><p class="font-label-sm text-label-sm text-on-surface-variant text-[11px] truncate">student@devascent.io</p></div><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="my-learning" href="#"><span class="material-symbols-outlined text-[18px]">school</span>My Learning</a><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="certificate-demo" href="#"><span class="material-symbols-outlined text-[18px]">workspace_premium</span>Certificate</a></div></div></div></div></header><main class="w-full pt-20 bg-background"><div class="flex flex-col w-full">
+<!-- Top Urgency Notification Banner -->
+<div class="w-full bg-primary text-on-primary py-2.5 px-margin">
+<div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-center sm:text-left">
+<div class="flex items-center gap-2 mx-auto sm:mx-0">
+<span class="inline-flex h-2 w-2 rounded-full bg-secondary-container animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider font-semibold text-secondary-container">Cohort #4 Status</span>
+<span class="font-body-sm text-body-sm">31 of 40 seats filled for upcoming Monday batch.</span>
+</div>
+<div class="hidden md:flex items-center gap-4 text-on-primary-container font-label-sm text-label-sm">
+<span>⚡ 70% Early Bird Closes Tonight</span>
+<span class="opacity-40">•</span>
+<span>Razorpay 256-Bit Secure</span>
+</div>
+</div>
+</div>
+<!-- Hero Section -->
+<section class="relative w-full overflow-hidden bg-surface pt-12 pb-20 lg:pt-16 lg:pb-28">
+<!-- Ambient Background Lighting Layer -->
+<div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-gradient-to-tr from-primary/10 via-surface-variant to-secondary-container/20 blur-3xl -z-10 pointer-events-none rounded-full"></div>
+<div class="max-w-7xl mx-auto px-margin">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+<!-- Main Pitch Column -->
+<div class="lg:col-span-7 flex flex-col items-start gap-6">
+<!-- Status Pill -->
+<div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">rocket_launch</span>
+<span class="font-semibold tracking-wide">Admissions Open for Batch #4</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="text-on-surface-variant">Limited to 40 Students</span>
+</div>
+<h1 class="font-display-hero text-display-hero-mobile lg:text-display-hero text-on-surface tracking-tight leading-[1.08]">
+            Become a Full-Stack Web Developer. <span class="text-primary underline decoration-secondary-container decoration-wavy decoration-2 underline-offset-8">Build &amp; Ship 4 Production Apps</span> in 6 Weeks.
+          </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+            From BCA fundamentals to production Next.js, Node.js, and Cloud deployment. Live Q&amp;A, weekly code reviews, Razorpay integration, and an industry-verifiable PDF certificate.
+          </p>
+<!-- Dual CTAs -->
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto pt-2">
+<a class="flex items-center justify-center gap-3 bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md px-8 py-4 rounded-xl shadow-lg shadow-primary-container/25 transition-all transform active:scale-[0.98]" href="#pricing">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+<span>Enroll in Course — ₹1,499</span>
+<span class="text-on-primary/75 text-xs bg-black/20 px-2 py-0.5 rounded font-semibold tracking-wider">70% OFF</span>
+</a>
+<button class="flex items-center justify-center gap-2 bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md px-6 py-4 rounded-xl shadow-sm transition-colors" onclick="document.getElementById('preview-modal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-[20px] text-primary">play_circle</span>
+<span>Watch 15-Min Free Preview</span>
+</button>
+</div>
+<!-- Social Proof Bar -->
+<div class="pt-6 w-full flex flex-wrap items-center gap-6 text-on-surface-variant">
+<div class="flex items-center gap-2">
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-label-sm text-label-sm font-bold text-on-surface">4.9/5 Rating</span>
+<span class="font-body-sm text-body-sm">(280+ alumni)</span>
+</div>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span>Hired at Top Startups</span>
+</div>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">terminal</span>
+<span>100% Practical Code-First</span>
+</div>
+</div>
+</div>
+<!-- Terminal & Code Visual Bento -->
+<div class="lg:col-span-5 relative">
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-xl relative overflow-hidden">
+<!-- Simulated Code Header -->
+<div class="flex items-center justify-between pb-4 mb-4 bg-surface-container-low -mx-6 -mt-6 px-6 py-3.5">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-error inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-secondary-container inline-block"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-2 font-mono text-xs">cohort-4-app.ts</span>
+</div>
+<span class="text-[11px] font-label-sm text-secondary bg-secondary-container/30 px-2 py-0.5 rounded font-mono">LIVE PREVIEW</span>
+</div>
+<div class="space-y-3 font-mono text-xs text-on-surface-variant">
+<div class="flex items-center justify-between text-secondary">
+<span>// Student Production Dashboard</span>
+<span>Ready for deploy</span>
+</div>
+<p class="text-on-surface"><span class="text-primary font-bold">export const</span> cohortConfig = {</p>
+<p class="pl-4">durationWeeks: <span class="text-secondary font-semibold">6</span>,</p>
+<p class="pl-4">productionApps: <span class="text-secondary font-semibold">4</span>,</p>
+<p class="pl-4">liveCodeReviews: <span class="text-primary font-semibold">true</span>,</p>
+<p class="pl-4">paymentGateway: <span class="text-amber-600">"Razorpay Webhooks"</span>,</p>
+<p class="pl-4">verificationId: <span class="text-amber-600">"DEVASCENT-2025-VALID"</span>,</p>
+<p class="text-on-surface">};</p>
+</div>
+<!-- Mini Live Stat Card within IDE -->
+<div class="mt-5 p-4 rounded-xl bg-surface-container-low flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Course Completion Rate</p>
+<p class="font-headline-sm text-headline-sm text-primary font-bold">94.8%</p>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm bg-secondary-container text-on-secondary-container px-2 py-1 rounded font-bold">Industry Average: 12%</span>
+<p class="text-[11px] font-body-sm text-on-surface-variant mt-1">Due to 1-on-1 Mentor Accountability</p>
+</div>
+</div>
+<!-- Student Success Card Overlay -->
+<div class="mt-4 p-3.5 bg-surface-container-high rounded-xl flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold">
+                RK
+              </div>
+<div class="flex-1 min-w-0">
+<p class="font-label-sm text-label-sm text-on-surface font-semibold truncate">Rahul K. (BCA 3rd Year)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-xs">Placed as Jr. Fullstack Engineer at ₹7.5 LPA</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Tech Stack Marquee / Strip -->
+<section class="w-full bg-surface-container-low py-10">
+<div class="max-w-7xl mx-auto px-margin">
+<p class="text-center font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-6">
+        Curated Modern Stack • Zero Outdated Tech • Used by Scaled Tech Unicorns
+      </p>
+<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-4 text-center">
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="font-headline-sm text-headline-sm text-primary">TS</span>
+<span class="font-label-sm text-label-sm text-on-surface mt-1">TypeScript</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="font-headline-sm text-headline-sm text-primary">N15</span>
+<span class="font-label-sm text-label-sm text-on-surface mt-1">Next.js 15</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="font-headline-sm text-headline-sm text-primary">RC</span>
+<span class="font-label-sm text-label-sm text-on-surface mt-1">React 19</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="font-headline-sm text-headline-sm text-primary">PG</span>
+<span class="font-label-sm text-label-sm text-on-surface mt-1">PostgreSQL</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="font-headline-sm text-headline-sm text-primary">TW</span>
+<span class="font-label-sm text-label-sm text-on-surface mt-1">TailwindCSS</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="font-headline-sm text-headline-sm text-secondary font-bold">₹</span>
+<span class="font-label-sm text-label-sm text-on-surface mt-1">Razorpay API</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="font-headline-sm text-headline-sm text-primary">DK</span>
+<span class="font-label-sm text-label-sm text-on-surface mt-1">Docker</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="font-headline-sm text-headline-sm text-primary">GIT</span>
+<span class="font-label-sm text-label-sm text-on-surface mt-1">GitHub CI/CD</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 4 Real-World Projects Section -->
+<section class="w-full py-20 bg-background">
+<div class="max-w-7xl mx-auto px-margin">
+<div class="max-w-3xl mb-14">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm mb-3">
+<span class="material-symbols-outlined text-[16px]">folder_special</span>
+<span>Resume-Defining Portfolio Projects</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+          Say goodbye to generic Todo apps and weather widgets.
+        </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-3">
+          Recruiters reject boilerplate tutorial projects in 3 seconds. In DevAscent, you deploy 4 production-grade systems complete with real databases, user auth, and banking-grade payments.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Project 1 -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="px-2.5 py-1 bg-surface-container-high rounded font-label-sm text-label-sm text-primary font-semibold">PROJECT 01</span>
+<span class="text-xs font-mono text-on-surface-variant">Next.js 15 • PostgreSQL • Prisma</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Multi-Tenant SaaS Feedback Platform</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              A full SaaS architecture allowing companies to embed customer feature requests, upvoting mechanics, role-based access control, and subdomain tenant isolation.
+            </p>
+<div class="h-48 rounded-xl bg-surface-container-low overflow-hidden relative mb-4">
+<img class="w-full h-full object-cover" data-alt="Modern desktop web application user interface showing a polished multi-tenant SaaS dashboard with user feedback boards, upvoting counters, clean indigo and neutral typography, sleek modern tech analytics cards" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmp8G1_Bx17Ycltn0tc3lvoEr4KotPfRJutwU6A7JoVUNGC1LxW4YTrAROM7WtAhf0rWiCNbrX48lT-5pKpViVwXUmLASCeJfhKUQvOTincbGgsBOxdNsDvQ5bBvFJIn1-ZAQhq7soLvXZhfupHqlgtznppv0IDgALC5TKJeEuXQNKpzpEBnu0c5401-FvFIaQfDxVVpTM_4WKwgG2rju3VBw34Y8LgU27LuCVaFnH0ifn7_0wWvQ"/>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Custom Domains</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Row-Level Security</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Prisma ORM</span>
+</div>
+</div>
+<!-- Project 2 -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="px-2.5 py-1 bg-surface-container-high rounded font-label-sm text-label-sm text-primary font-semibold">PROJECT 02</span>
+<span class="text-xs font-mono text-secondary">Razorpay API • Webhook Idempotency</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">UPI Payment Gateway &amp; Order Checkout Engine</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              End-to-end Indian eCommerce checkout flow. Implement secure signature verification, webhook listeners, automated GST invoicing, and UPI payment callbacks.
+            </p>
+<div class="h-48 rounded-xl bg-surface-container-low overflow-hidden relative mb-4">
+<img class="w-full h-full object-cover" data-alt="Payment checkout modal screen with UPI QR code, Google Pay and PhonePe logos, clean Indian fintech UI design with order totals, security badge and green verification status" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDhekXmUOsnvwqz4rR-d4hGl1IYdzbsVDQlzslw92lWHpEh4lRb9-A9Wz08song_LW-Z6SAnxFyFY-V87FeEAzc58H-PDKRgfWR3ND98QTfIGS01QE5Ovd9u9JbXew_7LtQSdJ0lZN3pdF-S3emhWnUhCRkZrX-4qju-I2pGKHjrB6ftxNmvHzCUDdH4EKJAMA_pWpRAeyGycon7tZtPLBzqGM8vPsjIZYx6Na-iYqS2dU2uDwyWM"/>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Webhook Handlers</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">HMAC SHA256 Verify</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Automated PDF Invoices</span>
+</div>
+</div>
+<!-- Project 3 -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="px-2.5 py-1 bg-surface-container-high rounded font-label-sm text-label-sm text-primary font-semibold">PROJECT 03</span>
+<span class="text-xs font-mono text-on-surface-variant">WebSockets • Redis • Next.js</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Real-Time Team Chat &amp; Collaborative Canvas</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Slack-style persistent workspace with channels, typing indicators, read receipts, real-time message delivery through Socket.io and Redis pub/sub.
+            </p>
+<div class="h-48 rounded-xl bg-surface-container-low overflow-hidden relative mb-4">
+<img class="w-full h-full object-cover" data-alt="Modern dark-accented real-time chat workspace interface with channels list, active conversation bubbles, typing indicators and markdown code snippet preview inside messenger" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjQUowB_aRKqu7BD2uFYbXN38FC7GA3oQG20Nj3NmAalTlEA-THqB-NTJfb4gDi5ZFRKfkHi-m8TtGpQ4mIUk0ubHb-FzlVYtz6x0gbOUJuDuh_UmO9RpiLOsonlRYjDgkjCoCZTdCCkCA_z3OPsQ5icQnYCmYwCzPPijTTTHfeCJV9hvawZOnpnjVWB288vh5lkBRWSNCm_WHRaaCgr0xKPjVq1RByaiOrAqzIGxiRKk9CCZQuxc"/>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Socket.io Rooms</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Redis Cache</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">File Uploads</span>
+</div>
+</div>
+<!-- Project 4 -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="px-2.5 py-1 bg-surface-container-high rounded font-label-sm text-label-sm text-primary font-semibold">PROJECT 04</span>
+<span class="text-xs font-mono text-secondary">Puppeteer • Cryptographic QR Hash</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Automated Verifiable Certificate Engine</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              The very engine powering DevAscent's credentialing: generate pixel-perfect high-res PDF credentials on-demand with cryptographically secured QR validation endpoints.
+            </p>
+<div class="h-48 rounded-xl bg-surface-container-low overflow-hidden relative mb-4">
+<img class="w-full h-full object-cover" data-alt="High quality graduation certificate template preview with gold foil seal, dark blue trim, scannable QR verification code and student name on an elegant off-white paper texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwwoIB_SEolx2-OIlnjaineTOVHykhkqdVj9jSaNBgcKWs0lZUrpQpH0h4yTWFfugF5zC5xx9QEEuwz1QTMkdbhQ_qPWIgZPbw1rRzE8Uh3SOUlcOBVWlqh7rR1qiX3ZvESaBthbkMMrTtG7HbewwxX2qV1CBBWziBzkOP-yKwr9NEXyTirpscogbgZyixwtEeOeULJ6zKpAxaxSudyqcDnBpY3oA_w-YzsWN-ZwNfBPfDbSfln9c"/>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Headless Chrome</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">Public Verification URL</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-label-sm text-label-sm text-xs">AWS S3 Signed URLs</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Meet Your Instructor Section -->
+<section class="w-full py-20 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-margin">
+<div class="bg-surface-container-lowest rounded-3xl p-8 lg:p-12 shadow-md">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+<!-- Profile Avatar Column -->
+<div class="lg:col-span-4 flex flex-col items-center text-center">
+<div class="relative w-56 h-56 sm:w-64 sm:h-64 rounded-2xl overflow-hidden shadow-lg bg-surface-container">
+<img alt="Lead Instructor" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyuN7Ngh2YgpmPsJ3RuKZX9aFSINrfY7yuH2KNnvetZV8uAKXG2eOcTspJr1-afr2xk9Xi0uHHeJCQ5kmY60aVLhKisE4fFZveYafG3eVTKmVcbdyhpdp0ekSUpJRcov2JlEWFmCoyIKIH3eh_b1HqvLPSRP62IdBftRqHstqNnE9WFLbhYegxncQ-Kc6a34eaG04fizRe2-U4T8GE6yUynrSdAlX4VxK4J-eiCFn2tn0o4haZsog"/>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mt-5">Arunodaya Varma</h3>
+<p class="font-label-md text-label-md text-primary font-medium">Lead Instructor &amp; Founder</p>
+<div class="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/50 text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>BCA Gold Medalist &amp; Masters in CS</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+              Ex-Fullstack Lead at FinTech Startup (Bengaluru)
+            </p>
+</div>
+<!-- Instructor Personal Note -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<div class="inline-flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">format_quote</span>
+<span>A PERSONAL NOTE FROM YOUR INSTRUCTOR</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight leading-snug">
+              "I built this course specifically for college students and career switchers who want real portfolio projects that crack interviews, not boring 40-hour theory videos."
+            </h2>
+<div class="space-y-4 font-body-md text-body-md text-on-surface-variant leading-relaxed">
+<p>
+                When I graduated with my BCA degree in 2018, colleges were still teaching outdated Turbo C++ and PHP 5.4. When I stepped into interviews at product startups, they asked for TypeScript, serverless functions, database indexing, and how I handled payment webhooks.
+              </p>
+<p>
+                I spent two years fumbling through scattered YouTube playlists and outdated documentation. DevAscent Academy is the exact accelerated blueprint I wished I had on Day 1: crisp, high-velocity, practical software engineering with no fluff.
+              </p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
+<div class="p-4 bg-surface-container-low rounded-xl">
+<p class="font-headline-sm text-headline-sm text-primary font-bold">1200+</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Code Reviews Performed</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl">
+<p class="font-headline-sm text-headline-sm text-primary font-bold">6+ Yrs</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Production Full-Stack Exp</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl col-span-2 sm:col-span-1">
+<p class="font-headline-sm text-headline-sm text-secondary font-bold">100%</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Direct Doubt Resolution</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Complete 6-Week Curriculum Roadmap -->
+<section class="w-full py-20 bg-background" id="curriculum">
+<div class="max-w-7xl mx-auto px-margin">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<span class="px-3.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">
+          ENGINEERING SYLLABUS
+        </span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-3">
+          The 6-Week Zero-to-Shipped Roadmap
+        </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-3">
+          Every single module is focused on writing code. You commit to GitHub on Day 1 and deploy to production by Week 6.
+        </p>
+</div>
+<!-- Curriculum Accordion Container -->
+<div class="max-w-4xl mx-auto space-y-4">
+<!-- Week 1 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<span class="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-bold">01</span>
+<div>
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">WEEK 1 • ARCHITECTURE</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">JavaScript Mastery &amp; Modern Async Architecture</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Event Loop, Promises, Async/Await internals, ESNext syntax, TypeScript strict mode, and building CLI tools from scratch.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-surface-container rounded text-on-surface">6 Live Hours</span>
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-surface-container rounded text-on-surface">2 Challenges</span>
+</div>
+</div>
+</div>
+<!-- Week 2 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<span class="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-bold">02</span>
+<div>
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">WEEK 2 • FRONTEND EVOLUTION</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Next.js 15 App Router &amp; Server Components</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">RSC mental models, Server Actions, streaming SSR with Suspense, routing cache, dynamic layouts, and zero-runtime TailwindCSS styling.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-surface-container rounded text-on-surface">8 Live Hours</span>
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-secondary-container text-on-secondary-container font-semibold rounded">Project 1 Shipped</span>
+</div>
+</div>
+</div>
+<!-- Week 3 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<span class="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-bold">03</span>
+<div>
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">WEEK 3 • PERSISTENCE &amp; DATA</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Database Design (PostgreSQL &amp; Prisma)</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Relational schema design, foreign keys, cascade rules, indexing for high-speed queries, database migrations, connection pooling via Neon/Supabase.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-surface-container rounded text-on-surface">6 Live Hours</span>
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-surface-container rounded text-on-surface">DB Benchmarking</span>
+</div>
+</div>
+</div>
+<!-- Week 4 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<span class="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-bold">04</span>
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase font-bold">WEEK 4 • FINTECH &amp; PAYMENTS</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Payment Gateway Integration with Razorpay (Webhooks, Orders, UPI)</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Creating order IDs, handling UPI QR codes, cryptographic signature validation, webhook retry logic, and preventing duplicate payment bugs.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-surface-container rounded text-on-surface">7 Live Hours</span>
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-secondary-container text-on-secondary-container font-semibold rounded">Project 2 Shipped</span>
+</div>
+</div>
+</div>
+<!-- Week 5 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<span class="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-bold">05</span>
+<div>
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">WEEK 5 • DEVOPS &amp; INFRA</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Deployment, CI/CD, Docker &amp; VPS Setup</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Dockerizing Next.js and Node microservices, multi-stage builds, reverse proxies with NGINX, SSL with Let's Encrypt, and automated GitHub Actions pipelines.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-surface-container rounded text-on-surface">6 Live Hours</span>
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-surface-container rounded text-on-surface">Cloud VPS Live</span>
+</div>
+</div>
+</div>
+<!-- Week 6 -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<span class="flex-shrink-0 w-10 h-10 rounded-xl bg-secondary text-on-secondary flex items-center justify-center font-bold">06</span>
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase font-bold">WEEK 6 • CAPSTONE &amp; PLACEMENT</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Capstone Project + Automated Certificate Generation &amp; Interview Prep</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Building the automated verifiable PDF certificate service, 1-on-1 resume review, GitHub profile overhaul, and mock technical interview simulator.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+<span class="font-label-sm text-label-sm px-2.5 py-1 bg-secondary-container text-on-secondary-container font-semibold rounded">Certified Dev</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Transparent Pricing Section -->
+<section class="w-full py-20 bg-surface-container-low" id="pricing">
+<div class="max-w-7xl mx-auto px-margin">
+<div class="max-w-4xl mx-auto">
+<!-- Main Highlight Pricing Card -->
+<div class="bg-surface-container-lowest rounded-3xl p-8 lg:p-12 shadow-xl relative overflow-hidden">
+<!-- Top Accent Bar -->
+<div class="absolute top-0 left-0 right-0 h-2 bg-primary"></div>
+<div class="flex flex-col lg:flex-row gap-10 items-start justify-between">
+<div class="flex-1">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold mb-4">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>EARLY BIRD LAUNCH PRICING</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+                DevAscent Full-Stack Accelerator Cohort #4
+              </h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3">
+                Immediate access to community Discord, live curriculum schedules, starter repos, and complete certification track upon enrollment.
+              </p>
+<!-- Inclusions Checkmarks -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-8">
+<div class="flex items-center gap-2.5 font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+<span>Lifetime course &amp; recording access</span>
+</div>
+<div class="flex items-center gap-2.5 font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+<span>Discord Private Community &amp; Mentors</span>
+</div>
+<div class="flex items-center gap-2.5 font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+<span>4 Capstone Projects with code reviews</span>
+</div>
+<div class="flex items-center gap-2.5 font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+<span>Official Verifiable Certificate (with QR)</span>
+</div>
+<div class="flex items-center gap-2.5 font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+<span>Resume &amp; GitHub Review by Arunodaya</span>
+</div>
+<div class="flex items-center gap-2.5 font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+<span>7-Day 100% No-Risk Money Back</span>
+</div>
+</div>
+</div>
+<!-- Price Column / Action Card -->
+<div class="w-full lg:w-80 bg-surface-container-low rounded-2xl p-6 flex flex-col items-center text-center">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">One-Time Fee</span>
+<div class="flex items-baseline justify-center gap-3 my-2">
+<span class="font-price-hero text-price-hero text-on-surface font-extrabold">₹1,499</span>
+<span class="font-headline-sm text-headline-sm text-on-surface-variant line-through opacity-60">₹4,999</span>
+</div>
+<p class="font-label-sm text-label-sm text-secondary font-semibold">Includes all GST &amp; platform fees</p>
+<a class="w-full mt-6 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md py-4 rounded-xl shadow-md transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+<span>Secure Checkout Now</span>
+</a>
+<p class="text-xs font-body-sm text-on-surface-variant mt-3">
+                7-Day 100% Money-Back Guarantee
+              </p>
+<!-- Payment Methods List -->
+<div class="mt-6 pt-6 w-full border-t border-surface-container-high flex flex-col items-center gap-2">
+<span class="text-[11px] font-label-sm text-on-surface-variant uppercase tracking-wider">Accepted Indian &amp; Global Payments</span>
+<div class="flex flex-wrap items-center justify-center gap-2 text-on-surface-variant">
+<span class="px-2 py-1 bg-surface-container-lowest rounded text-xs font-bold">UPI</span>
+<span class="px-2 py-1 bg-surface-container-lowest rounded text-xs font-bold">GPay</span>
+<span class="px-2 py-1 bg-surface-container-lowest rounded text-xs font-bold">PhonePe</span>
+<span class="px-2 py-1 bg-surface-container-lowest rounded text-xs font-bold">RuPay</span>
+<span class="px-2 py-1 bg-surface-container-lowest rounded text-xs font-bold">Cards</span>
+<span class="px-2 py-1 bg-surface-container-lowest rounded text-xs font-bold">EMI</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Razorpay Security Callout -->
+<div class="mt-8 pt-6 border-t border-surface-container flex flex-col sm:flex-row items-center justify-between gap-4 text-on-surface-variant">
+<div class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">verified_user</span>
+<span>Processed securely via Razorpay Payment Gateway. Your banking info never touches our servers.</span>
+</div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-surface-container text-xs font-mono font-semibold">
+<span>SSL 256-BIT ENCRYPTION</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive FAQ Accordion -->
+<section class="w-full py-20 bg-background" id="faq">
+<div class="max-w-4xl mx-auto px-margin">
+<div class="text-center mb-12">
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold">FREQUENTLY ASKED QUESTIONS</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-3">
+          Everything You Need to Know Before Enrolling
+        </h2>
+</div>
+<div class="space-y-4">
+<!-- FAQ 1 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+<details class="group">
+<summary class="flex items-center justify-between cursor-pointer list-none font-headline-sm text-headline-sm text-on-surface">
+<span>I only know basic C/Java or basic HTML/CSS from my BCA/B.Tech college. Is this for me?</span>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant mt-4 leading-relaxed">
+              Yes! Week 1 is specifically engineered to bridge the gap between basic college theoretical programming and modern modular JavaScript/TypeScript. As long as you understand basic concepts like variables and if/else conditions, our step-by-step framework will bring you up to production standards.
+            </p>
+</details>
+</div>
+<!-- FAQ 2 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+<details class="group">
+<summary class="flex items-center justify-between cursor-pointer list-none font-headline-sm text-headline-sm text-on-surface">
+<span>What if I miss a live session due to college exams or work?</span>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant mt-4 leading-relaxed">
+              All live workshops and Q&amp;A sessions are recorded in pristine 1080p and uploaded to your student portal within 2 hours of completion. You have lifetime access to rewatch sessions anytime, anywhere.
+            </p>
+</details>
+</div>
+<!-- FAQ 3 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+<details class="group">
+<summary class="flex items-center justify-between cursor-pointer list-none font-headline-sm text-headline-sm text-on-surface">
+<span>How does the 7-day refund guarantee work?</span>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant mt-4 leading-relaxed">
+              We stand 100% behind our curriculum quality. Attend Week 1, review the materials, and interact with the mentors. If you feel it's not the right accelerator for you, send a simple email to support@devascent.io within 7 days of cohort start for an instant 100% refund. No questions asked.
+            </p>
+</details>
+</div>
+<!-- FAQ 4 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-6">
+<details class="group">
+<summary class="flex items-center justify-between cursor-pointer list-none font-headline-sm text-headline-sm text-on-surface">
+<span>How does the verifiable certificate work?</span>
+<span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant mt-4 leading-relaxed">
+              Upon completing all 4 capstone assignments and passing code verification, you receive an industry credential with a unique hash. Recruiters or hiring managers can scan the embedded QR code or visit devascent.io/verify to view your exact grades, repository links, and certified skills directly.
+            </p>
+</details>
+</div>
+</div>
+</div>
+</section>
+<!-- Sticky Bottom Enrollment Bar for High Conversion -->
+<div class="sticky bottom-0 z-40 w-full bg-surface-container-lowest/95 backdrop-blur-md shadow-2xl py-3 px-margin">
+<div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex flex-col">
+<span class="font-label-sm text-label-sm text-primary font-bold">Cohort #4 Starts Monday</span>
+<span class="text-xs text-on-surface-variant">Only 9 seats left at ₹1,499</span>
+</div>
+<div class="sm:hidden flex flex-col">
+<span class="font-price-hero text-[22px] leading-tight font-extrabold text-on-surface">₹1,499</span>
+<span class="text-[10px] text-on-surface-variant line-through">₹4,999</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center gap-2 text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>7-Day 100% Money-Back Guarantee</span>
+</div>
+<a class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md px-6 py-2.5 rounded-lg shadow-sm transition-all" href="#pricing">
+<span>Enroll Now</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Free Preview Video Modal (Hidden by default) -->
+<div class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden" id="preview-modal">
+<div class="bg-surface-container-lowest rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative">
+<div class="flex items-center justify-between pb-4 mb-4 border-b border-surface-container">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Next.js 15 Server Components Preview</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Lecture 1.3: How RSC eliminated client waterfalls</p>
+</div>
+<button class="p-1 rounded-full hover:bg-surface-container-high transition-colors text-on-surface" onclick="document.getElementById('preview-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="relative w-full aspect-video rounded-xl bg-surface-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Screenshot of an informative video lecture showcasing Next.js 15 server component diagram with code editor on split screen and instructor video badge in corner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoTVD2y0hKKwfHvFNeNloT3pno2DEB2O6EJj64jjnyfflUy5cUjzmR10-DXjq-QFW33YhU5YsD0HV79QTdMJl_B_THt2YMsoLyA4FZxg_IYssv5IHsI3aLPBJ0-Bf4pvKUNzLJoOKZlYM1OnTFr5yOBPurUFcGJGwzV-oH3WChJdPJ2gU95Hoj5A5wEf-iAqkefyFX6bSjwc_iJf4hSIh0BYL_TUqhQmrgMqftl8-eW5MxPM6CWos"/>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+<div class="w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg cursor-pointer transform hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-xs font-mono text-on-surface-variant">Duration: 14 mins 42 secs</span>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#pricing" onclick="document.getElementById('preview-modal').classList.add('hidden')">
+          Unlock Full 42 Hours of Content →
+        </a>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-low text-on-surface"><div class="max-w-7xl mx-auto px-margin pt-space-2xl pb-space-xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-space-xl"><div class="lg:col-span-4 flex flex-col gap-space-md"><div class="flex items-center gap-space-sm"><img alt="DevAscent Academy Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><span class="font-headline-sm text-headline-sm text-on-surface">DevAscent Academy</span></div><p class="font-body-md text-body-md text-on-surface-variant">The high-impact engineering accelerator engineered specifically for aspiring Indian developers, career-switchers, and tech leaders.</p><div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-high w-fit"><span class="material-symbols-outlined text-secondary text-[18px]">verified</span><span class="font-label-sm text-label-sm text-on-surface font-medium">Made for Indian Developers &amp; Students (BCA / MCA / B.Tech / Self-Taught)</span></div></div><div class="lg:col-span-3 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Curriculum &amp; Track</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="curriculum" href="#">Full Syllabus Breakdown</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="certificate-demo" href="#">Verifiable Certificate Demo</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="pricing" href="#">Upcoming Cohort Schedule</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="faq" href="#">Curriculum FAQ</a></div></div><div class="lg:col-span-2 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Policies &amp; Trust</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="refund-policy" href="#">Refund Policy (7-day no questions)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="terms-of-service" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="privacy-policy" href="#">Privacy Policy</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="verify-certificate" href="#">Certificate Registry</a></div></div><div class="lg:col-span-3 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Student Support</span><p class="font-body-sm text-body-sm text-on-surface-variant">Have questions before enrolling? Our admissions mentors are available on WhatsApp and email.</p><div class="flex flex-col gap-space-xs"><a class="flex items-center gap-space-xs font-label-md text-label-md text-primary hover:text-on-primary-fixed transition-colors" href="mailto:support@devascent.io"><span class="material-symbols-outlined text-[18px]">mail</span>support@devascent.io</a><a class="flex items-center gap-space-xs font-label-md text-label-md text-secondary hover:text-on-secondary-fixed-variant transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">chat</span>WhatsApp Priority Support</a></div></div></div><div class="mt-space-xl pt-space-lg bg-surface-container rounded-xl p-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex flex-wrap items-center gap-space-md text-on-surface-variant"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">lock</span><span class="font-label-sm text-label-sm font-medium">Razorpay 256-bit SSL Encrypted Checkout</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">account_balance_wallet</span><span class="font-label-sm text-label-sm font-medium">UPI / RuPay / NetBanking Accepted</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">qr_code_2</span><span class="font-label-sm text-label-sm font-medium">Verifiable PDF Certificates with QR Verification</span></div></div><div class="font-body-sm text-body-sm text-on-surface-variant shrink-0">© 2025 DevAscent Academy. All rights reserved.</div></div></div></footer></body></html>

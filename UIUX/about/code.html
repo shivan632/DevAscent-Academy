@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>About DevAscent: Glass Bento &amp; Systems Dossier</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Subtle Animated Cyber Grid Background */
+    .grid-bg-cyber-enhanced {
+      background-size: 36px 36px;
+      background-image: 
+        linear-gradient(to right, rgba(79, 70, 229, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(79, 70, 229, 0.06) 1px, transparent 1px);
+      position: relative;
+    }
+
+    /* Ambient scanline sweep */
+    .scanline-overlay::before {
+      content: " ";
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 38, 0) 50%, rgba(0, 0, 0, 0.02) 50%);
+      background-size: 100% 4px;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Spotlight interactive cards */
+    .spotlight-card {
+      position: relative;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+      overflow: hidden;
+    }
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: inherit;
+      background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(79, 70, 229, 0.07), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .spotlight-card:hover::before {
+      opacity: 1;
+    }
+    .spotlight-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px -15px rgba(53, 37, 205, 0.12), 0 0 0 1px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Insignia Rotating Glowing HUD Ring */
+    @keyframes hudRotateClockwise {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes hudRotateCounter {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes insigniaPulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.55)) drop-shadow(0 0 35px rgba(79, 70, 229, 0.45)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 25px rgba(6, 182, 212, 0.85)) drop-shadow(0 0 50px rgba(79, 70, 229, 0.7)); transform: scale(1.03); }
+    }
+
+    .insignia-hud-ring-outer {
+      animation: hudRotateClockwise 24s linear infinite;
+    }
+    .insignia-hud-ring-inner {
+      animation: hudRotateCounter 16s linear infinite;
+    }
+    .insignia-core-glow {
+      animation: insigniaPulseGlow 4s ease-in-out infinite;
+    }
+
+    /* Glowing Pipeline Connector Flow */
+    @keyframes dataPipelineFlow {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+    .pipeline-pulse-stream {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      overflow: hidden;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .pipeline-pulse-stream::after {
+      content: '';
+      position: absolute;
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #06b6d4, #4f46e5, transparent);
+      animation: dataPipelineFlow 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    /* Terminal Blinking Cursor */
+    @keyframes terminalCursor {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    .terminal-cursor-blink {
+      animation: terminalCursor 0.9s infinite;
+    }
+
+    /* Button Shimmer */
+    @keyframes shimmerMove {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .btn-shimmer {
+      background-size: 200% auto;
+      transition: all 0.3s ease;
+    }
+    .btn-shimmer:hover {
+      background-position: right center;
+    }
+
+    /* Ambient Pulsing Glow */
+    @keyframes ambientBreath {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.75; transform: scale(1.08); }
+    }
+    .ambient-glow-breath {
+      animation: ambientBreath 6s ease-in-out infinite;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-variant": "#d3e4fe",
+            "on-surface-variant": "#464555",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed": "#002113",
+            "tertiary": "#454854",
+            "secondary": "#006c49",
+            "surface-tint": "#4d44e3",
+            "on-surface": "#0b1c30",
+            "primary-fixed": "#e2dfff",
+            "error": "#ba1a1a",
+            "inverse-surface": "#213145",
+            "surface-container-highest": "#d3e4fe",
+            "tertiary-container": "#5c606c",
+            "background": "#f8f9ff",
+            "on-error-container": "#93000a",
+            "primary-container": "#4f46e5",
+            "inverse-on-surface": "#eaf1ff",
+            "surface-container-high": "#dce9ff",
+            "secondary-fixed": "#6ffbbe",
+            "on-secondary-fixed-variant": "#005236",
+            "secondary-fixed-dim": "#4edea3",
+            "on-tertiary-fixed": "#171b26",
+            "outline-variant": "#c7c4d8",
+            "surface-dim": "#cbdbf5",
+            "surface-container": "#e5eeff",
+            "surface": "#f8f9ff",
+            "tertiary-fixed": "#dfe2f1",
+            "on-primary-fixed": "#0f0069",
+            "primary": "#3525cd",
+            "secondary-container": "#6cf8bb",
+            "surface-container-low": "#eff4ff",
+            "on-tertiary-container": "#d8dbea",
+            "tertiary-fixed-dim": "#c3c6d4",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#00714d",
+            "primary-fixed-dim": "#c3c0ff",
+            "inverse-primary": "#c3c0ff",
+            "on-tertiary-fixed-variant": "#434652",
+            "on-primary-fixed-variant": "#3323cc",
+            "on-primary-container": "#dad7ff",
+            "surface-bright": "#f8f9ff",
+            "on-primary": "#ffffff",
+            "error-container": "#ffdad6",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#0b1c30",
+            "on-error": "#ffffff",
+            "outline": "#777587"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "3xl": "1.5rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "gutter-sm": "1rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-2xl": "4rem",
+            "space-xl": "2.5rem",
+            "margin-sm": "1rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "margin": "2rem"
+          },
+          fontFamily: {
+            "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "display-hero-mobile": ["Plus Jakarta Sans", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "display-hero": ["Plus Jakarta Sans", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "price-hero": ["Plus Jakarta Sans", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "headline-lg-mobile": ["Plus Jakarta Sans", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"]
+          },
+          fontSize: {
+            "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+            "display-hero-mobile": ["36px", { lineHeight: "44px", fontWeight: "800" }],
+            "label-md": ["14px", { lineHeight: "20px", fontWeight: "600" }],
+            "display-hero": ["56px", { lineHeight: "64px", fontWeight: "800" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "price-hero": ["48px", { lineHeight: "52px", fontWeight: "800" }],
+            "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "headline-lg": ["40px", { lineHeight: "48px", fontWeight: "700" }],
+            "headline-md": ["28px", { lineHeight: "36px", fontWeight: "600" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "700" }],
+            "label-sm": ["12px", { lineHeight: "16px", fontWeight: "600" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary selection:text-on-primary scanline-overlay">
+<!-- PERSISTENT TOP HEADER -->
+<header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-surface-container-high/60 shadow-[0_1px_10px_rgba(11,28,48,0.03)]">
+<div class="h-20 max-w-7xl mx-auto px-margin flex items-center justify-between gap-gutter">
+<!-- Logo & Title with Custom Insignia Emblem -->
+<div class="flex items-center gap-space-md shrink-0">
+<a class="flex items-center gap-space-sm group" data-path="about" href="#">
+<div class="relative w-9 h-9 flex items-center justify-center p-0.5 rounded-lg bg-[#0b1324] border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.3)] transition-transform group-hover:scale-105">
+<img alt="DevAscent Emblem" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSVxEh8omLbc4s4y5Gd9kFXVAbi9EOUVECk4arbZNe4b0C10kZx7r7-_TDMmRHFmHX9VowLGVaixbnbDs3TToO29CMEoIEs8tOsdVQh0E0TeRWAOTow0qp_hVCs1KpfErCV_EnX3n97JbVNgipwB1n1gC8cdaRiv1irLLiCZ7KHu-1LS2rkQ7lTGepYVA1f4x6gYne0nFgww35Lsq8Hp5aIMBN0SUvTvX-7B_wouV73rxsxYCIcXdTDU7egjXJDHP3"/>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">DevAscent Academy</span>
+</a>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden xl:flex items-center gap-space-xs" data-active-classes="bg-primary-container text-on-primary font-label-md text-label-md px-space-md py-space-xs rounded-lg">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary px-space-sm py-space-xs rounded-lg transition-colors" data-path="courses" href="#">Courses</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary px-space-sm py-space-xs rounded-lg transition-colors" data-path="curriculum" href="#">Curriculum</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary px-space-sm py-space-xs rounded-lg transition-colors" data-path="ai-studio" href="#">AI Studio</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary px-space-sm py-space-xs rounded-lg transition-colors" data-path="roadmaps" href="#">Roadmaps</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary px-space-sm py-space-xs rounded-lg transition-colors" data-path="analytics" href="#">Analytics</a>
+<a aria-current="page" class="transition-all bg-primary text-on-primary shadow-sm font-label-md text-label-md px-space-md py-space-xs rounded-lg" data-path="about" href="#">About</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary px-space-sm py-space-xs rounded-lg transition-colors" data-path="community" href="#">Community</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary px-space-sm py-space-xs rounded-lg transition-colors" data-path="faq" href="#">FAQ</a>
+</nav>
+<!-- Right Actions: Cohort Status & Shivan Insignia Avatar Micro-Pill -->
+<div class="flex items-center gap-space-md shrink-0">
+<div class="hidden md:flex items-center gap-space-xs bg-secondary-container/40 border border-secondary/20 px-3 py-1.5 rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+<span class="font-label-sm text-label-sm text-secondary font-bold tracking-tight">Batch #04 Enrolling</span>
+</div>
+<button aria-label="Toggle color mode" class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">light_mode</span>
+</button>
+<div class="flex items-center gap-space-sm pl-space-xs border-l border-outline-variant/30">
+<div class="relative p-1 rounded-full bg-slate-950 border border-cyan-400/40 shadow-[0_0_10px_rgba(6,182,212,0.35)]">
+<img alt="Shivan Mishra Emblem Avatar" class="w-7 h-7 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkUDqG7ILM8hMCVNoW681yQwgutCmN_uwMjkGrw4HNjdXABRLir0zkArZ16y0wgXvCUdcGmJuL2LmOSYIFVlDCOHPvU94HHwr-KchPhEnwG1OPPUDDbf-ePxxxXggQSZtZ33mQiAC-OQzWIhIq96yeXv7SRb358B0_74weODB-O-O_sS3rmykUaRlt1o03yWuUkbZhy9DJwmhmVyYWgIb76MS73F-NVaACE1dJI-X5dFduQVtYiUC-RLaBuDCSewCz"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-secondary ring-2 ring-white"></span>
+</div>
+<div class="hidden lg:flex flex-col text-left">
+<span class="font-label-sm text-label-sm text-on-surface font-bold leading-tight">Shivan Mishra</span>
+<span class="font-label-sm text-label-sm text-primary font-semibold text-[11px] leading-tight">Founder</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN VIEWPORT -->
+<main class="w-full pt-20 bg-surface min-h-screen">
+<!-- 1. HERO SECTION: CYBER-EDITORIAL SYSTEM DOSSIER -->
+<section class="relative w-full overflow-hidden bg-gradient-to-b from-surface-container-low via-surface to-surface-container-lowest grid-bg-cyber-enhanced pt-space-lg pb-space-2xl border-b border-surface-container">
+<!-- Glowing Radial Ambient Flares -->
+<div class="absolute -top-32 -right-20 w-[550px] h-[550px] rounded-full bg-primary-fixed/50 blur-3xl pointer-events-none ambient-glow-breath"></div>
+<div class="absolute top-48 -left-32 w-[480px] h-[480px] rounded-full bg-cyan-400/20 blur-3xl pointer-events-none ambient-glow-breath" style="animation-delay: -3s;"></div>
+<div class="max-w-7xl mx-auto px-margin relative z-10">
+<!-- Breadcrumb & Top System Flag -->
+<div class="flex flex-wrap items-center justify-between gap-space-md mb-space-lg">
+<div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+<a class="hover:text-primary transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span>DevAscent OS</span>
+</a>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface font-semibold">Systems Dossier &amp; Founder Origin</span>
+</div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-lowest/90 border border-primary/20 backdrop-blur-md text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-primary text-[17px]">hub</span>
+<span class="font-label-sm text-label-sm font-bold tracking-wide">Arch: High-Throughput Mentorship Engine</span>
+</div>
+</div>
+<!-- Hero Headline & Core Directive -->
+<div class="max-w-4xl mb-space-lg">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-fixed text-primary font-mono-code text-[12px] font-bold mb-space-md border border-primary/20 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span>SYSTEM_MISSION: PRODUCTION_READY_2025</span>
+</div>
+<h1 class="font-display-hero text-headline-lg md:text-display-hero text-on-surface tracking-tight leading-[1.08] mb-space-md font-extrabold">
+            Crafting Distributed Systems Engineers, <span class="bg-gradient-to-r from-primary via-indigo-600 to-cyan-600 bg-clip-text text-transparent">Not Tutorial Watchers.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed max-w-3xl">
+            Conceived by <strong class="text-on-surface font-semibold">Shivan Mishra</strong> (Founder &amp; Principal Systems Architect) to dismantle the engineering syllabus deficit. We replace 20-year-old classroom theory with real distributed backends, live Redis cache locks, microservices, and cryptographic capstone proofs.
+          </p>
+</div>
+<!-- Live Engineering Telemetry Strip with Fluctuating Telemetry -->
+<div class="mb-space-xl p-space-sm sm:px-space-md bg-surface-container-lowest/95 backdrop-blur-xl border border-surface-container-high rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-y-3 gap-x-6 text-on-surface-variant font-mono-code text-xs">
+<div class="flex items-center gap-2">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+</span>
+<span class="font-semibold text-on-surface">CLUSTER_STATUS: ONLINE</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-cyan-600 text-[15px]">speed</span>
+<span>PING: <strong class="text-on-surface" id="live-ping-val">21ms</strong> [AWS ap-south-1 Mumbai]</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[15px]">dns</span>
+<span>NODES: <strong class="text-on-surface">14 Active Edge Relays</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[15px]">verified_user</span>
+<span>UPTIME: <strong class="text-secondary font-bold">99.99%</strong> (Verified Registry)</span>
+</div>
+<div class="hidden xl:flex items-center gap-1.5 text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+<span>SLO: 100% LIVE CODE COMMIT REQUIREMENT</span>
+</div>
+</div>
+<!-- BENTO GRID HERO (3 Key Modular Cards) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
+<!-- Card 1: Founder / Operator Identity Bento Card (NO Human Face: Insignia Emblem & Cyber HUD) -->
+<div class="lg:col-span-5 spotlight-card bg-surface-container-lowest rounded-2xl border border-surface-container-high p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden">
+<!-- Background Cyber Aura -->
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="relative z-10">
+<!-- Header tag with Operator Key and Status -->
+<div class="flex items-center justify-between pb-space-sm mb-space-md border-b border-surface-container">
+<span class="font-mono-code text-[11px] text-on-surface-variant tracking-wider uppercase flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  OPERATOR_KEY: SHIVAN_MISHRA
+                </span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-mono-code text-[10px] text-primary font-bold tracking-wide border border-primary/20">STAFF ARCH</span>
+</div>
+<!-- Cybernetic Insignia Showcase Arena -->
+<div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-gradient-to-b from-[#090e1c] via-[#0d162a] to-[#080d19] mb-space-md flex items-center justify-center border border-slate-800/80 shadow-inner group">
+<!-- Outer Rotating HUD Ring -->
+<div class="absolute w-56 h-56 rounded-full border border-dashed border-cyan-500/30 insignia-hud-ring-outer pointer-events-none"></div>
+<!-- Inner Geometric HUD Ring with Markers -->
+<div class="absolute w-44 h-44 rounded-full border border-indigo-500/30 border-t-cyan-400 insignia-hud-ring-inner pointer-events-none"></div>
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(6,182,212,0.15),_transparent_70%)] pointer-events-none"></div>
+<!-- Insignia Emblem Image -->
+<div class="relative z-10 p-2 insignia-core-glow max-w-[200px] flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
+<img alt="Shivan Mishra Official Insignia" class="w-full h-auto object-contain max-h-[170px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjcBydQ4_2p_atJGGhv-is2Dv0wrfvWSj8-wSPVAKirf9AxQ9nTd1WDHkyYYVQO7DchjNlkOInuAsPfeKL2F8L1pNjNpLGZM1TgXwk_kMsikhk805ijmhxZ__GocBELvxA_jpdm0e3vOv5do6Vpd0rv1zFeNyx8UlMYVgSDIDB3_ebNRxdeqrtqD2FUCgBJYzJJrGCNek70IJE3KZLXVXtOmue5m28NqbYTSMqjWB55wuSdYs9Dc6B964B56YTz2GL"/>
+</div>
+<!-- Floating Holographic Badge -->
+<div class="absolute top-3 right-3 bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-cyan-500/40 shadow-lg flex items-center gap-1.5">
+<span class="material-symbols-outlined text-cyan-400 text-[16px]">token</span>
+<span class="font-mono-code text-[10px] text-cyan-200 font-bold tracking-wider">SECURE_SIG</span>
+</div>
+<!-- Bottom Cryptographic Status Badge -->
+<div class="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur-md py-2 px-3 rounded-xl shadow-md flex items-center justify-between border border-slate-700/60">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+<span class="font-mono-code text-[11px] font-semibold text-slate-200">ARCHITECT CREDENTIALS // VERIFIED</span>
+</div>
+<span class="material-symbols-outlined text-cyan-400 text-[16px]">verified</span>
+</div>
+</div>
+<!-- Identity & Architectural Credentials -->
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">Shivan Mishra</h3>
+<span class="material-symbols-outlined text-primary text-[20px]" title="Verified Founder">verified</span>
+</div>
+<p class="font-label-md text-label-md text-primary font-medium">Founder &amp; Principal Systems Architect</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant pt-1 leading-relaxed">
+                  Direct head of engineering and curriculum design. Previously architected mission-critical high-frequency transaction engines, low-latency queues, and distributed consensus streaming platforms.
+                </p>
+</div>
+</div>
+<!-- Social Links & SHA PGP Fingerprint -->
+<div class="mt-space-md pt-space-sm border-t border-surface-container space-y-space-sm relative z-10">
+<div class="grid grid-cols-4 gap-2">
+<a class="py-2 px-2 rounded-lg bg-surface-container-low hover:bg-primary-fixed hover:text-primary text-center font-label-sm text-[12px] font-semibold flex items-center justify-center gap-1 transition-colors" href="#">
+<span class="material-symbols-outlined text-[15px]">code</span>
+<span>Git</span>
+</a>
+<a class="py-2 px-2 rounded-lg bg-surface-container-low hover:bg-primary-fixed hover:text-primary text-center font-label-sm text-[12px] font-semibold flex items-center justify-center gap-1 transition-colors" href="#">
+<span class="material-symbols-outlined text-[15px]">share</span>
+<span>LinkedIn</span>
+</a>
+<a class="py-2 px-2 rounded-lg bg-surface-container-low hover:bg-primary-fixed hover:text-primary text-center font-label-sm text-[12px] font-semibold flex items-center justify-center gap-1 transition-colors" href="#">
+<span class="material-symbols-outlined text-[15px]">tag</span>
+<span>Twitter</span>
+</a>
+<a class="py-2 px-2 rounded-lg bg-surface-container-low hover:bg-secondary-container hover:text-secondary text-center font-label-sm text-[12px] font-semibold flex items-center justify-center gap-1 transition-colors" href="#">
+<span class="material-symbols-outlined text-[15px]">calendar_month</span>
+<span>1:1</span>
+</a>
+</div>
+<div class="bg-surface-container-low px-3 py-2 rounded-lg flex items-center justify-between font-mono-code text-[11px] text-tertiary">
+<span>PGP: 7F9A 41BC 88E1 2940</span>
+<span class="text-secondary font-bold">RSA 4096 / VERIFIED</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Interactive Terminal Window (shivan_manifesto.sh) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<div class="spotlight-card bg-[#0c1322] text-slate-200 rounded-2xl p-space-lg shadow-xl border border-slate-800 flex-1 flex flex-col justify-between overflow-hidden relative">
+<!-- Window Top Bar with Interactive Tabs & OS Dots -->
+<div>
+<div class="flex items-center justify-between pb-space-sm border-b border-slate-800">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-red-500/80 inline-block shadow-sm"></span>
+<span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block shadow-sm"></span>
+<span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block shadow-sm"></span>
+<!-- Tabs -->
+<div class="ml-3 flex items-center gap-1.5">
+<button class="flex items-center gap-1.5 px-3 py-1 rounded bg-slate-900 border border-slate-700 text-xs font-mono-code text-cyan-300 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+<span>shivan_manifesto.sh</span>
+</button>
+<button class="hidden sm:flex items-center gap-1 px-3 py-1 rounded bg-slate-950/60 border border-transparent hover:border-slate-800 text-xs font-mono-code text-slate-400 transition-colors" type="button">
+<span>pipeline_slo.yaml</span>
+</button>
+</div>
+</div>
+<!-- Status Execution Tag -->
+<div class="flex items-center gap-2 text-xs font-mono-code">
+<span class="px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 text-[11px] font-bold flex items-center gap-1.5 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                      [STATUS: COMPILED &amp; ACTIVE]
+                    </span>
+</div>
+</div>
+<!-- Code / Statement Body with Neon Typographic Accents -->
+<div class="py-space-md font-mono-code text-sm leading-relaxed space-y-3">
+<div class="text-slate-400 flex items-start gap-3">
+<span class="text-slate-600 select-none text-xs">01</span>
+<span class="text-cyan-400">#!/usr/bin/env devascent_engine</span>
+</div>
+<div class="text-slate-400 flex items-start gap-3">
+<span class="text-slate-600 select-none text-xs">02</span>
+<span><span class="text-purple-400">export</span> TARGET_STANDARD=<span class="text-emerald-300">"Production_Staff_Level"</span></span>
+</div>
+<div class="text-slate-300 flex items-start gap-3 bg-slate-900/80 p-3 rounded-xl border-l-2 border-cyan-400 shadow-md">
+<span class="text-slate-600 select-none text-xs">03</span>
+<p class="text-slate-200">
+<span class="text-amber-300 font-bold">echo</span> <span class="text-emerald-300">"Why DevAscent was born: standard college curricula teach 20-year-old C++ while production demands Redis, Kafka, and idempotent microservices."</span>
+</p>
+</div>
+<div class="text-slate-400 flex items-start gap-3">
+<span class="text-slate-600 select-none text-xs">04</span>
+<span class="text-slate-300">
+                      We treat Indian software engineers with intellectual dignity. No passive 60-hour video bingeing. Day one starts with Git rebases, schema indexing, idempotency keys, and handling Razorpay webhooks under simulated network partitions.
+                    </span>
+</div>
+<div class="text-slate-400 flex items-start gap-3">
+<span class="text-slate-600 select-none text-xs">05</span>
+<span class="text-cyan-400 flex items-center gap-1">
+<span>&gt; shivan.execute_credo()</span>
+<span class="inline-block w-2.5 h-4 bg-cyan-400 terminal-cursor-blink ml-1"></span>
+</span>
+</div>
+</div>
+</div>
+<!-- Bottom Terminal Quick Guarantee -->
+<div class="pt-space-sm border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono-code text-slate-400">
+<div class="flex items-center gap-2">
+<span class="text-emerald-400 font-bold">✓</span>
+<span>100% Live Containerized Code Reviews</span>
+</div>
+<div class="text-cyan-300 flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">verified</span>
+<span>SHA-256 Diplomas</span>
+</div>
+</div>
+</div>
+<!-- Card 3: 4 Metric Counters with Glowing Progress Telemetry -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm">
+<!-- Metric 1 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-mono-code text-[11px] text-on-surface-variant font-bold">MENTORED</span>
+<span class="material-symbols-outlined text-primary text-[18px]">group</span>
+</div>
+<div class="font-headline-md text-headline-md font-bold text-on-surface">1,200+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-1000" style="width: 88%"></div>
+</div>
+<span class="text-[11px] text-on-surface-variant mt-1 block font-mono-code">Tier-1, 2 &amp; 3 grads</span>
+</div>
+<!-- Metric 2 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-mono-code text-[11px] text-secondary font-bold">DEFENSE RATE</span>
+<span class="material-symbols-outlined text-secondary text-[18px]">shield_with_heart</span>
+</div>
+<div class="font-headline-md text-headline-md font-bold text-secondary">94.8%</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-secondary h-full rounded-full transition-all duration-1000" style="width: 94.8%"></div>
+</div>
+<span class="text-[11px] text-on-surface-variant mt-1 block font-mono-code">Staff architect audit</span>
+</div>
+<!-- Metric 3 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-mono-code text-[11px] text-on-surface-variant font-bold">AVG CTC</span>
+<span class="material-symbols-outlined text-tertiary text-[18px]">payments</span>
+</div>
+<div class="font-headline-md text-headline-md font-bold text-on-surface">₹18.4L</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-tertiary h-full rounded-full transition-all duration-1000" style="width: 82%"></div>
+</div>
+<span class="text-[11px] text-on-surface-variant mt-1 block font-mono-code">Full-stack &amp; platform</span>
+</div>
+<!-- Metric 4 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-mono-code text-[11px] text-primary font-bold">TRUST SCORE</span>
+<span class="material-symbols-outlined text-primary text-[18px]">grade</span>
+</div>
+<div class="font-headline-md text-headline-md font-bold text-on-surface">4.9<span class="text-sm font-normal text-on-surface-variant">/5</span></div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-primary-container h-full rounded-full transition-all duration-1000" style="width: 98%"></div>
+</div>
+<span class="text-[11px] text-on-surface-variant mt-1 block font-mono-code">800+ audited reviews</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. INTERACTIVE SYSTEMS BLUEPRINT & PEDAGOGICAL PIPELINE -->
+<section class="max-w-7xl mx-auto px-margin py-space-2xl w-full">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-space-xl gap-space-md">
+<div>
+<div class="inline-flex items-center gap-1.5 text-primary font-mono-code text-xs font-bold uppercase tracking-wider mb-1">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span>PEDAGOGICAL_ARCHITECTURE_V4</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">
+            Interactive Systems Blueprint
+          </h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg">
+          Unlike rote video sites, our curriculum functions as a continuous deployment pipeline. Hover over each node to inspect technical benchmarks.
+        </p>
+</div>
+<!-- Horizontal Pipeline Grid with Animated Connector -->
+<div class="relative">
+<!-- Connecting Glowing Data Stream (Desktop) -->
+<div class="hidden lg:block pipeline-pulse-stream"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter relative z-10">
+<!-- Stage 01 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-surface-container-high shadow-sm flex flex-col justify-between group">
+<div class="absolute top-0 left-6 right-6 h-1 bg-primary/20 rounded-full group-hover:bg-primary group-hover:shadow-[0_0_12px_rgba(79,70,229,0.5)] transition-all"></div>
+<div>
+<div class="flex items-center justify-between mb-space-md pt-2">
+<span class="font-mono-code text-xs font-bold text-primary px-2.5 py-1 rounded bg-primary-fixed">STAGE 01</span>
+<span class="material-symbols-outlined text-primary text-[24px] group-hover:scale-110 transition-transform">terminal</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 font-bold group-hover:text-primary transition-colors">Systems Foundation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+                Low-level OS memory abstractions, async event loops, Git rebase governance, and clean RESTful API schemas under strict linting.
+              </p>
+</div>
+<div class="pt-space-sm border-t border-surface-container font-mono-code text-[11px] text-tertiary flex items-center justify-between">
+<span>BENCHMARK</span>
+<span class="text-on-surface font-semibold group-hover:text-primary transition-colors">&lt; 5ms Node I/O</span>
+</div>
+</div>
+<!-- Stage 02 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-surface-container-high shadow-sm flex flex-col justify-between group">
+<div class="absolute top-0 left-6 right-6 h-1 bg-secondary/20 rounded-full group-hover:bg-secondary group-hover:shadow-[0_0_12px_rgba(0,108,73,0.5)] transition-all"></div>
+<div>
+<div class="flex items-center justify-between mb-space-md pt-2">
+<span class="font-mono-code text-xs font-bold text-secondary px-2.5 py-1 rounded bg-secondary-container">STAGE 02</span>
+<span class="material-symbols-outlined text-secondary text-[24px] group-hover:scale-110 transition-transform">sync_alt</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 font-bold group-hover:text-secondary transition-colors">Microservices &amp; Webhooks</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+                Handling live payment gateways with idempotent keys, outbox patterns, transactional integrity, and fault-tolerant Razorpay workers.
+              </p>
+</div>
+<div class="pt-space-sm border-t border-surface-container font-mono-code text-[11px] text-tertiary flex items-center justify-between">
+<span>GUARANTEE</span>
+<span class="text-secondary font-semibold">Zero Replay Errors</span>
+</div>
+</div>
+<!-- Stage 03 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-surface-container-high shadow-sm flex flex-col justify-between group">
+<div class="absolute top-0 left-6 right-6 h-1 bg-primary/20 rounded-full group-hover:bg-primary group-hover:shadow-[0_0_12px_rgba(79,70,229,0.5)] transition-all"></div>
+<div>
+<div class="flex items-center justify-between mb-space-md pt-2">
+<span class="font-mono-code text-xs font-bold text-primary px-2.5 py-1 rounded bg-primary-fixed">STAGE 03</span>
+<span class="material-symbols-outlined text-primary text-[24px] group-hover:scale-110 transition-transform">speed</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 font-bold group-hover:text-primary transition-colors">Concurrency &amp; Redis</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+                Distributed locks with Redlock, pub/sub streaming with Kafka clusters, write-through caching layers, and Postgres index tuning.
+              </p>
+</div>
+<div class="pt-space-sm border-t border-surface-container font-mono-code text-[11px] text-tertiary flex items-center justify-between">
+<span>STRESS TEST</span>
+<span class="text-primary font-semibold">10,000 req / sec</span>
+</div>
+</div>
+<!-- Stage 04 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-surface-container-high shadow-sm flex flex-col justify-between group">
+<div class="absolute top-0 left-6 right-6 h-1 bg-secondary/20 rounded-full group-hover:bg-secondary group-hover:shadow-[0_0_12px_rgba(0,108,73,0.5)] transition-all"></div>
+<div>
+<div class="flex items-center justify-between mb-space-md pt-2">
+<span class="font-mono-code text-xs font-bold text-secondary px-2.5 py-1 rounded bg-secondary-container">STAGE 04</span>
+<span class="material-symbols-outlined text-secondary text-[24px] group-hover:scale-110 transition-transform">gavel</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 font-bold group-hover:text-secondary transition-colors">Live Capstone Defense</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+                Real 45-minute architectural defense in front of Staff Platform Engineers and Shivan Mishra before SHA-256 certificate issuance.
+              </p>
+</div>
+<div class="pt-space-sm border-t border-surface-container font-mono-code text-[11px] text-tertiary flex items-center justify-between">
+<span>ACCREDITATION</span>
+<span class="text-secondary font-semibold">Cryptographic Hash</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. GUIDING PRINCIPLES BENTO MATRIX -->
+<section class="bg-surface-container-low py-space-2xl w-full border-y border-surface-container">
+<div class="max-w-7xl mx-auto px-margin">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-space-xl gap-space-md">
+<div>
+<span class="font-mono-code text-xs font-bold text-primary tracking-widest uppercase mb-1 block">FOUNDATIONAL_CONVICTIONS</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">Guiding Principles Matrix</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+            Architected to protect student time, maximize compounding skills, and instill uncompromising craftsmanship.
+          </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Bento 01: Production-Grade or Nothing (7 cols) -->
+<div class="md:col-span-7 spotlight-card bg-surface-container-lowest p-space-xl rounded-2xl border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[26px]">memory</span>
+</div>
+<span class="font-mono-code text-xs text-on-surface-variant px-2.5 py-1 rounded bg-surface-container">PILLAR_01</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-space-sm">Production-Grade or Nothing</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-space-md">
+                We don't tolerate toy Todo lists. Every student writes production code deployed to real cloud clusters: full multi-tenancy, zero-downtime migrations, automated unit test suites, and system telemetry monitors.
+              </p>
+<!-- Mock Terminal Snippet -->
+<div class="bg-surface-container-low p-space-sm rounded-xl font-mono-code text-xs text-on-surface space-y-1 border border-surface-container">
+<div class="text-tertiary flex items-center gap-2">
+<span class="text-primary font-bold">❯</span>
+<span>devascent deploy --tenant=enterprise_09 --env=production</span>
+</div>
+<div class="text-secondary pl-4 font-semibold">✔ CI/CD Checks Passed (32/32 tests green)</div>
+<div class="text-on-surface-variant pl-4">✔ Postgres Index Latency: 0.8ms | Redis Lock: Active</div>
+</div>
+</div>
+<div class="mt-space-md pt-space-md border-t border-surface-container flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs font-semibold">Zero Toy Projects</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs font-semibold">Real Concurrency</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs font-semibold">CI/CD Pipelines</span>
+</div>
+</div>
+<!-- Bento 02: Cryptographic Transparency (5 cols) -->
+<div class="md:col-span-5 spotlight-card bg-surface-container-lowest p-space-xl rounded-2xl border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-secondary-container text-secondary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[26px]">verified</span>
+</div>
+<span class="font-mono-code text-xs text-secondary px-2.5 py-1 rounded bg-secondary-container/40">PILLAR_02</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-space-sm">Cryptographic Transparency</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-space-md">
+                Unconditional 7-day refund guarantee. No lock-in, no hidden small print. Every graduate's project defense is publicly auditable on our SHA-256 certificate registry.
+              </p>
+<!-- Mini Registry Certificate Badge -->
+<div class="p-space-sm rounded-xl bg-secondary-container/20 border border-secondary/30 flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-[28px]">qr_code_2</span>
+<div class="overflow-hidden">
+<div class="font-mono-code text-xs font-bold text-secondary">REGISTRY: VERIFIED</div>
+<div class="font-mono-code text-[11px] text-on-surface-variant truncate">HASH: 4e91...b820a1f</div>
+</div>
+</div>
+</div>
+<div class="mt-space-md pt-space-md border-t border-surface-container flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container font-label-sm text-xs font-semibold">7-Day Refund</span>
+<span class="px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container font-label-sm text-xs font-semibold">Public Hash Registry</span>
+</div>
+</div>
+<!-- Bento 03: AI-Accelerated Pedagogy (5 cols) -->
+<div class="md:col-span-5 spotlight-card bg-surface-container-lowest p-space-xl rounded-2xl border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[26px]">smart_toy</span>
+</div>
+<span class="font-mono-code text-xs text-primary px-2.5 py-1 rounded bg-primary-fixed">PILLAR_03</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-space-sm">AI-Accelerated Pedagogy</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-space-md">
+                Automated AST code critiques directly in GitHub PRs, Whisper voice synthesis audio recaps for each architecture clinic, and adaptive roadmap routing built natively for engineers.
+              </p>
+<div class="p-3 bg-surface-container-low rounded-xl font-mono-code text-xs flex items-center justify-between text-on-surface border border-surface-container">
+<span>PR REVIEW TIME</span>
+<span class="text-primary font-bold">&lt; 4 Minutes Avg</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-md border-t border-surface-container flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs font-semibold">Whisper Audio Engine</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs font-semibold">AST Syntax Lint</span>
+</div>
+</div>
+<!-- Bento 04: Student-First Economics (7 cols) -->
+<div class="md:col-span-7 spotlight-card bg-surface-container-lowest p-space-xl rounded-2xl border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-tertiary text-on-tertiary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[26px]">currency_rupee</span>
+</div>
+<span class="font-mono-code text-xs text-on-surface px-2.5 py-1 rounded bg-surface-container">PILLAR_04</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-space-sm">Student-First Economics</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-space-md">
+                We reject the exploitative ₹3,00,000 ISA loan racket that traps graduates. DevAscent is priced transparently at ₹1,499 with instant UPI and no-cost EMI. World-class mentorship should be democratic, honest, and accessible to builders in every corner of India.
+              </p>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+<div class="p-3 rounded-lg bg-surface-container-low border border-surface-container text-center">
+<div class="font-mono-code text-base font-bold text-on-surface">₹1,499</div>
+<div class="text-[11px] text-on-surface-variant">All-Inclusive Fee</div>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-low border border-surface-container text-center">
+<div class="font-mono-code text-base font-bold text-secondary">0 Hidden</div>
+<div class="text-[11px] text-on-surface-variant">No Surprise Costs</div>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-low border border-surface-container text-center">
+<div class="font-mono-code text-base font-bold text-primary">₹0 Debt</div>
+<div class="text-[11px] text-on-surface-variant">Zero Predatory Loans</div>
+</div>
+</div>
+</div>
+<div class="mt-space-md pt-space-md border-t border-surface-container flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs font-semibold">No-Cost EMI</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs font-semibold">Instant UPI</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs font-semibold">Democratized Access</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. TIMELINE: THE DEVASCENT EVOLUTION -->
+<section class="max-w-7xl mx-auto px-margin py-space-2xl w-full">
+<div class="text-center max-w-2xl mx-auto mb-space-2xl">
+<div class="inline-flex items-center gap-1.5 text-primary font-mono-code text-xs font-bold uppercase tracking-widest mb-1">
+<span class="material-symbols-outlined text-[16px]">history_edu</span>
+<span>CHRONOLOGY_LOG</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">Origin Story &amp; Growth Milestones</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">
+          From a weekend Discord system teardown room to India’s most rigorous modern engineering academy.
+        </p>
+</div>
+<div class="relative max-w-4xl mx-auto">
+<!-- Vertical connector line with subtle glow -->
+<div class="absolute top-4 bottom-4 left-6 md:left-1/3 w-0.5 bg-gradient-to-b from-primary via-secondary to-cyan-500 opacity-40"></div>
+<!-- 2023 -->
+<div class="flex flex-col md:flex-row gap-space-md mb-space-xl relative group">
+<div class="md:w-1/3 flex flex-col md:items-end pl-12 md:pl-0">
+<span class="px-3 py-1 rounded-full bg-primary-fixed text-primary font-mono-code text-sm font-bold inline-block shadow-sm">2023</span>
+<span class="font-label-md text-label-md text-on-surface-variant mt-1 font-semibold">The Prototype</span>
+</div>
+<div class="md:w-2/3 spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-surface-container-high shadow-sm ml-12 md:ml-0 group-hover:border-primary transition-colors">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 font-bold">Weekend Systems Teardowns</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-sm leading-relaxed">
+              Frustrated by college students forced to compile in legacy Turbo C++, Shivan Mishra started conducting free 1-on-1 architecture teardowns for 30 ambitious undergraduates on Discord and Zoom.
+            </p>
+<div class="inline-flex items-center gap-2 text-primary font-mono-code text-xs font-bold">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Batch #00: 30 students, 28 placed in first 90 days</span>
+</div>
+</div>
+</div>
+<!-- Early 2024 -->
+<div class="flex flex-col md:flex-row gap-space-md mb-space-xl relative group">
+<div class="md:w-1/3 flex flex-col md:items-end pl-12 md:pl-0">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-secondary font-mono-code text-sm font-bold inline-block shadow-sm">Early 2024</span>
+<span class="font-label-md text-label-md text-on-surface-variant mt-1 font-semibold">Platform Launch</span>
+</div>
+<div class="md:w-2/3 spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-surface-container-high shadow-sm ml-12 md:ml-0 group-hover:border-secondary transition-colors">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 font-bold">DevAscent Platform &amp; Registry Go Live</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-sm leading-relaxed">
+              Engineered an automated cohort management engine with real-time Razorpay integration, instant webhook handling, and the cryptographic Verified Certificate Registry for transparent proof-of-work.
+            </p>
+<div class="inline-flex items-center gap-2 text-secondary font-mono-code text-xs font-bold">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Batches #01 &amp; #02 sold out in 4 hours</span>
+</div>
+</div>
+</div>
+<!-- Late 2024 -->
+<div class="flex flex-col md:flex-row gap-space-md mb-space-xl relative group">
+<div class="md:w-1/3 flex flex-col md:items-end pl-12 md:pl-0">
+<span class="px-3 py-1 rounded-full bg-surface-container-high text-on-surface font-mono-code text-sm font-bold inline-block shadow-sm">Late 2024</span>
+<span class="font-label-md text-label-md text-on-surface-variant mt-1 font-semibold">AI Integration</span>
+</div>
+<div class="md:w-2/3 spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-surface-container-high shadow-sm ml-12 md:ml-0 group-hover:border-outline transition-colors">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 font-bold">The AI Study Studio Rollout</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-sm leading-relaxed">
+              Shipped proprietary AI tooling including Whisper-driven Voice Synthesizer notes, automated AST code critiques for homework PRs, and adaptive knowledge-graph roadmaps.
+            </p>
+<div class="inline-flex items-center gap-2 text-primary font-mono-code text-xs font-bold">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Reduced homework submission review lag to under 4 minutes</span>
+</div>
+</div>
+</div>
+<!-- 2025 & Beyond -->
+<div class="flex flex-col md:flex-row gap-space-md relative group">
+<div class="md:w-1/3 flex flex-col md:items-end pl-12 md:pl-0">
+<span class="px-3 py-1 rounded-full bg-primary text-on-primary font-mono-code text-sm font-bold inline-block shadow-sm">2025 &amp; Beyond</span>
+<span class="font-label-md text-label-md text-primary mt-1 font-semibold">Nationwide Scale</span>
+</div>
+<div class="md:w-2/3 spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-primary/40 shadow-md ml-12 md:ml-0">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 font-bold">1,200+ Alumni Impact</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-sm leading-relaxed">
+              Active alumni now working as SDE-1, SDE-2, and platform engineers across Bengaluru, Hyderabad, Gurugram, and Pune. Launching enterprise hiring days and direct recruiter pipelines.
+            </p>
+<div class="inline-flex items-center gap-2 text-secondary font-mono-code text-xs font-bold">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Cohort #04 enrolling with upgraded distributed systems track</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. ENGINEERING ADVISORY BOARD & DIRECT FOUNDER DESK -->
+<section class="bg-surface-container-low py-space-2xl w-full border-t border-surface-container">
+<div class="max-w-7xl mx-auto px-margin">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- Left: Mentors Grid (8 cols) -->
+<div class="lg:col-span-8 space-y-space-md">
+<div>
+<span class="font-mono-code text-xs font-bold text-primary tracking-widest uppercase mb-1 block">ADVISORY_TELEMETRY</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Engineering Advisory Board</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-xl">
+                Staff engineers, cloud architects, and fintech leads collaborating directly with Shivan Mishra to conduct bi-weekly code teardowns and calibrate curriculum relevance.
+              </p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-gutter pt-space-xs">
+<!-- Mentor 1 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-space-sm">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed text-primary font-bold font-headline-sm flex items-center justify-center shadow-sm">
+                      RK
+                    </div>
+<div>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface">Rohan Kulkarni</h4>
+<p class="text-[12px] text-on-surface-variant">Staff Platform Eng</p>
+</div>
+</div>
+<span class="inline-block px-2 py-0.5 rounded bg-surface-container text-primary font-mono-code text-[10px] font-bold mb-2">Ex-Fintech Unicorn</span>
+<p class="font-body-sm text-xs text-on-surface-variant">
+                    Advises on distributed database replication, idempotent payment webhooks, and transactional consistency.
+                  </p>
+</div>
+<div class="pt-3 mt-3 border-t border-surface-container flex items-center gap-1.5 text-xs text-primary font-medium">
+<span class="material-symbols-outlined text-[15px]">rate_review</span>
+<span>Bi-weekly Capstone Reviews</span>
+</div>
+</div>
+<!-- Mentor 2 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-space-sm">
+<div class="w-12 h-12 rounded-xl bg-secondary-container text-secondary font-bold font-headline-sm flex items-center justify-center shadow-sm">
+                      AP
+                    </div>
+<div>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface">Ananya Pathak</h4>
+<p class="text-[12px] text-on-surface-variant">Principal Cloud Arch</p>
+</div>
+</div>
+<span class="inline-block px-2 py-0.5 rounded bg-surface-container text-secondary font-mono-code text-[10px] font-bold mb-2">Multi-Cloud Specialist</span>
+<p class="font-body-sm text-xs text-on-surface-variant">
+                    Guides container orchestration, Kubernetes manifests, edge delivery caching, and Terraform provisioning tracks.
+                  </p>
+</div>
+<div class="pt-3 mt-3 border-t border-surface-container flex items-center gap-1.5 text-xs text-secondary font-medium">
+<span class="material-symbols-outlined text-[15px]">cloud_done</span>
+<span>Cloud Infra Clinics</span>
+</div>
+</div>
+<!-- Mentor 3 -->
+<div class="spotlight-card bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-space-sm">
+<div class="w-12 h-12 rounded-xl bg-tertiary-fixed text-tertiary font-bold font-headline-sm flex items-center justify-center shadow-sm">
+                      VS
+                    </div>
+<div>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface">Vikram Sen</h4>
+<p class="text-[12px] text-on-surface-variant">Head of Backend</p>
+</div>
+</div>
+<span class="inline-block px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-code text-[10px] font-bold mb-2">Scale Series-C</span>
+<p class="font-body-sm text-xs text-on-surface-variant">
+                    Conducts live mock system design rounds and capstone defense evaluation for candidates preparing for top product firms.
+                  </p>
+</div>
+<div class="pt-3 mt-3 border-t border-surface-container flex items-center gap-1.5 text-xs text-tertiary font-medium">
+<span class="material-symbols-outlined text-[15px]">groups</span>
+<span>Evaluates Final Defenses</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Direct Founder Desk Hotline (4 cols) -->
+<div class="lg:col-span-4 spotlight-card bg-surface-container-lowest p-space-lg rounded-2xl border border-secondary/30 shadow-md flex flex-col justify-between">
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="inline-flex items-center gap-2 text-secondary font-mono-code text-xs font-bold">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span>
+<span>LIVE FOUNDER DESK</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-secondary-container text-secondary text-[10px] font-bold font-mono-code">SLA &lt; 25m</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Have a technical doubt before enrolling?</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                Connect directly with Shivan Mishra. No marketing reps or aggressive sales pressure. Strictly engineering consultation and curriculum roadmap alignment.
+              </p>
+<!-- Live SLA badge -->
+<div class="bg-surface-container-low p-2.5 rounded-xl flex items-center gap-2 text-xs text-on-surface font-mono-code border border-surface-container">
+<span class="material-symbols-outlined text-secondary text-[18px]">bolt</span>
+<span>Direct WhatsApp Hotline Active</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm">
+<a class="w-full py-3 px-space-md rounded-xl bg-secondary hover:bg-secondary/90 text-on-secondary font-label-md text-label-md font-bold flex items-center justify-center gap-2 shadow-md transition-all hover:shadow-lg" href="#">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+<span>Message Shivan on WhatsApp</span>
+</a>
+<p class="text-center font-mono-code text-[11px] text-tertiary mt-2">
+                Open 9:00 AM – 9:00 PM IST
+              </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. BOTTOM CYBER CTA BANNER -->
+<section class="w-full bg-gradient-to-r from-[#18116d] via-primary to-[#054b35] text-on-primary py-space-2xl relative overflow-hidden">
+<!-- Glow ambient overlay -->
+<div class="absolute inset-0 grid-bg-cyber-enhanced opacity-20"></div>
+<div class="max-w-4xl mx-auto px-margin text-center relative z-10 flex flex-col items-center gap-space-md">
+<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-mono-code text-xs">
+<span class="w-2 h-2 rounded-full bg-cyan-300 animate-pulse"></span>
+<span>COHORT #04 SEATS: 48 OF 60 CLAIMED</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg md:text-[44px] md:leading-[52px] font-extrabold text-white tracking-tight">
+          Ready to Build Real Production Software with Shivan?
+        </h2>
+<p class="font-body-lg text-body-lg text-white/90 max-w-2xl">
+          Skip months of disjointed YouTube playlists. Master end-to-end full-stack engineering, microservices, and AI tooling under direct founder mentorship.
+        </p>
+<div class="flex flex-col sm:flex-row items-center gap-space-md mt-space-sm w-full sm:w-auto">
+<a class="w-full sm:w-auto px-space-xl py-space-md rounded-xl bg-surface-container-lowest text-primary font-label-md text-label-md font-bold hover:bg-surface-bright transition-all shadow-xl flex items-center justify-center gap-2 group btn-shimmer" data-path="curriculum" href="#">
+<span>Enroll in Cohort #04 (₹1,499)</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+<a class="w-full sm:w-auto px-space-lg py-space-md rounded-xl bg-white/10 hover:bg-white/20 text-white font-label-md text-label-md font-semibold backdrop-blur-md border border-white/20 transition-colors flex items-center justify-center gap-2" href="#">
+<span class="material-symbols-outlined text-[18px]">event_available</span>
+<span>Schedule Founder 1:1 Q&amp;A</span>
+</a>
+</div>
+<div class="flex items-center gap-space-md mt-space-sm text-white/80 font-mono-code text-xs flex-wrap justify-center">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-cyan-300">check_circle</span>
+            ₹1,499 Total Fee
+          </span>
+<span>•</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-cyan-300">check_circle</span>
+            7-Day Unconditional Refund
+          </span>
+<span>•</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-cyan-300">check_circle</span>
+            Razorpay 256-bit Encrypted
+          </span>
+</div>
+</div>
+</section>
+</main>
+<!-- PERSISTENT DEVASCENT FOOTER -->
+<footer class="w-full bg-surface-container-low border-t border-surface-container">
+<div class="max-w-7xl mx-auto px-margin py-space-2xl">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-gutter">
+<!-- Left 2 Cols: Brand & Security -->
+<div class="lg:col-span-2 flex flex-col gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-slate-950 p-1 border border-cyan-500/30 flex items-center justify-center shadow-sm">
+<img alt="DevAscent Emblem" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5ht8-hWIZRATrPZQ_cAW5FgOqGbqr85mLo4CzZL8esgH4FohQ76sAkyr4BoMwUIuDtk3-j-k9LfoM1tJmIdQ8tvTgxMnSlvtv60ysZT4Boog0C4YOeLZAI3bTW7UbFt10YsSM-ZQQt3RaDDg3cJocnM8n5DiDDNsXCmKxgXtn027cnsnYaKdUCIsAemoLY1p9ucCmT6sOVZDDBLy-86uM4IKKwq4mD6YGcUP0mcDsPEPG3LshmPIbQgsrKL7ByEgQ"/>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">DevAscent Academy</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm">
+            Tier-1 engineered curriculum, AI tooling, and disciplined mentorship built for ambitious engineers switching into high-impact software careers.
+          </p>
+<div class="flex items-center gap-space-sm pt-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Founded by Shivan Mishra</span>
+</div>
+<div class="flex items-center gap-space-md pt-space-sm">
+<div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-space-xs rounded-lg border border-surface-container shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[16px]">verified</span>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">Razorpay Verified</span>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-space-xs rounded-lg border border-surface-container shadow-sm">
+<span class="material-symbols-outlined text-primary text-[16px]">lock</span>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">256-bit SSL Encrypted</span>
+</div>
+</div>
+</div>
+<!-- Col 3: Academics -->
+<div class="flex flex-col gap-space-sm">
+<span class="font-label-md text-label-md text-on-surface font-bold tracking-wide">Academics</span>
+<nav class="flex flex-col gap-space-xs">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="courses" href="#">Fullstack Track</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="curriculum" href="#">Curriculum</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="ai-studio" href="#">AI Tools &amp; Studio</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="roadmaps" href="#">Career Roadmaps</a>
+</nav>
+</div>
+<!-- Col 4: Trust & Proof -->
+<div class="flex flex-col gap-space-sm">
+<span class="font-label-md text-label-md text-on-surface font-bold tracking-wide">Trust &amp; Proof</span>
+<nav class="flex flex-col gap-space-xs">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="governance-and-trust" href="#">Governance &amp; Trust</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="refund-policy" href="#">7-Day Refund Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="verified-certificate-registry" href="#">Verified Registry</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="analytics" href="#">Placement Analytics</a>
+</nav>
+</div>
+<!-- Col 5: Organization -->
+<div class="flex flex-col gap-space-sm">
+<span class="font-label-md text-label-md text-on-surface font-bold tracking-wide">Organization</span>
+<nav class="flex flex-col gap-space-xs">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="about" href="#">About Us</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="community" href="#">Community Discord</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="faq" href="#">FAQ &amp; Admissions</a>
+</nav>
+</div>
+</div>
+<!-- Copyright Subfooter -->
+<div class="mt-space-2xl pt-space-lg border-t border-surface-container flex flex-col sm:flex-row items-center justify-between gap-space-md text-on-surface-variant font-body-sm text-body-sm">
+<p>© 2025 DevAscent Academy Pvt. Ltd. All rights reserved.</p>
+<div class="flex items-center gap-space-lg">
+<a class="hover:text-primary transition-colors" data-path="refund-policy" href="#">Refunds</a>
+<a class="hover:text-primary transition-colors" data-path="governance-and-trust" href="#">Security &amp; Compliance</a>
+<a class="hover:text-primary transition-colors" data-path="verified-certificate-registry" href="#">Registry</a>
+</div>
+</div>
+</div>
+</footer>
+<!-- Vanilla JS: Cursor Spotlight Follower & Micro Live Telemetry Simulation -->
+<script>
+    // 1. Dynamic Mouse-Follow Spotlight for Bento Cards
+    document.querySelectorAll('.spotlight-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+
+    // 2. Realistic Ping Telemetry Micro-Jitter (20ms - 24ms)
+    const pingEl = document.getElementById('live-ping-val');
+    if (pingEl) {
+      setInterval(() => {
+        const jitter = Math.floor(Math.random() * 5) + 19;
+        pingEl.textContent = `${jitter}ms`;
+      }, 3500);
+    }
+  </script>
+</body></html>

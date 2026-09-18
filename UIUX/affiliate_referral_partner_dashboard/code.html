@@ -1,0 +1,596 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary": "#006c49", "on-primary-fixed": "#0f0069", "on-tertiary-container": "#d8dbea", "tertiary": "#454854", "surface-container-high": "#dce9ff", "surface": "#f8f9ff", "background": "#f8f9ff", "primary-fixed-dim": "#c3c0ff", "primary-fixed": "#e2dfff", "error": "#ba1a1a", "primary": "#3525cd", "on-secondary-container": "#00714d", "on-primary-container": "#dad7ff", "on-tertiary-fixed": "#171b26", "surface-container-lowest": "#ffffff", "tertiary-container": "#5c606c", "outline-variant": "#c7c4d8", "surface-container": "#e5eeff", "secondary-fixed-dim": "#4edea3", "on-error": "#ffffff", "outline": "#777587", "on-background": "#0b1c30", "on-primary-fixed-variant": "#3323cc", "surface-bright": "#f8f9ff", "on-surface-variant": "#464555", "on-surface": "#0b1c30", "on-secondary": "#ffffff", "tertiary-fixed": "#dfe2f1", "on-tertiary-fixed-variant": "#434652", "on-primary": "#ffffff", "inverse-primary": "#c3c0ff", "secondary-fixed": "#6ffbbe", "on-secondary-fixed-variant": "#005236", "on-secondary-fixed": "#002113", "tertiary-fixed-dim": "#c3c6d4", "on-tertiary": "#ffffff", "primary-container": "#4f46e5", "surface-container-low": "#eff4ff", "on-error-container": "#93000a", "surface-variant": "#d3e4fe", "surface-dim": "#cbdbf5", "surface-container-highest": "#d3e4fe", "surface-tint": "#4d44e3", "inverse-on-surface": "#eaf1ff", "inverse-surface": "#213145", "secondary-container": "#6cf8bb", "error-container": "#ffdad6" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-sm": "0.5rem", "space-lg": "1.5rem", "margin": "2rem", "space-md": "1rem", "gutter-sm": "1rem", "space-xl": "2.5rem", "gutter": "1.5rem", "margin-sm": "1rem", "space-xs": "0.25rem", "space-2xl": "4rem" }, "fontFamily": { "headline-sm": ["Plus Jakarta Sans"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "price-hero": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "body-sm": ["Inter"], "label-md": ["Inter"], "display-hero": ["Plus Jakarta Sans"] }, "fontSize": { "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "600" }], "price-hero": ["48px", { "lineHeight": "52px", "fontWeight": "800" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "fontWeight": "800" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }], "headline-lg": ["40px", { "lineHeight": "48px", "fontWeight": "700" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "display-hero": ["56px", { "lineHeight": "64px", "fontWeight": "800" }] } } } };</script></head><body class="bg-background font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-[1200px] mx-auto px-margin-sm lg:px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm" href="#"><img alt="Brand logo. - Primary color: #4f46e5
+- Font: plusJakartaSans
+- Mode: light
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AOf_bcpL9m853Hq05s_9V4R0K9B74h12lR7gqS7G3vJ7x68y"><span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">DevAscent</span></a><nav class="hidden xl:flex items-center gap-space-lg" data-active-classes="text-primary font-bold"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="courses" href="#">Courses</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="curriculum" href="#">Curriculum</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="community" href="#">Community</a><a aria-current="page" class="transition-colors text-primary font-bold" data-path="referrals" href="#">Referrals</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="verify-certificate" href="#">Verify Certificate</a></nav></div><div class="flex items-center gap-space-md"><button aria-label="Toggle theme" class="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors shadow-sm focus:outline-none" id="themeToggleBtn" title="Toggle dark / light mode"><span class="material-symbols-outlined text-xl transition-transform hover:rotate-12">dark_mode</span></button><div class="hidden sm:flex items-center gap-space-xs px-space-sm py-space-xs bg-secondary-fixed/30 rounded-full text-on-secondary-fixed"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-sm text-label-sm font-semibold">Cohort Active</span></div><div class="flex items-center gap-space-sm pl-space-xs"><div class="relative"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AOf_bcoH860X5a_hHhM_1bXk7N7J2g5XzQxQ_4K8z4n8kY2e"><span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-secondary"></span></div><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface leading-none">Aarav Sharma</span><span class="font-label-sm text-label-sm text-on-surface-variant">Full-Stack Fellow</span></div></div></div></div></header><main class="w-full pt-20 bg-background min-h-screen"><div class="flex flex-col w-full">
+<!-- Subtle Ambient Top Glow -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-72 bg-gradient-to-r from-primary-fixed-dim/40 via-surface-variant to-secondary-fixed/30 blur-3xl opacity-60 pointer-events-none rounded-full"></div>
+<div class="max-w-[1200px] mx-auto px-margin-sm lg:px-margin pt-space-md pb-space-2xl flex flex-col gap-space-xl relative z-10">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+<div class="space-y-space-xs max-w-2xl">
+<div class="inline-flex items-center gap-space-xs px-space-sm py-1 bg-surface-container rounded-full text-on-surface-variant font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="">Partner Hub Tier-1 • Rahul Sharma</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Affiliate &amp; Creator Referral Program</h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Empower your developer network. Earn 25% commission (₹375 per paid enrollment) on every student who enrolls with your referral link or custom coupon.
+          </p>
+</div>
+<!-- Quick Payout Status Chip & CSV Export Button -->
+<div class="flex items-center gap-space-sm self-start md:self-auto shrink-0">
+<button class="flex items-center gap-space-xs px-space-md py-space-sm bg-surface-container-lowest text-on-surface font-label-md text-label-md rounded-lg shadow-sm hover:bg-surface-container transition-all" id="downloadCsvBtn">
+<span class="material-symbols-outlined text-primary text-base">download</span>
+<span class="">Export CSV</span>
+</button>
+<a class="flex items-center gap-space-xs px-space-md py-space-sm bg-primary text-on-primary font-label-md text-label-md rounded-lg shadow-md hover:bg-primary-container transition-all" href="#payout-settings">
+<span class="material-symbols-outlined text-base">account_balance_wallet</span>
+<span class="">UPI Settings</span>
+</a>
+</div>
+</div>
+<!-- 4 Key Metrics Bento -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- 1. Total Earnings -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold">Total Earnings</span>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xl">payments</span>
+</div>
+</div>
+<div class="mt-space-md space-y-space-xs">
+<div class="font-price-hero text-price-hero text-on-surface tracking-tight">₹24,375</div>
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-secondary font-bold px-space-xs py-0.5 bg-secondary-fixed/40 rounded">
+<span class="material-symbols-outlined text-xs">trending_up</span>+₹3,750 this week
+              </span>
+</div>
+</div>
+</div>
+<!-- 2. Successful Enrollments -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary"></div>
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold">Paid Enrollments</span>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-xl">school</span>
+</div>
+</div>
+<div class="mt-space-md space-y-space-xs">
+<div class="font-price-hero text-price-hero text-on-surface tracking-tight">65 <span class="font-body-md text-body-md text-on-surface-variant font-normal">Students</span></div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="text-secondary font-semibold">18%</span> cohort conversion rate
+            </div>
+</div>
+</div>
+<!-- 3. Pending Payout -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-full h-1 bg-surface-tint"></div>
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold">Pending Next Cycle</span>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-surface-tint">
+<span class="material-symbols-outlined text-xl">schedule</span>
+</div>
+</div>
+<div class="mt-space-md space-y-space-xs">
+<div class="font-price-hero text-price-hero text-on-surface tracking-tight">₹7,500</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm truncate">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span>
+<span class="truncate">Auto-disburses 1st of month</span>
+</div>
+</div>
+</div>
+<!-- 4. Clicks & Link Visits -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-full h-1 bg-tertiary-container"></div>
+<div class="flex items-start justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold">Clicks &amp; Visits</span>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-xl">ads_click</span>
+</div>
+</div>
+<div class="mt-space-md space-y-space-xs">
+<div class="font-price-hero text-price-hero text-on-surface tracking-tight">1,420</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="text-primary font-semibold">4.58%</span> link CTR this month
+            </div>
+</div>
+</div>
+</div>
+<!-- Referral Asset Generator & Promo Kit (Split Bento) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+<!-- Left: Link & Coupon Quick Generator (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<div class="bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col gap-space-lg">
+<div class="space-y-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary">link</span>
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">Referral Asset Generator</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Share your bespoke link or custom coupon. Attributions are dynamically tracked with 90-day cookied persistence.</p>
+</div>
+<!-- Link Box -->
+<div class="space-y-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Your Personal Referral URL</label>
+<div class="flex flex-col sm:flex-row items-stretch gap-space-xs p-space-xs bg-surface rounded-lg">
+<div class="flex items-center gap-space-xs px-space-sm py-2 flex-grow overflow-hidden font-body-sm text-body-sm text-on-surface font-semibold truncate">
+<span class="material-symbols-outlined text-on-surface-variant text-base">public</span>
+<span class="truncate select-all" id="referralUrl">https://devascent.io/r/RAHUL25</span>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<button class="flex items-center gap-space-xs px-space-md py-space-sm bg-primary text-on-primary rounded-md font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95 shadow-sm" id="copyUrlBtn">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+<span id="copyUrlText" class="">Copy Link</span>
+</button>
+<button class="flex items-center justify-center w-10 h-10 bg-surface-container text-on-surface rounded-md hover:bg-surface-container-high transition-all" id="qrModalOpen" title="View &amp; Download QR">
+<span class="material-symbols-outlined text-lg">qr_code_2</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Coupon Code Section -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center text-secondary shadow-sm">
+<span class="material-symbols-outlined text-2xl">local_offer</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-wide">RAHUL25</span>
+<span class="px-space-xs py-0.5 rounded text-[10px] font-bold bg-secondary-fixed/40 text-on-secondary-fixed">10% OFF APPLIED</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Gives students 10% instant discount; credits you 25% reward.</p>
+</div>
+</div>
+<button class="px-space-md py-space-sm bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md rounded-lg shadow-sm transition-all flex items-center gap-space-xs self-stretch sm:self-auto justify-center" id="copyCodeBtn">
+<span class="material-symbols-outlined text-base">copy_all</span>
+<span id="copyCodeText" class="">Copy Code</span>
+</button>
+</div>
+<!-- Social Share Quick Actions -->
+<div class="space-y-space-xs pt-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">1-Click Broadcast</span>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm">
+<!-- LinkedIn -->
+<a class="flex items-center justify-center gap-space-xs px-space-sm py-space-sm rounded-lg bg-surface-container text-on-surface hover:bg-surface-variant transition-colors font-label-sm text-label-sm font-semibold" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fdevascent.io%2Fr%2FRAHUL25" rel="noopener" target="_blank">
+<svg class="w-4 h-4 fill-current text-primary" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.25c-.9 0-1.63.73-1.63 1.63s.73 1.63 1.63 1.63 1.63-.73 1.63-1.63-.73-1.63-1.63-1.63Z"></path></svg>
+<span class="">LinkedIn</span>
+</a>
+<!-- WhatsApp -->
+<a class="flex items-center justify-center gap-space-xs px-space-sm py-space-sm rounded-lg bg-secondary-fixed/30 text-on-secondary-fixed hover:bg-secondary-fixed/50 transition-colors font-label-sm text-label-sm font-semibold" href="https://api.whatsapp.com/send?text=Join%20me%20at%20DevAscent%20Academy%20Cohort!%20Get%2010%25%20off%20with%20code%20RAHUL25%3A%20https%3A%2F%2Fdevascent.io%2Fr%2FRAHUL25" rel="noopener" target="_blank">
+<svg class="w-4 h-4 fill-current text-secondary" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.71 4.3 3.8.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.29Z"></path></svg>
+<span class="">WhatsApp</span>
+</a>
+<!-- X / Twitter -->
+<a class="flex items-center justify-center gap-space-xs px-space-sm py-space-sm rounded-lg bg-surface-container text-on-surface hover:bg-surface-variant transition-colors font-label-sm text-label-sm font-semibold" href="https://twitter.com/intent/tweet?text=Level%20up%20your%20engineering%20game%20with%20%40DevAscentAcademy.%20Use%20my%20code%20RAHUL25%20for%20an%20exclusive%20discount%3A%20https%3A%2F%2Fdevascent.io%2Fr%2FRAHUL25" rel="noopener" target="_blank">
+<svg class="w-4 h-4 fill-current text-on-surface" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+<span class="">X / Twitter</span>
+</a>
+<!-- Telegram -->
+<a class="flex items-center justify-center gap-space-xs px-space-sm py-space-sm rounded-lg bg-surface-container text-on-surface hover:bg-surface-variant transition-colors font-label-sm text-label-sm font-semibold" href="https://t.me/share/url?url=https%3A%2F%2Fdevascent.io%2Fr%2FRAHUL25&amp;text=Check%20out%20DevAscent%20Academy%20Flagship%20Cohorts!" rel="noopener" target="_blank">
+<svg class="w-4 h-4 fill-current text-primary" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.17 3.35-1.37 3.73-1.37.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"></path></svg>
+<span class="">Telegram</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Creator Marketing Assets & Review Kit (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary">campaign</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Creator Promo Kit</h3>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container text-on-surface-variant font-label-sm text-label-sm rounded font-medium">Assets v2.4</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Production-ready promotional collateral to drop into your newsletters, YouTube descriptions, or GitHub READMEs.</p>
+<div class="space-y-space-sm">
+<!-- Asset 1: Banner Deck -->
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded bg-primary-fixed flex items-center justify-center text-primary font-bold">
+<span class="material-symbols-outlined text-base">image</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Social Banner Deck (Figma &amp; PNG)</div>
+<div class="font-body-sm text-label-sm text-on-surface-variant">1200x630 (X/OG), 1080x1080 (Insta)</div>
+</div>
+</div>
+<button class="text-primary hover:text-primary-container p-space-xs" title="Download ZIP">
+<span class="material-symbols-outlined text-xl">download</span>
+</button>
+</div>
+<!-- Asset 2: Verified Syllabus PDF with Affiliate Link -->
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded bg-secondary-fixed flex items-center justify-center text-secondary font-bold">
+<span class="material-symbols-outlined text-base">picture_as_pdf</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Branded Syllabus PDF</div>
+<div class="font-body-sm text-label-sm text-on-surface-variant">Embedded with your custom referral tag</div>
+</div>
+</div>
+<button class="text-secondary hover:text-on-secondary-container p-space-xs" title="Download Branded PDF">
+<span class="material-symbols-outlined text-xl">download</span>
+</button>
+</div>
+<!-- Asset 3: Sample Tweets & Hook Templates -->
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded bg-surface-container-high flex items-center justify-center text-on-surface font-bold">
+<span class="material-symbols-outlined text-base">rate_review</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Sample Copy &amp; Review Threads</div>
+<div class="font-body-sm text-label-sm text-on-surface-variant">5 high-converting technical copy templates</div>
+</div>
+</div>
+<button class="text-primary hover:text-primary-container p-space-xs" id="viewSampleCopyBtn" title="View Templates">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
+</div>
+<!-- Mini Terminal Quote for Technical Credibility -->
+<div class="bg-inverse-surface p-space-sm rounded-lg text-inverse-on-surface font-mono text-[12px] space-y-1">
+<div class="flex items-center justify-between text-on-surface-variant text-[10px]">
+<span class="">curl attribution test</span>
+<span class="text-secondary">HTTP 200 OK</span>
+</div>
+<div class="text-secondary-fixed">GET /api/v1/referrals/RAHUL25/verify</div>
+<div class="text-inverse-on-surface/80">{"status": "active", "payout_rate": "0.25", "upi_verified": true}</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Referral Transactions Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="p-space-lg flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold">Recent Referral Transactions</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Real-time ledger of enrollments attributed to your link or coupon.</p>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Showing latest 5 records</span>
+</div>
+</div>
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse font-body-sm text-body-sm">
+<thead>
+<tr class="bg-surface text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-space-sm px-space-md">Date</th>
+<th class="py-space-sm px-space-md">Student</th>
+<th class="py-space-sm px-space-md">Track Enrolled</th>
+<th class="py-space-sm px-space-md">Order Value</th>
+<th class="py-space-sm px-space-md">Your Commission</th>
+<th class="py-space-sm px-space-md">Payout Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-transparent">
+<!-- Row 1 -->
+<tr class="hover:bg-surface transition-colors">
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">24 Oct 2025</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap font-mono text-[13px]">priya.s***@gmail.com</td>
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">Full-Stack Web Dev &amp; Razorpay</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap">₹1,499</td>
+<td class="py-space-md px-space-md text-secondary font-bold whitespace-nowrap">+₹375.00</td>
+<td class="py-space-md px-space-md whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-surface-container text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>7-Day Lock Window
+                  </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface transition-colors">
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">22 Oct 2025</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap font-mono text-[13px]">arjun.k***@outlook.com</td>
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">Distributed Systems &amp; Go</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap">₹1,499</td>
+<td class="py-space-md px-space-md text-secondary font-bold whitespace-nowrap">+₹375.00</td>
+<td class="py-space-md px-space-md whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-secondary-fixed/40 text-on-secondary-fixed">
+<span class="material-symbols-outlined text-xs">verified</span>Settled (Queued for Nov 1)
+                  </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface transition-colors">
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">21 Oct 2025</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap font-mono text-[13px]">divya.n***@techcorp.in</td>
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">Full-Stack Web Dev &amp; Razorpay</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap">₹1,499</td>
+<td class="py-space-md px-space-md text-secondary font-bold whitespace-nowrap">+₹375.00</td>
+<td class="py-space-md px-space-md whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-secondary-fixed/40 text-on-secondary-fixed">
+<span class="material-symbols-outlined text-xs">verified</span>Settled (Queued for Nov 1)
+                  </span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface transition-colors">
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">18 Oct 2025</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap font-mono text-[13px]">rohit.b***@yahoo.com</td>
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">Backend Engineering Track</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap">₹1,499</td>
+<td class="py-space-md px-space-md text-secondary font-bold whitespace-nowrap">+₹375.00</td>
+<td class="py-space-md px-space-md whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-secondary-fixed/40 text-on-secondary-fixed">
+<span class="material-symbols-outlined text-xs">verified</span>Settled (Queued for Nov 1)
+                  </span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface transition-colors">
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">15 Oct 2025</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap font-mono text-[13px]">karthik.v***@zoho.com</td>
+<td class="py-space-md px-space-md text-on-surface font-medium whitespace-nowrap">Full-Stack Web Dev &amp; Razorpay</td>
+<td class="py-space-md px-space-md text-on-surface whitespace-nowrap">₹1,499</td>
+<td class="py-space-md px-space-md text-secondary font-bold whitespace-nowrap">+₹375.00</td>
+<td class="py-space-md px-space-md whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-secondary-fixed/40 text-on-secondary-fixed">
+<span class="material-symbols-outlined text-xs">verified</span>Settled (Queued for Nov 1)
+                  </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer -->
+<div class="p-space-md bg-surface flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-sm text-label-sm text-on-surface-variant">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-base text-secondary">security</span>
+<span class="">All conversions audited via cryptographic transaction IDs on Razorpay.</span>
+</div>
+<a class="text-primary hover:underline font-semibold flex items-center gap-1" href="#">
+<span class="">View all 65 transactions</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Payout Settings, Verification & Regulatory Rules Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl" id="payout-settings">
+<!-- Payout Configuration Card (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col gap-space-lg">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary">account_balance</span>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold">Payout &amp; Banking Details</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Automated NEFT / IMPS / UPI disbursements powered by RazorpayX.</p>
+</div>
+<span class="inline-flex items-center gap-1 px-space-sm py-1 bg-secondary-fixed/40 text-on-secondary-fixed font-label-sm text-label-sm rounded-full font-semibold">
+<span class="material-symbols-outlined text-xs">check_circle</span> Verified Bank Link
+            </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<!-- Linked UPI ID Box -->
+<div class="p-space-md rounded-lg bg-surface flex flex-col justify-between space-y-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase tracking-wider">Primary UPI ID</span>
+<span class="material-symbols-outlined text-secondary text-sm">bolt</span>
+</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">rahul.dev@okhdfcbank</div>
+<span class="font-body-sm text-[12px] text-on-surface-variant">HDFC Bank Limited • Instant VPA Routing</span>
+</div>
+<!-- Tax Identification (PAN / GST) -->
+<div class="p-space-md rounded-lg bg-surface flex flex-col justify-between space-y-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase tracking-wider">TDS / PAN Compliance</span>
+<span class="material-symbols-outlined text-secondary text-sm">verified_user</span>
+</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold">ABCDE1234F</div>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Individual Creator • 5% TDS Deducted (Form 16A)</span>
+</div>
+</div>
+<!-- Payout Notice & Cycle details -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm pt-space-xs">
+<div class="text-on-surface-variant font-body-sm text-body-sm">
+              Next scheduled auto-transfer: <span class="text-on-surface font-bold">Nov 1, 2025 at 06:00 AM IST</span>
+</div>
+<button class="px-space-md py-2 bg-surface text-on-surface hover:bg-surface-container font-label-md text-label-md rounded-lg transition-colors">
+              Update Bank Details
+            </button>
+</div>
+</div>
+<!-- 7-Day Refund Clawback Rule Notice (5 cols) -->
+<div class="lg:col-span-5 bg-surface-container-low p-space-xl rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="space-y-space-sm">
+<div class="flex items-center gap-space-xs text-primary">
+<span class="material-symbols-outlined text-xl">gavel</span>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-bold">7-Day Refund Protection Rule</h4>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface leading-relaxed">
+              DevAscent offers every student a transparent, no-questions-asked <strong>7-Day Money-Back Guarantee</strong>.
+            </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              To prevent fraudulent self-referrals and transaction abuse, commission units lock in <em>Pending Verification</em> for exactly 7 calendar days post-checkout. Once the refund window closes, your ₹375.00 per enrollment automatically transitions to <strong>Settled</strong> and credits in the immediate subsequent monthly payout cycle.
+            </p>
+</div>
+<div class="p-space-sm bg-surface-container-lowest rounded-lg flex items-center gap-space-sm shadow-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed/50 flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-base">shield</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">Zero clawback risk for confirmed creators once settled.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Hidden/Interactive QR Code Modal Dialog -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm hidden items-center justify-center p-4" id="qrModal">
+<div class="bg-surface-container-lowest max-w-sm w-full p-space-xl rounded-2xl shadow-xl flex flex-col items-center gap-space-md text-center">
+<div class="flex items-center justify-between w-full">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Your Referral QR Code</h3>
+<button class="text-on-surface-variant hover:text-on-surface p-1" id="qrModalClose">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- High-Fidelity Inline SVG QR Code Representation -->
+<div class="p-space-md bg-surface-container-lowest rounded-xl shadow-md">
+<svg class="w-48 h-48 text-on-surface" fill="currentColor" viewBox="0 0 100 100">
+<!-- Position Detection Patterns (Top Left, Top Right, Bottom Left) -->
+<path d="M0,0 h30 v30 h-30 z M5,5 v20 h20 v-20 z M10,10 h10 v10 h-10 z"></path>
+<path d="M70,0 h30 v30 h-30 z M75,5 v20 h20 v-20 z M80,10 h10 v10 h-10 z"></path>
+<path d="M0,70 h30 v30 h-30 z M5,75 v20 h20 v-20 z M10,80 h10 v10 h-10 z"></path>
+<!-- Mock Data Matrix Bits -->
+<rect height="5" width="5" x="35" y="5"></rect>
+<rect height="5" width="10" x="45" y="5"></rect>
+<rect height="5" width="5" x="60" y="5"></rect>
+<rect height="10" width="5" x="35" y="15"></rect>
+<rect height="5" width="15" x="50" y="15"></rect>
+<rect height="5" width="10" x="40" y="25"></rect>
+<rect height="10" width="5" x="55" y="25"></rect>
+<rect height="5" width="5" x="5" y="35"></rect>
+<rect height="10" width="10" x="15" y="35"></rect>
+<rect height="5" width="10" x="35" y="35"></rect>
+<rect height="10" width="5" x="50" y="35"></rect>
+<rect height="5" width="10" x="70" y="35"></rect>
+<rect height="10" width="10" x="85" y="35"></rect>
+<rect height="5" width="15" x="5" y="50"></rect>
+<rect height="15" width="5" x="25" y="45"></rect>
+<rect height="10" width="20" x="40" y="45"></rect>
+<rect height="5" width="10" x="65" y="45"></rect>
+<rect height="5" width="15" x="80" y="50"></rect>
+<rect height="5" width="10" x="10" y="60"></rect>
+<rect height="10" width="5" x="35" y="60"></rect>
+<rect height="5" width="15" x="45" y="60"></rect>
+<rect height="15" width="5" x="65" y="55"></rect>
+<rect height="5" width="10" x="75" y="60"></rect>
+<rect height="5" width="10" x="35" y="75"></rect>
+<rect height="10" width="5" x="50" y="75"></rect>
+<rect height="5" width="15" x="60" y="75"></rect>
+<rect height="5" width="15" x="80" y="75"></rect>
+<rect height="10" width="5" x="35" y="85"></rect>
+<rect height="5" width="20" x="45" y="85"></rect>
+<rect height="10" width="10" x="70" y="85"></rect>
+<rect height="5" width="10" x="85" y="90"></rect>
+</svg>
+</div>
+<div class="space-y-1 text-center">
+<div class="font-headline-sm text-headline-sm font-bold text-on-surface">devascent.io/r/RAHUL25</div>
+<p class="font-body-sm text-label-sm text-on-surface-variant">Print this on tech flyers, conference tags, or campus meetup slides.</p>
+</div>
+<button class="w-full py-space-sm bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-space-xs hover:bg-primary-container transition-colors" id="downloadQrAssetBtn">
+<span class="material-symbols-outlined text-base">download</span>
+<span class="">Download High-Res SVG</span>
+</button>
+</div>
+</div>
+<!-- Interactive JavaScript for micro-interactions & feedback -->
+<script>
+    (function() {
+      // 1. Copy Link Behavior
+      const copyUrlBtn = document.getElementById('copyUrlBtn');
+      const copyUrlText = document.getElementById('copyUrlText');
+      const referralUrl = document.getElementById('referralUrl');
+
+      if (copyUrlBtn && referralUrl) {
+        copyUrlBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(referralUrl.innerText.trim()).then(() => {
+            copyUrlText.innerText = 'Copied!';
+            copyUrlBtn.classList.add('bg-secondary');
+            copyUrlBtn.classList.remove('bg-primary');
+            setTimeout(() => {
+              copyUrlText.innerText = 'Copy Link';
+              copyUrlBtn.classList.remove('bg-secondary');
+              copyUrlBtn.classList.add('bg-primary');
+            }, 2000);
+          });
+        });
+      }
+
+      // 2. Copy Code Behavior
+      const copyCodeBtn = document.getElementById('copyCodeBtn');
+      const copyCodeText = document.getElementById('copyCodeText');
+
+      if (copyCodeBtn && copyCodeText) {
+        copyCodeBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText('RAHUL25').then(() => {
+            copyCodeText.innerText = 'Code Copied!';
+            setTimeout(() => {
+              copyCodeText.innerText = 'Copy Code';
+            }, 2000);
+          });
+        });
+      }
+
+      // 3. QR Modal Handlers
+      const qrModal = document.getElementById('qrModal');
+      const qrModalOpen = document.getElementById('qrModalOpen');
+      const qrModalClose = document.getElementById('qrModalClose');
+      const downloadQrAssetBtn = document.getElementById('downloadQrAssetBtn');
+
+      if (qrModal && qrModalOpen && qrModalClose) {
+        qrModalOpen.addEventListener('click', () => {
+          qrModal.classList.remove('hidden');
+          qrModal.classList.add('flex');
+        });
+
+        qrModalClose.addEventListener('click', () => {
+          qrModal.classList.add('hidden');
+          qrModal.classList.remove('flex');
+        });
+
+        qrModal.addEventListener('click', (e) => {
+          if (e.target === qrModal) {
+            qrModal.classList.add('hidden');
+            qrModal.classList.remove('flex');
+          }
+        });
+      }
+
+      if (downloadQrAssetBtn) {
+        downloadQrAssetBtn.addEventListener('click', () => {
+          alert('Downloading high-resolution vector QR SVG for Rahul25...');
+        });
+      }
+
+      // 4. CSV Export Notification
+      const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+      if (downloadCsvBtn) {
+        downloadCsvBtn.addEventListener('click', () => {
+          const csvContent = "data:text/csv;charset=utf-8," 
+            + "Date,Student Email,Track,Order Value INR,Commission INR,Status\n"
+            + "2025-10-24,priya.s***@gmail.com,Full-Stack Web Dev & Razorpay,1499,375.00,Pending Lock Window\n"
+            + "2025-10-22,arjun.k***@outlook.com,Distributed Systems & Go,1499,375.00,Settled\n"
+            + "2025-10-21,divya.n***@techcorp.in,Full-Stack Web Dev & Razorpay,1499,375.00,Settled\n"
+            + "2025-10-18,rohit.b***@yahoo.com,Backend Engineering Track,1499,375.00,Settled\n"
+            + "2025-10-15,karthik.v***@zoho.com,Full-Stack Web Dev & Razorpay,1499,375.00,Settled\n";
+
+          const encodedUri = encodeURI(csvContent);
+          const link = document.createElement("a");
+          link.setAttribute("href", encodedUri);
+          link.setAttribute("download", "DevAscent_Affiliate_Earnings_October_2025.csv");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      }
+
+      // 5. Sample Copy Preview Toast
+      const viewSampleCopyBtn = document.getElementById('viewSampleCopyBtn');
+      if (viewSampleCopyBtn) {
+        viewSampleCopyBtn.addEventListener('click', () => {
+          alert("Sample Tweet Copied to Clipboard:\n\n'I spent the last 3 months learning system design with DevAscent Academy. Incredible production-grade projects. If you want to break into Tier-1 product roles, use code RAHUL25 for 10% off: https://devascent.io/r/RAHUL25'");
+        });
+      }
+    })();
+  </script>
+</div></main><footer class="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.02)] mt-space-2xl"><div class="max-w-[1200px] mx-auto px-margin-sm lg:px-margin py-space-xl flex flex-col gap-space-xl"><div class="grid grid-cols-1 md:grid-cols-4 gap-space-xl"><div class="space-y-space-md md:col-span-2"><div class="flex items-center gap-space-sm"><img alt="Brand logo. - Primary color: #4f46e5
+- Font: plusJakartaSans
+- Mode: light
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AOf_bcpL9m853Hq05s_9V4R0K9B74h12lR7gqS7G3vJ7x68y"><span class="font-headline-sm text-headline-sm text-on-surface font-bold">DevAscent Academy</span></div><p class="font-body-sm text-body-sm text-on-surface-variant max-w-md">Engineering the next generation of principal engineers and technical leaders through production-grade cohort fellowships and verified credentialing.</p><div class="flex flex-wrap items-center gap-space-sm pt-space-xs"><div class="flex items-center gap-space-xs px-space-sm py-space-xs bg-surface-container-lowest rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.06)]"><span class="material-symbols-outlined text-secondary text-base">verified</span><span class="font-label-sm text-label-sm text-on-surface">ISO 9001:2015 Certified</span></div><div class="flex items-center gap-space-xs px-space-sm py-space-xs bg-surface-container-lowest rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.06)]"><span class="material-symbols-outlined text-primary text-base">lock</span><span class="font-label-sm text-label-sm text-on-surface">Razorpay 256-bit Encrypted</span></div><div class="flex items-center gap-space-xs px-space-sm py-space-xs bg-surface-container-lowest rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.06)]"><span class="material-symbols-outlined text-secondary text-base">check_circle</span><span class="font-label-sm text-label-sm text-on-surface">AICTE Outcome Aligned</span></div></div></div><div class="space-y-space-sm"><h4 class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Academics</h4><ul class="space-y-space-xs font-body-sm text-body-sm text-on-surface-variant"><li class=""><a class="hover:text-primary transition-colors" data-path="courses" href="#">Flagship Cohorts</a></li><li class=""><a class="hover:text-primary transition-colors" data-path="curriculum" href="#">Syllabus Trees</a></li><li class=""><a class="hover:text-primary transition-colors" data-path="verify-certificate" href="#">Credential Ledger</a></li><li class=""><a class="hover:text-primary transition-colors" href="#">Hiring Partners</a></li></ul></div><div class="space-y-space-sm"><h4 class="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">Governance &amp; Legal</h4><ul class="space-y-space-xs font-body-sm text-body-sm text-on-surface-variant"><li class=""><a class="hover:text-primary transition-colors" href="#">Refund Terms &amp; Guarantee</a></li><li class=""><a class="hover:text-primary transition-colors" href="#">Terms of Enrollment</a></li><li class=""><a class="hover:text-primary transition-colors" href="#">Data Privacy (DPDP Act)</a></li><li class=""><a class="hover:text-primary transition-colors" href="#">Grievance Redressal</a></li></ul></div></div><div class="pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md text-on-surface-variant font-body-sm text-body-sm"><p class="">© 2025 DevAscent Learning Technologies Pvt. Ltd. All rights reserved.</p><div class="flex items-center gap-space-md"><span class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-secondary"></span>All Platform Systems Operational</span></div></div></div></footer>
+
+</body></html>

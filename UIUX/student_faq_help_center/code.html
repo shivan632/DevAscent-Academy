@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-background": "#0b1c30", "inverse-surface": "#213145", "on-tertiary-fixed": "#171b26", "surface-variant": "#d3e4fe", "tertiary-fixed-dim": "#c3c6d4", "inverse-on-surface": "#eaf1ff", "secondary-fixed": "#6ffbbe", "on-secondary": "#ffffff", "on-primary": "#ffffff", "on-tertiary-fixed-variant": "#434652", "primary-fixed-dim": "#c3c0ff", "tertiary": "#454854", "on-primary-fixed": "#0f0069", "error": "#ba1a1a", "on-primary-container": "#dad7ff", "secondary": "#006c49", "tertiary-fixed": "#dfe2f1", "primary": "#3525cd", "on-tertiary-container": "#d8dbea", "surface-container": "#e5eeff", "surface-container-low": "#eff4ff", "primary-container": "#4f46e5", "surface": "#f8f9ff", "error-container": "#ffdad6", "on-primary-fixed-variant": "#3323cc", "primary-fixed": "#e2dfff", "surface-container-high": "#dce9ff", "on-tertiary": "#ffffff", "on-error-container": "#93000a", "on-surface-variant": "#464555", "secondary-container": "#6cf8bb", "on-secondary-fixed-variant": "#005236", "surface-tint": "#4d44e3", "on-secondary-fixed": "#002113", "background": "#f8f9ff", "on-secondary-container": "#00714d", "surface-container-lowest": "#ffffff", "tertiary-container": "#5c606c", "on-error": "#ffffff", "inverse-primary": "#c3c0ff", "surface-dim": "#cbdbf5", "on-surface": "#0b1c30", "outline": "#777587", "surface-container-highest": "#d3e4fe", "outline-variant": "#c7c4d8", "surface-bright": "#f8f9ff", "secondary-fixed-dim": "#4edea3" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2.5rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-xs": "0.25rem", "margin": "2rem", "margin-sm": "1rem", "gutter": "1.5rem", "space-md": "1rem", "gutter-sm": "1rem", "space-2xl": "4rem" }, "fontFamily": { "label-sm": ["Inter"], "label-md": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "display-hero-mobile": ["Plus Jakarta Sans"], "price-hero": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "body-sm": ["Inter"] }, "fontSize": { "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "600" }], "display-hero": ["56px", { "lineHeight": "64px", "fontWeight": "800" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "fontWeight": "800" }], "price-hero": ["48px", { "lineHeight": "52px", "fontWeight": "800" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }], "headline-lg": ["40px", { "lineHeight": "48px", "fontWeight": "700" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }] } } } }</script></head><body class="bg-background font-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm shrink-0"><a class="flex items-center gap-space-sm" data-path="courses" href="#"><img alt="DevAscent Academy Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface leading-none">DevAscent</span><span class="font-label-sm text-label-sm text-primary tracking-wide leading-tight uppercase">Academy</span></div></a></div><nav class="hidden xl:flex items-center gap-space-lg" data-active-classes="text-primary font-bold"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="courses" href="#">Courses</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="curriculum" href="#">Curriculum</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="my-library" href="#">My Library</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="verify-certificate" href="#">Verify Certificate</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="pricing" href="#">Pricing</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="support-faq" href="#">Support / FAQ</a></nav><div class="flex items-center gap-space-md shrink-0"><div class="relative flex flex-col items-end"><span class="hidden md:inline-block px-2 py-0.5 mb-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm text-[10px] uppercase font-bold tracking-wider">Batch Starts Monday</span><a class="flex items-center gap-space-xs bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md px-space-md py-space-sm rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition-all" data-path="pricing" href="#"><span class="material-symbols-outlined text-[18px]">shopping_bag</span><span>Enroll Now (₹1,499)</span></a></div><div class="relative group flex items-center pl-space-xs"><button class="flex items-center gap-1.5 focus:outline-none p-1 rounded-full hover:bg-surface-container-high transition-colors" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyuN7Ngh2YgpmPsJ3RuKZX9aFSINrfY7yuH2KNnvetZV8uAKXG2eOcTspJr1-afr2xk9Xi0uHHeJCQ5kmY60aVLhKisE4fFZveYafG3eVTKmVcbdyhpdp0ekSUpJRcov2JlEWFmCoyIKIH3eh_b1HqvLPSRP62IdBftRqHstqNnE9WFLbhYegxncQ-Kc6a34eaG04fizRe2-U4T8GE6yUynrSdAlX4VxK4J-eiCFn2tn0o4haZsog"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></button><div class="absolute right-0 top-full mt-2 w-48 py-2 bg-surface-container-lowest rounded-xl shadow-[0_10px_15px_-3px_rgba(15,23,42,0.08),0_4px_6px_-4px_rgba(15,23,42,0.04)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col z-50"><div class="px-4 py-2 bg-surface-container-low mx-2 rounded-lg mb-1"><p class="font-label-sm text-label-sm text-on-surface font-semibold truncate">Dev Student</p><p class="font-label-sm text-label-sm text-on-surface-variant text-[11px] truncate">student@devascent.io</p></div><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="my-library" href="#"><span class="material-symbols-outlined text-[18px]">school</span>My Library</a><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="verify-certificate" href="#"><span class="material-symbols-outlined text-[18px]">verified</span>Verify Certificate</a><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-error hover:bg-surface-container-low transition-colors" data-path="login" href="#"><span class="material-symbols-outlined text-[18px]">logout</span>Sign Out</a></div></div></div></div></header><main class="w-full pt-20 bg-background"><div class="flex flex-col w-full">
+<!-- Knowledge Base Hub Header & Search Section -->
+<section class="relative w-full bg-surface-container-lowest py-space-2xl px-margin overflow-hidden">
+<!-- Ambient tech background elements -->
+<div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-surface-container-high/40 blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-secondary-container/20 blur-3xl pointer-events-none"></div>
+<div class="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
+<!-- Breadcrumb & Badge -->
+<div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-low mb-space-md shadow-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">DevAscent Student Support</span>
+<span class="font-label-sm text-label-sm text-outline-variant">•</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Updated for 2025 Cohorts</span>
+</div>
+<h1 class="font-display-hero text-display-hero text-on-surface tracking-tight max-w-3xl mb-space-sm">
+        Frequently Asked Questions &amp; Knowledge Base
+      </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-space-xl">
+        Everything you need to know about enrollments, Razorpay payments, live mentor sessions, and cryptographically verified certificates.
+      </p>
+<!-- Live Search Bar Component -->
+<div class="w-full max-w-3xl relative">
+<div class="relative flex items-center bg-surface-container-lowest rounded-xl shadow-lg shadow-on-surface/5 transition-shadow focus-within:shadow-xl">
+<span class="material-symbols-outlined text-outline ml-space-md text-[24px]">search</span>
+<input aria-label="Search FAQ questions" class="w-full h-14 pl-space-sm pr-space-xl font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 bg-transparent focus:outline-none" id="faq-search-input" placeholder="Search questions (e.g., certificate verification, GST invoice, laptop specs, Discord access)..." type="text"/>
+<button class="hidden absolute right-4 p-1 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors" id="clear-search-btn" title="Clear search" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Quick Search Tags -->
+<div class="flex flex-wrap items-center justify-center gap-space-xs mt-space-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Popular searches:</span>
+<button class="font-label-sm text-label-sm text-primary hover:underline" onclick="setSearch('certificate verification')" type="button">#certificate-verification</button>
+<button class="font-label-sm text-label-sm text-primary hover:underline" onclick="setSearch('GST invoice')" type="button">#gst-tax-invoice</button>
+<button class="font-label-sm text-label-sm text-primary hover:underline" onclick="setSearch('Discord')" type="button">#discord-invite</button>
+<button class="font-label-sm text-label-sm text-primary hover:underline" onclick="setSearch('laptop specs')" type="button">#system-requirements</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Support Stat Strip -->
+<section class="w-full bg-surface-container-low py-space-md px-margin">
+<div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-space-md">
+<div class="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[28px]">speed</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight">&lt; 15 min</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Avg. WhatsApp Response</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-primary text-[28px]">verified_user</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight">100%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Razorpay Secured UPI</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[28px]">workspace_premium</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight">ISO-Ready</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SHA-256 Verifiable Creds</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-primary-container text-[28px]">forum</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight">24 / 7</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Private Discord Mentorship</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Filter & Accordion Grid Section -->
+<section class="w-full py-space-2xl px-margin bg-background">
+<div class="max-w-5xl mx-auto flex flex-col gap-space-xl">
+<!-- Category Filter Pills -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Filter by topic category</span>
+<span class="font-label-sm text-label-sm text-primary font-semibold" id="results-counter">Showing 6 curated answers</span>
+</div>
+<div class="flex items-center gap-space-xs overflow-x-auto pb-2 scrollbar-none" id="category-filters" role="tablist">
+<button class="category-btn px-space-md py-space-xs rounded-full font-label-md text-label-md bg-primary text-on-primary shadow-sm transition-all whitespace-nowrap" data-category="all" type="button">
+            All Topics
+          </button>
+<button class="category-btn px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all whitespace-nowrap" data-category="enrollment" type="button">
+            Enrollment &amp; Razorpay
+          </button>
+<button class="category-btn px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all whitespace-nowrap" data-category="access" type="button">
+            Course Access &amp; Discord
+          </button>
+<button class="category-btn px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all whitespace-nowrap" data-category="assessments" type="button">
+            Assessments &amp; Quizzes
+          </button>
+<button class="category-btn px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all whitespace-nowrap" data-category="certificates" type="button">
+            Verifiable Certificates
+          </button>
+<button class="category-btn px-space-md py-space-xs rounded-full font-label-md text-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all whitespace-nowrap" data-category="refunds" type="button">
+            Refunds &amp; Guarantees
+          </button>
+</div>
+</div>
+<!-- FAQ Questions Container -->
+<div class="flex flex-col gap-space-md" id="faq-list">
+<!-- Question 1 -->
+<article class="faq-item group bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all" data-category="enrollment access" data-keywords="access instant immediately payment dashboard razorpay automated email login lms credentials upi">
+<button aria-expanded="true" class="faq-toggle w-full flex items-start justify-between gap-space-md text-left" type="button">
+<div class="flex items-start gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm text-[11px] font-bold">Enrollment</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm text-[11px]">Instant Access</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">How do I access my course immediately after payment?</h2>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[24px] shrink-0 transition-transform duration-200 icon-arrow rotate-180">expand_more</span>
+</button>
+<div class="faq-content mt-space-md pl-12 flex flex-col gap-space-sm text-on-surface-variant font-body-md text-body-md">
+<p>
+              Once your Razorpay payment completes via UPI, Debit/Credit card, NetBanking, or RuPay, two automated actions take place simultaneously within 3 seconds:
+            </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm my-space-xs">
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px] shrink-0">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface"><strong class="font-semibold">Instant Dashboard Redirect:</strong> Your browser unlocks the Student Library immediately with pre-provisioned LMS access.</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px] shrink-0">mark_email_read</span>
+<span class="font-body-sm text-body-sm text-on-surface"><strong class="font-semibold">Automated Email Receipt:</strong> A GST-compliant tax invoice and your unique magic login token are delivered straight to your inbox.</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              No manual activation or waiting for cohort review needed. Simply head over to <a class="text-primary font-semibold hover:underline" data-path="my-library" href="#">My Library</a> to start module 1 immediately.
+            </p>
+</div>
+</article>
+<!-- Question 2 -->
+<article class="faq-item group bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all" data-category="certificates assessments" data-keywords="when receive certificate automated capstone project review signed pdf qr code verify cryptographic sha-256 linkedin">
+<button aria-expanded="false" class="faq-toggle w-full flex items-start justify-between gap-space-md text-left" type="button">
+<div class="flex items-start gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">verified</span>
+</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm text-[11px] font-bold">Certificates</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm text-[11px]">Verification</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">When and how will I receive my certificate?</h2>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[24px] shrink-0 transition-transform duration-200 icon-arrow">expand_more</span>
+</button>
+<div class="faq-content hidden mt-space-md pl-12 flex flex-col gap-space-sm text-on-surface-variant font-body-md text-body-md">
+<p>
+              Your official DevAscent Certificate of Completion is automatically generated the moment two milestones are met:
+            </p>
+<ol class="list-decimal pl-5 space-y-1 font-body-sm text-body-sm text-on-surface">
+<li>100% of the video curriculum, interactive exercises, and checkpoint quizzes are submitted.</li>
+<li>Your end-of-track Capstone GitHub pull request passes our automated CI/CD code grader and mentor code review.</li>
+</ol>
+<div class="mt-space-xs p-space-md rounded-lg bg-surface-container flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[28px]">qr_code_scanner</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Includes Permanent Public QR Link &amp; SHA-256 Hash</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Recruiters can verify your original repository submission directly with one click.</span>
+</div>
+</div>
+<a class="px-space-md py-space-xs bg-primary text-on-primary rounded-lg font-label-md text-label-md whitespace-nowrap shadow-sm hover:bg-primary-container transition-colors" data-path="verify-certificate" href="#">
+                Try Verification Engine
+              </a>
+</div>
+</div>
+</article>
+<!-- Question 3 -->
+<article class="faq-item group bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all" data-category="access enrollment" data-keywords="lifetime access recordings starter code repository updates expire duration period cohort">
+<button aria-expanded="false" class="faq-toggle w-full flex items-start justify-between gap-space-md text-left" type="button">
+<div class="flex items-start gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary-container shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">all_inclusive</span>
+</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm text-[11px] font-bold">Course Access</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm text-[11px]">Lifetime Deal</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">How long do I have access to the recordings and starter code?</h2>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[24px] shrink-0 transition-transform duration-200 icon-arrow">expand_more</span>
+</button>
+<div class="faq-content hidden mt-space-md pl-12 flex flex-col gap-space-sm text-on-surface-variant font-body-md text-body-md">
+<p>
+              You receive <strong class="font-semibold text-on-surface">Lifetime Access</strong> with no annual recurring fees or expiration deadlines. This applies to:
+            </p>
+<ul class="list-disc pl-5 space-y-1 font-body-sm text-body-sm text-on-surface">
+<li>All 4K high-definition video lessons and module walkthroughs.</li>
+<li>Production starter templates, architecture diagrams, and GitHub repositories.</li>
+<li>Every future framework update (e.g., Next.js, Docker, Kubernetes revisions) released for this curriculum at zero extra cost.</li>
+</ul>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Even after landing your role or completing the program, you can revisit boilerplate code and interview cheat-sheets whenever preparing for engineering rounds.
+            </p>
+</div>
+</article>
+<!-- Question 4 -->
+<article class="faq-item group bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all" data-category="access assessments" data-keywords="technical issues bugs code-along doubt support discord mentor ama live 1-on-1 error assistance">
+<button aria-expanded="false" class="faq-toggle w-full flex items-start justify-between gap-space-md text-left" type="button">
+<div class="flex items-start gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">bug_report</span>
+</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm text-[11px] font-bold">Doubt Support</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm text-[11px]">Daily Mentorship</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">What if I face technical issues or bugs during the code-along?</h2>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[24px] shrink-0 transition-transform duration-200 icon-arrow">expand_more</span>
+</button>
+<div class="faq-content hidden mt-space-md pl-12 flex flex-col gap-space-sm text-on-surface-variant font-body-md text-body-md">
+<p>
+              We know coding alone leads to friction. That's why DevAscent operates a multi-tier resolution system so you never stay blocked:
+            </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm my-space-xs">
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs text-primary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[20px]">forum</span>
+<span>Dedicated Discord Channels</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Private forum with dedicated `#bug-help` channels manned by teaching assistants with SLA response under 30 minutes.
+                </p>
+</div>
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs text-secondary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[20px]">screen_share</span>
+<span>Daily Live Mentor AMA</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Hop onto daily Google Meet screen-sharing sessions every evening (8 PM to 10 PM IST) to debug complex stack traces with lead instructors.
+                </p>
+</div>
+</div>
+</div>
+</article>
+<!-- Question 5 -->
+<article class="faq-item group bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all" data-category="refunds enrollment" data-keywords="refund 7-day money-back guarantee policy friction cancel returns upi razorpay terms">
+<button aria-expanded="false" class="faq-toggle w-full flex items-start justify-between gap-space-md text-left" type="button">
+<div class="flex items-start gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm text-[11px] font-bold">Refund Policy</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm text-[11px]">Zero Risk</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">How does the 7-day money-back guarantee work?</h2>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[24px] shrink-0 transition-transform duration-200 icon-arrow">expand_more</span>
+</button>
+<div class="faq-content hidden mt-space-md pl-12 flex flex-col gap-space-sm text-on-surface-variant font-body-md text-body-md">
+<p>
+              We back our curriculum with a straightforward 100% money-back guarantee for 7 full calendar days from your purchase timestamp.
+            </p>
+<div class="bg-surface-container-low p-space-md rounded-lg flex flex-col gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface font-semibold">How to claim your refund:</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Send a single email to <a class="text-primary font-semibold hover:underline" href="mailto:support@devascent.io">support@devascent.io</a> or ping our WhatsApp desk with your Order ID. No awkward interrogations or minimum completion roadblocks.
+              </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Your refund is initiated back through the original Razorpay payment rail (UPI account, credit card, or NetBanking) within 2-4 business days.
+              </p>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              For full legal specifics, view our transparent <a class="text-primary font-medium hover:underline" data-path="refund-policy" href="#">Refund Policy Agreement</a>.
+            </p>
+</div>
+</article>
+<!-- Question 6 -->
+<article class="faq-item group bg-surface-container-lowest rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all" data-category="assessments access" data-keywords="laptop specs mac windows linux 8gb ram computer requirements hardware machine vs code docker">
+<button aria-expanded="false" class="faq-toggle w-full flex items-start justify-between gap-space-md text-left" type="button">
+<div class="flex items-start gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">laptop_mac</span>
+</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm text-[11px] font-bold">Prerequisites</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm text-[11px]">Hardware</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Do I need a high-end laptop or Mac to take this course?</h2>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[24px] shrink-0 transition-transform duration-200 icon-arrow">expand_more</span>
+</button>
+<div class="faq-content hidden mt-space-md pl-12 flex flex-col gap-space-sm text-on-surface-variant font-body-md text-body-md">
+<p>
+<strong class="font-semibold text-on-surface">No high-end machine is required.</strong> You do not need an expensive Apple Silicon MacBook or an RTX graphics card.
+            </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm my-space-xs">
+<div class="p-space-sm rounded-lg bg-surface-container-low">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold block mb-1">RAM</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">8 GB minimum (16 GB is ideal for Docker tasks)</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-bold block mb-1">Operating System</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Windows 10/11 (with WSL2), macOS 11+, or Linux</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold block mb-1">Cloud Free Tier</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">We supply free Cloud IDE setups (GitHub Codespaces / Gitpod)</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              We guide you through setting up lightweight VS Code extensions and cloud terminals so your computer stays swift without crashing.
+            </p>
+</div>
+</article>
+</div>
+<!-- No Results State (Hidden by default) -->
+<div class="hidden flex-col items-center justify-center p-space-2xl bg-surface-container-lowest rounded-xl text-center shadow-sm" id="faq-empty-state">
+<span class="material-symbols-outlined text-outline-variant text-[56px] mb-space-sm">search_off</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">No matching questions found</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mb-space-md">
+          We couldn't find an answer matching your query. Our admissions team is available right now on WhatsApp to assist you.
+        </p>
+<button class="px-space-md py-space-sm bg-surface-container-high text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors" onclick="resetSearchAndFilters()" type="button">
+          Reset Filters &amp; Search
+        </button>
+</div>
+</div>
+</section>
+<!-- Interactive Trust Highlights & Direct Escalation Grid -->
+<section class="w-full py-space-2xl px-margin bg-surface-container-low">
+<div class="max-w-5xl mx-auto flex flex-col gap-space-xl">
+<div class="text-center">
+<span class="font-label-sm text-label-sm text-primary font-bold uppercase tracking-wider">Help Categories &amp; Quick Guides</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mt-1">Frequently Consulted Documents</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<span class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">GST Billing &amp; Company Invoices</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Need your employer to sponsor this course? Enter your organization's GSTIN at checkout to receive formal tax invoices automatically.
+            </p>
+</div>
+<a class="mt-space-md inline-flex items-center gap-space-xs font-label-md text-label-md text-primary font-semibold hover:gap-space-sm transition-all" data-path="pricing" href="#">
+<span>Explore Cohort Pricing</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<span class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Credential Verification Portal</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Learn how our public ledger verifies completion certificates with recruiter-ready cryptographic SHA-256 signatures.
+            </p>
+</div>
+<a class="mt-space-md inline-flex items-center gap-space-xs font-label-md text-label-md text-secondary font-semibold hover:gap-space-sm transition-all" data-path="verify-certificate" href="#">
+<span>Verify Any Certificate</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<span class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[24px]">menu_book</span>
+</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Full Curriculum Architecture</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Inspect the weekly technical breakdown from basic DSA fundamentals to containerized Kubernetes deployment pipelines.
+            </p>
+</div>
+<a class="mt-space-md inline-flex items-center gap-space-xs font-label-md text-label-md text-primary font-semibold hover:gap-space-sm transition-all" data-path="curriculum" href="#">
+<span>View Syllabus Breakdown</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Help Card (Mandated Direct Support Callout) -->
+<section class="w-full py-space-2xl px-margin bg-background">
+<div class="max-w-5xl mx-auto">
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-on-background to-inverse-surface p-space-xl md:p-space-2xl text-inverse-on-surface shadow-xl">
+<!-- Visual background accents -->
+<div class="absolute top-0 right-0 w-72 h-72 bg-primary-container/20 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute bottom-0 left-1/3 w-64 h-64 bg-secondary/15 rounded-full blur-2xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-xl">
+<!-- Text Content -->
+<div class="flex flex-col max-w-xl">
+<div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-surface-container-lowest/10 w-fit mb-space-sm">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-secondary-fixed font-semibold tracking-wide uppercase">Admissions Desk Active</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-inverse-on-surface tracking-tight mb-space-xs">
+              Still have unanswered questions?
+            </h2>
+<p class="font-body-lg text-body-lg text-surface-variant/90 mb-space-md">
+              Talk directly to our lead instructor or admissions team on WhatsApp or email. Our team typically replies in under 15 minutes.
+            </p>
+<div class="flex flex-wrap items-center gap-space-md text-surface-variant font-label-md text-label-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary-fixed text-[20px]">timer</span>
+<span>Response time under 15 minutes</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary-fixed text-[20px]">verified</span>
+<span>Direct Instructor Access</span>
+</div>
+</div>
+</div>
+<!-- Direct CTA Buttons -->
+<div class="flex flex-col sm:flex-row lg:flex-col gap-space-sm w-full lg:w-auto shrink-0">
+<!-- WhatsApp Priority Action -->
+<a class="flex items-center justify-center gap-space-xs px-space-lg py-3 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md shadow-md hover:bg-on-secondary-container transition-all" href="https://wa.me/919876543210?text=Hi%20DevAscent%2C%20I%20have%20a%20question%20regarding%20the%20engineering%20cohort" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+<span>WhatsApp (+91 98765 43210)</span>
+</a>
+<!-- Email Action -->
+<a class="flex items-center justify-center gap-space-xs px-space-lg py-3 rounded-xl bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 text-inverse-on-surface font-label-md text-label-md transition-colors" href="mailto:support@devascent.io">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+<span>Email support@devascent.io</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  (function() {
+    const searchInput = document.getElementById('faq-search-input');
+    const clearBtn = document.getElementById('clear-search-btn');
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    const faqItems = document.querySelectorAll('.faq-item');
+    const emptyState = document.getElementById('faq-empty-state');
+    const counterLabel = document.getElementById('results-counter');
+
+    let activeCategory = 'all';
+
+    // Accordion Toggle
+    faqItems.forEach(item => {
+      const toggleBtn = item.querySelector('.faq-toggle');
+      const content = item.querySelector('.faq-content');
+      const arrow = item.querySelector('.icon-arrow');
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', !isExpanded);
+
+        if (isExpanded) {
+          content.classList.add('hidden');
+          arrow.classList.remove('rotate-180');
+        } else {
+          content.classList.remove('hidden');
+          arrow.classList.add('rotate-180');
+        }
+      });
+    });
+
+    // Category Filtering
+    categoryBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        categoryBtns.forEach(b => {
+          b.classList.remove('bg-primary', 'text-on-primary');
+          b.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+        });
+        btn.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+        btn.classList.add('bg-primary', 'text-on-primary');
+
+        activeCategory = btn.getAttribute('data-category');
+        applyFilterAndSearch();
+      });
+    });
+
+    // Live Search Input Listener
+    searchInput.addEventListener('input', (e) => {
+      if (e.target.value.trim().length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      applyFilterAndSearch();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      clearBtn.classList.add('hidden');
+      searchInput.focus();
+      applyFilterAndSearch();
+    });
+
+    function applyFilterAndSearch() {
+      const query = (searchInput.value || '').toLowerCase().trim();
+      let visibleCount = 0;
+
+      faqItems.forEach(item => {
+        const itemCategories = item.getAttribute('data-category') || '';
+        const itemKeywords = (item.getAttribute('data-keywords') || '').toLowerCase();
+        const itemText = item.textContent.toLowerCase();
+
+        const matchesCategory = activeCategory === 'all' || itemCategories.includes(activeCategory);
+        const matchesQuery = query === '' || itemText.includes(query) || itemKeywords.includes(query);
+
+        if (matchesCategory && matchesQuery) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+        counterLabel.textContent = 'No questions found';
+      } else {
+        emptyState.classList.add('hidden');
+        emptyState.classList.remove('flex');
+        counterLabel.textContent = `Showing ${visibleCount} curated answers`;
+      }
+    }
+
+    // Helper exposed globally for preset clicks
+    window.setSearch = function(text) {
+      searchInput.value = text;
+      clearBtn.classList.remove('hidden');
+      applyFilterAndSearch();
+      searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    window.resetSearchAndFilters = function() {
+      searchInput.value = '';
+      clearBtn.classList.add('hidden');
+      activeCategory = 'all';
+      categoryBtns.forEach((b, idx) => {
+        if (idx === 0) {
+          b.classList.add('bg-primary', 'text-on-primary');
+          b.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+        } else {
+          b.classList.remove('bg-primary', 'text-on-primary');
+          b.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+        }
+      });
+      applyFilterAndSearch();
+    };
+  })();
+</script></main><footer class="w-full bg-surface-container-low text-on-surface"><div class="max-w-7xl mx-auto px-margin pt-space-2xl pb-space-xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-space-xl"><div class="lg:col-span-4 flex flex-col gap-space-md"><div class="flex items-center gap-space-sm"><img alt="DevAscent Academy Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><span class="font-headline-sm text-headline-sm text-on-surface">DevAscent Academy</span></div><p class="font-body-md text-body-md text-on-surface-variant">The high-impact engineering accelerator engineered specifically for aspiring Indian developers, career-switchers, and tech leaders.</p><div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-high w-fit"><span class="material-symbols-outlined text-secondary text-[18px]">verified</span><span class="font-label-sm text-label-sm text-on-surface font-medium">Made for Indian Developers &amp; Students (BCA / MCA / B.Tech / Self-Taught)</span></div></div><div class="lg:col-span-3 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Curriculum &amp; Tracks</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="courses" href="#">All Courses</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="curriculum" href="#">Full Syllabus Breakdown</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="my-library" href="#">Student Library</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="verify-certificate" href="#">Certificate Verification</a></div></div><div class="lg:col-span-2 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Policies &amp; Trust</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="refund-policy" href="#">Refund Policy</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="terms-of-service" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="privacy-policy" href="#">Privacy Policy</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="support-faq" href="#">FAQ</a></div></div><div class="lg:col-span-3 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Student Support</span><p class="font-body-sm text-body-sm text-on-surface-variant">Have questions before enrolling? Our admissions mentors are available on WhatsApp and email.</p><div class="flex flex-col gap-space-xs"><a class="flex items-center gap-space-xs font-label-md text-label-md text-primary hover:text-on-primary-fixed transition-colors" href="mailto:support@devascent.io"><span class="material-symbols-outlined text-[18px]">mail</span>support@devascent.io</a><a class="flex items-center gap-space-xs font-label-md text-label-md text-secondary hover:text-on-secondary-fixed-variant transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">chat</span>WhatsApp Priority Support</a></div></div></div><div class="mt-space-xl pt-space-lg bg-surface-container rounded-xl p-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex flex-wrap items-center gap-space-md text-on-surface-variant"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">lock</span><span class="font-label-sm text-label-sm font-medium">Razorpay 256-bit SSL Encrypted Checkout</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">account_balance_wallet</span><span class="font-label-sm text-label-sm font-medium">UPI / RuPay / NetBanking Accepted</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">qr_code_2</span><span class="font-label-sm text-label-sm font-medium">Verifiable PDF Certificates with QR Verification</span></div></div><div class="font-body-sm text-body-sm text-on-surface-variant shrink-0">© 2025 DevAscent Academy. All rights reserved.</div></div></div></footer></body></html>

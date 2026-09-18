@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary": "#006c49", "on-error-container": "#93000a", "secondary-fixed": "#6ffbbe", "tertiary": "#454854", "surface-container-low": "#eff4ff", "surface": "#f8f9ff", "on-primary-container": "#dad7ff", "on-error": "#ffffff", "on-background": "#0b1c30", "error": "#ba1a1a", "surface-dim": "#cbdbf5", "on-primary": "#ffffff", "on-secondary": "#ffffff", "on-secondary-fixed": "#002113", "primary-fixed": "#e2dfff", "secondary-container": "#6cf8bb", "background": "#f8f9ff", "surface-container-lowest": "#ffffff", "tertiary-container": "#5c606c", "on-tertiary": "#ffffff", "on-tertiary-fixed": "#171b26", "surface-container-high": "#dce9ff", "on-tertiary-fixed-variant": "#434652", "primary-fixed-dim": "#c3c0ff", "outline": "#777587", "tertiary-fixed": "#dfe2f1", "tertiary-fixed-dim": "#c3c6d4", "primary": "#3525cd", "inverse-primary": "#c3c0ff", "on-surface": "#0b1c30", "outline-variant": "#c7c4d8", "on-primary-fixed-variant": "#3323cc", "on-primary-fixed": "#0f0069", "surface-tint": "#4d44e3", "surface-variant": "#d3e4fe", "on-surface-variant": "#464555", "on-secondary-container": "#00714d", "surface-container": "#e5eeff", "secondary-fixed-dim": "#4edea3", "inverse-surface": "#213145", "error-container": "#ffdad6", "on-tertiary-container": "#d8dbea", "surface-container-highest": "#d3e4fe", "inverse-on-surface": "#eaf1ff", "on-secondary-fixed-variant": "#005236", "surface-bright": "#f8f9ff", "primary-container": "#4f46e5" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-2xl": "4rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-md": "1rem", "margin": "2rem", "gutter": "1.5rem", "space-xs": "0.25rem", "space-xl": "2.5rem", "gutter-sm": "1rem", "margin-sm": "1rem" }, "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "label-md": ["Inter"], "body-sm": ["Inter"], "price-hero": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"] }, "fontSize": { "headline-lg": ["40px", { "lineHeight": "48px", "fontWeight": "700" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "price-hero": ["48px", { "lineHeight": "52px", "fontWeight": "800" }], "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "600" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "fontWeight": "800" }], "display-hero": ["56px", { "lineHeight": "64px", "fontWeight": "800" }] } } } }</script></head><body class="bg-background font-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm shrink-0"><a class="flex items-center gap-space-sm" data-path="courses" href="#"><img alt="DevAscent Academy Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface leading-none">DevAscent</span><span class="font-label-sm text-label-sm text-primary tracking-wide leading-tight uppercase">Academy</span></div></a></div><nav class="hidden xl:flex items-center gap-space-md" data-active-classes="text-primary font-bold"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="courses" href="#">Courses</a><a aria-current="page" class="transition-colors text-primary font-bold" data-path="ai-notes" href="#">Notes Generator</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="ai-qa" href="#">AI Q&amp;A</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="pdf-summarizer" href="#">PDF Summarizer</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="roadmap" href="#">Roadmap</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="voice-tts" href="#">Voice &amp; TTS</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="analytics" href="#">Analytics</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="achievements" href="#">Achievements</a></nav><div class="flex items-center gap-space-sm shrink-0"><div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm text-[11px] font-bold tracking-wide"><span class="material-symbols-outlined text-[14px]">verified</span><span>Verified Cohort • Starts Monday</span></div><button class="p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark / Light Mode" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><a class="hidden sm:flex items-center gap-space-xs bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md px-space-md py-space-sm rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition-all" data-path="pricing" href="#"><span>Enroll Now (₹1,499)</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span></a><div class="relative group flex items-center pl-space-xs"><button class="flex items-center gap-1.5 focus:outline-none p-1 rounded-full hover:bg-surface-container-high transition-colors" type="button"><img alt="Student Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyuN7Ngh2YgpmPsJ3RuKZX9aFSINrfY7yuH2KNnvetZV8uAKXG2eOcTspJr1-afr2xk9Xi0uHHeJCQ5kmY60aVLhKisE4fFZveYafG3eVTKmVcbdyhpdp0ekSUpJRcov2JlEWFmCoyIKIH3eh_b1HqvLPSRP62IdBftRqHstqNnE9WFLbhYegxncQ-Kc6a34eaG04fizRe2-U4T8GE6yUynrSdAlX4VxK4J-eiCFn2tn0o4haZsog"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></button><div class="absolute right-0 top-full mt-2 w-52 py-2 bg-surface-container-lowest rounded-xl shadow-[0_10px_15px_-3px_rgba(15,23,42,0.08),0_4px_6px_-4px_rgba(15,23,42,0.04)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col z-50"><div class="px-4 py-2 bg-surface-container-low mx-2 rounded-lg mb-1"><p class="font-label-sm text-label-sm text-on-surface font-semibold truncate">Dev Student</p><p class="font-label-sm text-label-sm text-on-surface-variant text-[11px] truncate">student@devascent.io</p></div><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="analytics" href="#"><span class="material-symbols-outlined text-[18px]">insights</span>Analytics</a><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="achievements" href="#"><span class="material-symbols-outlined text-[18px]">workspace_premium</span>Achievements</a><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="roadmap" href="#"><span class="material-symbols-outlined text-[18px]">alt_route</span>My Roadmap</a></div></div></div></div></header><main class="w-full pt-20 bg-background"><div class="flex flex-col w-full">
+<!-- Subtle Ambient Glow Canvas -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute top-0 right-1/4 w-96 h-96 bg-surface-container-high/60 rounded-full blur-3xl pointer-events-none -z-10"></div>
+<div class="absolute top-32 left-1/12 w-80 h-80 bg-primary-fixed/40 rounded-full blur-3xl pointer-events-none -z-10"></div>
+<div class="max-w-7xl mx-auto px-margin py-space-xl flex flex-col gap-space-xl">
+<!-- Top Header & Metadata Strip -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs max-w-3xl">
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="hover:text-primary transition-colors cursor-pointer">DevAscent AI Suite</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">AI Notes Generator</span>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm pt-space-xs">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+              AI Lecture &amp; Code Notes Generator
+            </h1>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold shadow-sm">
+<span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+              Multi-Model Synthesis v4.2
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pt-1 max-w-2xl leading-relaxed">
+            Automatically transform cohort video sessions, system design deep dives, and live coding lectures into structured, production-ready engineering notes.
+          </p>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-end">
+<div class="flex items-center gap-2 px-space-md py-2 rounded-xl bg-surface-container-low shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">LLM Ingestion Active: Whisper v3 + Claude 3.5 Sonnet</span>
+</div>
+</div>
+</section>
+<!-- Main Workspace: Asymmetric Split Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Left Controls / Input Panel (w-1/3: 4 cols) -->
+<aside class="lg:col-span-4 flex flex-col gap-space-md">
+<!-- Control Parameters Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">tune</span>
+<span class="font-headline-sm text-[16px] text-on-surface font-bold">Extraction Setup</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-md">Cohort #14</span>
+</div>
+<!-- Lecture / Video Source Selector -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold flex items-center justify-between" for="lecture-select">
+<span>Lecture / Video Source</span>
+<span class="font-label-sm text-[11px] text-secondary font-medium">Recorded Session</span>
+</label>
+<div class="relative">
+<select class="w-full h-11 pl-3 pr-9 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none appearance-none cursor-pointer" id="lecture-select">
+<option selected="">Module 4: Distributed Idempotency &amp; Razorpay Webhooks</option>
+<option>Module 3: PostgreSQL Write Amplification &amp; B-Trees</option>
+<option>Module 2: Redis Streams vs Kafka Partitioning</option>
+<option>Module 1: TCP Handshakes, TLS 1.3 &amp; Keep-Alive Sockets</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 pointer-events-none text-on-surface-variant text-[18px]">expand_more</span>
+</div>
+</div>
+<!-- Video Timestamp Range Filter -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Video Range</label>
+<button class="font-label-sm text-[11px] text-primary hover:underline" id="rangeToggleBtn" type="button">Reset to Full (01:45:20)</button>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">From</span>
+<input class="bg-transparent font-mono text-xs text-on-surface focus:outline-none font-medium w-16" type="text" value="00:00:00"/>
+</div>
+</div>
+<div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">To</span>
+<input class="bg-transparent font-mono text-xs text-on-surface focus:outline-none font-medium w-16" type="text" value="01:45:20"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Custom Focus Prompt Input -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold flex items-center justify-between" for="promptInput">
+<span>Custom Synthesis Prompt</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">Optional</span>
+</label>
+<textarea class="w-full p-3 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none resize-none" id="promptInput" placeholder="e.g. Focus heavily on race conditions in Redis Redlock, distributed deadlocks, and idempotency key best practices." rows="3">Focus heavily on race conditions in Redis Redlock, distributed deadlocks, and idempotency key best practices.</textarea>
+</div>
+<!-- Detail Level Tabs -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Detail Level</label>
+<div class="grid grid-cols-3 gap-1 bg-surface-container-low p-1 rounded-lg text-center" id="detailTabs">
+<button class="py-1.5 text-xs font-label-sm rounded-md transition-all text-on-surface-variant hover:text-on-surface" type="button">Summary</button>
+<button class="py-1.5 text-xs font-label-sm rounded-md transition-all bg-surface-container-lowest text-primary shadow-sm font-bold" type="button">Deep Dive</button>
+<button class="py-1.5 text-xs font-label-sm rounded-md transition-all text-on-surface-variant hover:text-on-surface" type="button">Cheat Sheet</button>
+</div>
+</div>
+<!-- Output Formatting Checkboxes -->
+<div class="flex flex-col gap-2 pt-1">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Engine Output Artifacts</span>
+<label class="flex items-center gap-2.5 p-2 rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors">
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex flex-col leading-tight">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Mermaid Sequence Diagram</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">ASCII &amp; rendered SVG pipeline states</span>
+</div>
+</label>
+<label class="flex items-center gap-2.5 p-2 rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors">
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex flex-col leading-tight">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Benchmark Code Snippets</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Production Go &amp; TypeScript samples</span>
+</div>
+</label>
+<label class="flex items-center gap-2.5 p-2 rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors">
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex flex-col leading-tight">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Anki Flashcard Deck</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Auto-exports key terms &amp; interview Qs</span>
+</div>
+</label>
+</div>
+<!-- CTA Actions -->
+<div class="flex flex-col gap-2 pt-space-xs">
+<button class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md h-12 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-[0.99]" id="generateBtn" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span>Generate Engineering Notes</span>
+</button>
+<button class="w-full flex items-center justify-center gap-2 bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md h-10 rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">history</span>
+<span>Load Last Cached Note</span>
+</button>
+</div>
+</div>
+<!-- Quick Stats / Token Usage Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">memory</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Synthesis Pipeline</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Tokens consumed: 12,410</span>
+</div>
+</div>
+<div class="flex items-center gap-1 font-mono text-xs font-semibold text-secondary">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Online</span>
+</div>
+</div>
+<!-- Recent Notes Sidebar -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pb-1">
+<span class="font-headline-sm text-[16px] text-on-surface font-bold">Recent Lecture Notes</span>
+<a class="font-label-sm text-[12px] text-primary hover:underline" href="#">View All (28)</a>
+</div>
+<div class="flex flex-col gap-2">
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer flex items-center justify-between group">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-md bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">description</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-[13px] text-on-surface font-semibold truncate group-hover:text-primary transition-colors">Redis Cluster Split-Brain Notes</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Oct 28 • 2,420 words</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer flex items-center justify-between group">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-md bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">description</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-[13px] text-on-surface font-semibold truncate group-hover:text-primary transition-colors">Postgres MVCC &amp; Isolation Levels</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Oct 24 • 1,910 words</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer flex items-center justify-between group">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-md bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">description</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-[13px] text-on-surface font-semibold truncate group-hover:text-primary transition-colors">Kafka vs RabbitMQ Architecture</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Oct 18 • 3,150 words</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Right Main Content Canvas (w-2/3: 8 cols) -->
+<main class="lg:col-span-8 flex flex-col gap-space-md">
+<!-- Document Action Toolbar -->
+<div class="bg-surface-container-lowest rounded-xl p-space-sm px-space-md shadow-sm flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Synthesized Document Preview</span>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-wrap items-center gap-1.5 text-on-surface">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors" id="copyBtn" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span>Copy MD</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">tab</span>
+<span>Notion</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>.MD</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">print</span>
+<span>PDF</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-sm text-label-sm font-semibold hover:bg-primary hover:text-on-primary transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+<span>Push to GitHub</span>
+</button>
+</div>
+</div>
+<!-- The Rendered Note Document Container -->
+<article class="bg-surface-container-lowest rounded-2xl p-space-xl shadow-sm flex flex-col gap-space-xl">
+<!-- Document Header -->
+<header class="flex flex-col gap-space-sm pb-space-md border-b-0">
+<div class="flex flex-wrap items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-[12px] font-bold">
+                  ADVANCED SYSTEM DESIGN
+                </span>
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-[12px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                  100% Cohort Syllabus Aligned
+                </span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+                Module 4: Distributed Idempotency Invariants &amp; Lock Protocols
+              </h2>
+<!-- Metadata Pills -->
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 font-label-sm text-label-sm text-on-surface-variant pt-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">speed</span>
+<span>Generated in <strong class="text-on-surface">4.2s</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">article</span>
+<span>Word count: <strong class="text-on-surface">1,840 words</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">label</span>
+<span>Key terms: <strong class="text-on-surface">14 indexed</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">mic</span>
+<span>Instructor: <strong class="text-on-surface">Staff Eng. Vikramaditya</strong></span>
+</div>
+</div>
+</header>
+<!-- Section 1: Executive Architectural TL;DR -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-md bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">01</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Executive Architectural TL;DR</h3>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-lg flex flex-col gap-space-sm">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                  In distributed Indian fintech workflows—such as handling high-throughput asynchronous webhooks from <strong>Razorpay, PhonePe, or NPCI UPI switches</strong>—at-least-once network guarantees will inevitably create duplicate requests. Achieving strict idempotency without introducing catastrophic write lock contention requires a dual-tier persistence invariant.
+                </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm pt-space-xs">
+<div class="bg-surface-container-lowest p-space-md rounded-lg flex flex-col gap-1 shadow-sm">
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-primary font-bold">Key Invariant #1</span>
+<h4 class="font-label-md text-label-md text-on-surface font-semibold">Natural vs Synthetic Keys</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Never trust client-generated UUIDs solely. Pair vendor signature hashes with order references (<code class="text-xs bg-surface-container px-1 py-0.5 rounded">x-razorpay-signature</code>).</p>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-lg flex flex-col gap-1 shadow-sm">
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-primary font-bold">Key Invariant #2</span>
+<h4 class="font-label-md text-label-md text-on-surface font-semibold">Atomic Guard (SETNX)</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Execute state reservation in Redis with TTL before hitting relational DB transactions to prevent thread exhaustion.</p>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-lg flex flex-col gap-1 shadow-sm">
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-secondary font-bold">Key Invariant #3</span>
+<h4 class="font-label-md text-label-md text-on-surface font-semibold">Postgres Upsert Guard</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Final layer defense relies on <code class="text-xs bg-surface-container px-1 py-0.5 rounded">ON CONFLICT (idempotency_key) DO NOTHING</code> with read committed isolation.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Visual Topology & Flow -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-md bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">02</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Distributed Ingestion Topology</h3>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mermaid Sequence Diagram</span>
+</div>
+<!-- Topology Visual Canvas -->
+<div class="bg-surface-container-low rounded-xl p-space-lg flex flex-col gap-space-md">
+<!-- SVG Diagram Rendering -->
+<div class="w-full overflow-x-auto py-2">
+<div class="min-w-[620px] flex flex-col items-center">
+<!-- Diagram Actors -->
+<div class="grid grid-cols-4 w-full gap-4 pb-4">
+<div class="flex flex-col items-center p-2 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">webhook</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Razorpay Webhook</span>
+<span class="text-[10px] text-on-surface-variant">External Source</span>
+</div>
+<div class="flex flex-col items-center p-2 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">dns</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">API Edge Gateway</span>
+<span class="text-[10px] text-on-surface-variant">Go Gin Engine</span>
+</div>
+<div class="flex flex-col items-center p-2 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]">lock</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Redis Cluster</span>
+<span class="text-[10px] text-on-surface-variant">Redlock TTL 15s</span>
+</div>
+<div class="flex flex-col items-center p-2 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-tertiary text-[20px]">database</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">PostgreSQL Ledger</span>
+<span class="text-[10px] text-on-surface-variant">ACID Target</span>
+</div>
+</div>
+<!-- Flow SVG Representation -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+<svg class="w-full h-44 text-on-surface" fill="none" viewbox="0 0 700 170" xmlns="http://www.w3.org/2000/svg">
+<!-- Step 1 Line -->
+<path class="text-primary" d="M 90 25 L 260 25" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></path>
+<polygon class="text-primary" fill="currentColor" points="260,21 268,25 260,29"></polygon>
+<text class="font-mono text-[10px] fill-current text-primary font-bold" text-anchor="middle" x="175" y="18">1. POST /webhook/razorpay (event_id)</text>
+<!-- Step 2 Line -->
+<path class="text-secondary" d="M 268 60 L 440 60" stroke="currentColor" stroke-width="2"></path>
+<polygon class="text-secondary" fill="currentColor" points="440,56 448,60 440,64"></polygon>
+<text class="font-mono text-[10px] fill-current text-secondary font-bold" text-anchor="middle" x="355" y="52">2. SET key:{event_id} NX EX 15</text>
+<!-- Step 3 Decision Branch -->
+<path class="text-on-surface-variant" d="M 448 85 L 268 85" stroke="currentColor" stroke-dasharray="2 2" stroke-width="1.5"></path>
+<polygon class="text-on-surface-variant" fill="currentColor" points="272,81 264,85 272,89"></polygon>
+<text class="font-mono text-[10px] fill-current text-on-surface-variant" text-anchor="middle" x="355" y="100">3. OK (Acquired Lock) OR Nil (Reject Dupe)</text>
+<!-- Step 4 Line to DB -->
+<path class="text-primary" d="M 268 125 L 610 125" stroke="currentColor" stroke-width="2"></path>
+<polygon class="text-primary" fill="currentColor" points="610,121 618,125 610,129"></polygon>
+<text class="font-mono text-[10px] fill-current text-primary font-bold" text-anchor="middle" x="440" y="120">4. INSERT INTO webhook_events ON CONFLICT DO NOTHING</text>
+<!-- Step 5 200 OK ACK -->
+<path class="text-secondary" d="M 260 155 L 90 155" stroke="currentColor" stroke-width="2"></path>
+<polygon class="text-secondary" fill="currentColor" points="98,151 90,155 98,159"></polygon>
+<text class="font-mono text-[10px] fill-current text-secondary font-bold" text-anchor="middle" x="175" y="150">5. 200 HTTP OK (Razorpay Stopped Retry)</text>
+</svg>
+</div>
+</div>
+</div>
+<!-- Architectural Commentary -->
+<div class="p-space-md rounded-lg bg-surface-container flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">lightbulb</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Critical Design Rule from Cohort Q&amp;A</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Always respond with HTTP <code class="bg-surface-container-lowest px-1 py-0.5 rounded font-mono text-xs">200 OK</code> immediately once duplicate detection confirms the event is already in-flight or completed. If you return 5xx or 429 during duplicate detection, Razorpay will exponentially back off and retry, compounding queue pressure.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Idiomatic Production Code Implementation -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-md bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">03</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Idiomatic Production Implementation</h3>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-mono text-xs font-semibold">Golang 1.23</span>
+<span class="px-2.5 py-1 rounded bg-surface-container-low text-on-surface-variant font-mono text-xs font-semibold">TypeScript (Client)</span>
+</div>
+</div>
+<!-- Terminal Code Canvas -->
+<div class="rounded-xl overflow-hidden shadow-md" style="background-color: #0b0f19;">
+<!-- Terminal Header Bar -->
+<div class="flex items-center justify-between px-4 py-3 bg-tertiary-container/30">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="w-3 h-3 rounded-full bg-secondary-container"></span>
+<span class="w-3 h-3 rounded-full bg-primary-container"></span>
+<span class="font-mono text-xs text-outline-variant pl-2">internal/webhook/idempotency_guard.go</span>
+</div>
+<button class="text-outline-variant hover:text-on-primary flex items-center gap-1 font-mono text-xs" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>copy snippet</span>
+</button>
+</div>
+<!-- Code Lines -->
+<div class="p-4 font-mono text-xs leading-relaxed text-surface-container-high overflow-x-auto">
+<div class="flex gap-4">
+<div class="text-tertiary select-none text-right pr-2">
+                      01<br/>02<br/>03<br/>04<br/>05<br/>06<br/>07<br/>08<br/>09<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17<br/>18<br/>19<br/>20
+                    </div>
+<div class="flex-1">
+<span class="text-secondary-fixed">package</span> webhook<br/><br/>
+<span class="text-secondary-fixed">import</span> (<br/>
+                        <span class="text-secondary-container">"context"</span><br/>
+                        <span class="text-secondary-container">"fmt"</span><br/>
+                        <span class="text-secondary-container">"time"</span><br/>
+                        <span class="text-secondary-container">"github.com/redis/go-redis/v9"</span><br/>
+                      )<br/><br/>
+<span class="text-outline-variant">// AcquireLock enforces atomic single-flight execution for vendor events</span><br/>
+<span class="text-secondary-fixed">func</span> <span class="text-primary-fixed">AcquireLock</span>(ctx context.Context, rdb *redis.Client, eventID <span class="text-primary-fixed">string</span>, ttl time.Duration) (<span class="text-primary-fixed">bool</span>, <span class="text-primary-fixed">error</span>) {<br/>
+                        key := fmt.Sprintf(<span class="text-secondary-container">"lock:razorpay:event:%s"</span>, eventID)<br/>
+                        <span class="text-outline-variant">// SETNX: Atomic set if not exists</span><br/>
+                        ok, err := rdb.SetNX(ctx, key, <span class="text-secondary-container">"PROCESSING"</span>, ttl).Result()<br/>
+                        <span class="text-secondary-fixed">if</span> err != <span class="text-secondary-fixed">nil</span> {<br/>
+                          <span class="text-secondary-fixed">return</span> <span class="text-secondary-fixed">false</span>, fmt.Errorf(<span class="text-secondary-container">"redis lock failure: %w"</span>, err)<br/>
+                        }<br/>
+                        <span class="text-secondary-fixed">return</span> ok, <span class="text-secondary-fixed">nil</span><br/>
+                      }
+                    </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Production Pitfalls & Hard Truths -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-md bg-error text-on-error flex items-center justify-center font-bold text-xs">04</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Production Pitfalls &amp; Hard Truths</h3>
+</div>
+<div class="p-space-lg rounded-xl bg-error-container text-on-error-container flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center gap-2 font-bold text-headline-sm text-[16px]">
+<span class="material-symbols-outlined text-[22px]">warning</span>
+<span>Anti-Pattern: Zombie Key Deadlocks with Non-Expiring Keys</span>
+</div>
+<p class="font-body-md text-body-md leading-relaxed">
+                  During live production surges (e.g. Flash Sales, Flipkart Big Billion Days, or festival cohort enrollments), services may panic or experience OOM kills after acquiring a lock but <em>before</em> committing DB records. If your Redis lock does not feature a mathematically bound TTL, the event ID remains locked permanently, preventing legitimate automatic retries from ever settling the transaction.
+                </p>
+<div class="bg-surface-container-lowest/80 p-space-md rounded-lg text-on-surface flex flex-col gap-1 shadow-sm">
+<span class="font-label-sm text-label-sm font-bold text-error">The Gold Standard Fix:</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Always set TTL to exactly <code class="bg-surface-container px-1 py-0.5 rounded font-mono text-xs">3x Max-SLA</code> of your slowest downstream write. Include a Lua script release check that compares an execution nonce so workers do not delete subsequent requests' locks.
+                  </p>
+</div>
+</div>
+</section>
+<!-- Section 5: Key Takeaways & Community Discussion -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-md bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">05</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Discussion Prompts for Peer Cohort</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">forum</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Discord Peer Challenge #1</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    If Redis experiences a failover before the master replicates the newly acquired <code class="font-mono text-xs bg-surface-container px-1">SETNX</code> key to the replica, what happens to incoming duplicate webhooks? How does Martin Kleppmann’s critique of Redlock apply here?
+                  </p>
+<a class="font-label-sm text-label-sm text-primary font-semibold hover:underline pt-1" href="#">Join Discussion →</a>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">psychology</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Interview System Question</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    How would you build an idempotency key layer for an internal microservice mesh communicating via gRPC over HTTP/2 without utilizing an external distributed caching tier?
+                  </p>
+<a class="font-label-sm text-label-sm text-secondary font-semibold hover:underline pt-1" href="#">Review Model Solution →</a>
+</div>
+</div>
+</section>
+<!-- Bottom Floating Action Strip inside Document -->
+<footer class="pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-2">
+<img alt="Student Avatar" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyuN7Ngh2YgpmPsJ3RuKZX9aFSINrfY7yuH2KNnvetZV8uAKXG2eOcTspJr1-afr2xk9Xi0uHHeJCQ5kmY60aVLhKisE4fFZveYafG3eVTKmVcbdyhpdp0ekSUpJRcov2JlEWFmCoyIKIH3eh_b1HqvLPSRP62IdBftRqHstqNnE9WFLbhYegxncQ-Kc6a34eaG04fizRe2-U4T8GE6yUynrSdAlX4VxK4J-eiCFn2tn0o4haZsog"/>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Saved to Cohort Workspace</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Auto-synced with DevAscent Cloud</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-4 py-2 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high text-xs font-label-sm font-semibold transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+<span>Save Bookmark</span>
+</button>
+<button class="px-4 py-2 rounded-lg bg-primary-container text-on-primary hover:bg-primary text-xs font-label-sm font-semibold transition-all shadow-sm flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">share</span>
+<span>Share with Cohort Pod</span>
+</button>
+</div>
+</footer>
+</article>
+</main>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    // Interactive Detail Tabs
+    const tabs = document.querySelectorAll('#detailTabs button');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => {
+          t.className = 'py-1.5 text-xs font-label-sm rounded-md transition-all text-on-surface-variant hover:text-on-surface';
+        });
+        tab.className = 'py-1.5 text-xs font-label-sm rounded-md transition-all bg-surface-container-lowest text-primary shadow-sm font-bold';
+      });
+    });
+
+    // Copy Markdown Feedback
+    const copyBtn = document.getElementById('copyBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const originalHtml = copyBtn.innerHTML;
+        copyBtn.innerHTML = `<span class="material-symbols-outlined text-[16px] text-secondary">check</span><span class="text-secondary font-semibold">Copied!</span>`;
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHtml;
+        }, 1800);
+      });
+    }
+
+    // Generate Button Spinner Simulation
+    const generateBtn = document.getElementById('generateBtn');
+    if (generateBtn) {
+      generateBtn.addEventListener('click', () => {
+        const originalContent = generateBtn.innerHTML;
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = `<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span><span>Synthesizing Transcript...</span>`;
+        setTimeout(() => {
+          generateBtn.disabled = false;
+          generateBtn.innerHTML = originalContent;
+        }, 1200);
+      });
+    }
+  })();
+</script></main><footer class="w-full bg-surface-container-low text-on-surface"><div class="max-w-7xl mx-auto px-margin pt-space-2xl pb-space-xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-space-xl"><div class="lg:col-span-4 flex flex-col gap-space-md"><div class="flex items-center gap-space-sm"><img alt="DevAscent Academy Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><span class="font-headline-sm text-headline-sm text-on-surface">DevAscent Academy</span></div><p class="font-body-md text-body-md text-on-surface-variant">The high-impact engineering accelerator engineered specifically for aspiring Indian developers, career-switchers, and tech leaders.</p><div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-high w-fit"><span class="material-symbols-outlined text-secondary text-[18px]">verified</span><span class="font-label-sm text-label-sm text-on-surface font-medium">Made for Indian Developers &amp; Students (BCA / MCA / B.Tech / Self-Taught)</span></div></div><div class="lg:col-span-3 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Learning Hub &amp; AI Tools</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="ai-notes" href="#">Notes Generator</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="ai-qa" href="#">AI Q&amp;A Assistant</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="pdf-summarizer" href="#">PDF Summarizer</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="roadmap" href="#">Career Roadmap</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="voice-tts" href="#">Voice &amp; Audio Studio</a></div></div><div class="lg:col-span-2 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Analytics &amp; Profile</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="analytics" href="#">Performance Analytics</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="achievements" href="#">Badges &amp; Certificates</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="terms-of-service" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="privacy-policy" href="#">Privacy Policy</a></div></div><div class="lg:col-span-3 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Student Support</span><p class="font-body-sm text-body-sm text-on-surface-variant">Have questions before enrolling? Our admissions mentors are available on WhatsApp and email.</p><div class="flex flex-col gap-space-xs"><a class="flex items-center gap-space-xs font-label-md text-label-md text-primary hover:text-on-primary-fixed transition-colors" href="mailto:support@devascent.io"><span class="material-symbols-outlined text-[18px]">mail</span>support@devascent.io</a><a class="flex items-center gap-space-xs font-label-md text-label-md text-secondary hover:text-on-secondary-fixed-variant transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">chat</span>WhatsApp Priority Support</a></div></div></div><div class="mt-space-xl pt-space-lg bg-surface-container rounded-xl p-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex flex-wrap items-center gap-space-md text-on-surface-variant"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">lock</span><span class="font-label-sm text-label-sm font-medium">Razorpay 256-bit SSL Encrypted Checkout</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">account_balance_wallet</span><span class="font-label-sm text-label-sm font-medium">UPI / RuPay / NetBanking Accepted</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">qr_code_2</span><span class="font-label-sm text-label-sm font-medium">Verifiable PDF Certificates with QR Verification</span></div></div><div class="font-body-sm text-body-sm text-on-surface-variant shrink-0">© 2025 DevAscent Academy. All rights reserved.</div></div></div></footer></body></html>

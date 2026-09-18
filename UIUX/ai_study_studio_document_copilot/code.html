@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-bright":"#f8f9ff","surface-container-lowest":"#ffffff","primary":"#3525cd","secondary-fixed-dim":"#4edea3","outline":"#777587","inverse-on-surface":"#eaf1ff","surface":"#f8f9ff","on-primary-container":"#dad7ff","on-primary":"#ffffff","inverse-primary":"#c3c0ff","on-secondary":"#ffffff","primary-fixed-dim":"#c3c0ff","surface-container-highest":"#d3e4fe","inverse-surface":"#213145","on-tertiary-fixed-variant":"#434652","primary-fixed":"#e2dfff","secondary-container":"#6cf8bb","on-secondary-fixed":"#002113","surface-container":"#e5eeff","on-surface-variant":"#464555","tertiary":"#454854","error":"#ba1a1a","on-tertiary-fixed":"#171b26","on-tertiary":"#ffffff","surface-variant":"#d3e4fe","on-tertiary-container":"#d8dbea","secondary":"#006c49","surface-tint":"#4d44e3","on-primary-fixed":"#0f0069","on-error":"#ffffff","surface-dim":"#cbdbf5","outline-variant":"#c7c4d8","surface-container-low":"#eff4ff","tertiary-fixed":"#dfe2f1","secondary-fixed":"#6ffbbe","on-secondary-fixed-variant":"#005236","surface-container-high":"#dce9ff","tertiary-container":"#5c606c","on-background":"#0b1c30","tertiary-fixed-dim":"#c3c6d4","background":"#f8f9ff","on-surface":"#0b1c30","primary-container":"#4f46e5","error-container":"#ffdad6","on-secondary-container":"#00714d","on-primary-fixed-variant":"#3323cc","on-error-container":"#93000a"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"gutter-sm":"1rem","gutter":"1.5rem","space-xs":"0.25rem","space-2xl":"4rem","space-md":"1rem","margin":"2rem","space-xl":"2.5rem","space-sm":"0.5rem","space-lg":"1.5rem","margin-sm":"1rem"},fontFamily:{"body-sm":["Inter"],"headline-sm":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"label-sm":["Inter"],"body-lg":["Inter"],"display-hero":["Plus Jakarta Sans"],"body-md":["Inter"],"label-md":["Inter"],"price-hero":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"]},fontSize:{"body-sm":["14px",{lineHeight:"20px",fontWeight:"400"}],"headline-sm":["20px",{lineHeight:"28px",fontWeight:"600"}],"headline-lg":["40px",{lineHeight:"48px",fontWeight:"700"}],"label-sm":["12px",{lineHeight:"16px",fontWeight:"600"}],"body-lg":["18px",{lineHeight:"28px",fontWeight:"400"}],"display-hero":["56px",{lineHeight:"64px",fontWeight:"800"}],"body-md":["16px",{lineHeight:"24px",fontWeight:"400"}],"label-md":["14px",{lineHeight:"20px",fontWeight:"600"}],"price-hero":["48px",{lineHeight:"52px",fontWeight:"800"}],"display-hero-mobile":["36px",{lineHeight:"44px",fontWeight:"800"}],"headline-lg-mobile":["28px",{lineHeight:"36px",fontWeight:"700"}],"headline-md":["28px",{lineHeight:"36px",fontWeight:"600"}]}}}}</script></head><body class="bg-surface text-on-surface font-body-md"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 max-w-[1200px] mx-auto px-gutter flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm" data-path="courses" href="#"><img alt="Brand logo. - Primary color: #4f46e5
+- Font: plusJakartaSans
+- Mode: light
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">DevAscent</span></a><nav class="hidden xl:flex items-center gap-space-xs" data-active-classes="bg-surface-container text-primary font-label-md"><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="courses" href="#">Courses</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="curriculum" href="#">Curriculum</a><a aria-current="page" class="px-space-sm py-space-xs rounded transition-colors bg-surface-container text-primary font-label-md" data-path="ai-studio" href="#">AI Studio</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="roadmaps" href="#">Roadmaps</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="analytics" href="#">Analytics</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="community" href="#">Community</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="referrals" href="#">Referrals</a></nav></div><div class="flex items-center gap-space-sm sm:gap-space-md"><div class="hidden sm:flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-surface-container-low text-secondary font-label-sm text-label-sm"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span>Cohort Active</span></div><button aria-label="Toggle theme" class="p-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px] block">light_mode</span></button><div class="flex items-center gap-space-sm pl-space-xs sm:pl-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1WHXYoO3be0Gcvx81Neg1Km88hSGS1ipGARyTvruO5pPaEqcdX2udFS3N4fAhZkfbcUzT3B2AKOxddiHaZ8bXeSz0p-Qjr60FIoLiA7Gm_k1zihq5Ul_JJUhxdaIaX8iYhBOe5T0cznu6FJNg1s9ebSDnwt4cqEFIJwE6nGpjVFGZrK6Kn6GjSLIW0G4ikgn8fq1DByhk2-P3b3vyT_Rc74FWSbAxjWyrbxYA9n5qSYpgLlAdkRBjlIzQ"/><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface leading-tight">Aarav Sharma</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">Full Stack Fellow</span></div></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-16rem)]"><div class="flex flex-col w-full">
+<!-- Studio Breadcrumb & Context Header Bar -->
+<section class="w-full bg-surface-container-lowest shadow-sm">
+<div class="max-w-[1200px] mx-auto px-gutter py-space-md flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span>AI Learning Copilot • v2.4</span>
+</div>
+<span class="text-outline-variant">•</span>
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<span>Cohort 14: High-Scale Systems</span>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface font-semibold">Module 4: Distributed Idempotency</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container rounded font-label-sm text-label-sm text-secondary">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>GPU Sandbox Ready (L4 24GB)</span>
+</div>
+<div class="flex items-center rounded-lg bg-surface-container p-1 gap-1">
+<button class="px-space-sm py-1 rounded font-label-sm text-label-sm bg-surface-container-lowest text-primary shadow-sm transition-all" id="tab-notes-btn" onclick="switchMainTab('notes')">
+            Notes &amp; PDF Synthesizer
+          </button>
+<button class="px-space-sm py-1 rounded font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all" id="tab-qa-btn" onclick="switchMainTab('qa')">
+            AI Interview &amp; Q&amp;A Drill
+          </button>
+<button class="px-space-sm py-1 rounded font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1" id="tab-audio-btn" onclick="switchMainTab('audio')">
+<span>Voice Lab</span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed-dim"></span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Work Area (12-Col Grid) -->
+<div class="max-w-[1200px] mx-auto px-gutter py-space-xl w-full">
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- Left Column: Source Ingestion, Audio Memo, Presets (4 cols) -->
+<aside class="xl:col-span-4 flex flex-col gap-space-md">
+<!-- Document / Ingestion Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">auto_stories</span>
+<span>Source Inputs</span>
+</h2>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container/20 px-space-xs py-0.5 rounded">RAG Indexed</span>
+</div>
+<!-- Lecture Picker Dropdown Simulation -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Select Live Cohort Lecture</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low text-on-surface font-body-sm text-body-sm rounded-lg px-space-sm py-2.5 appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer">
+<option selected="">Module 4: Distributed Idempotency &amp; Webhooks (88 min)</option>
+<option>Module 3: PostgreSQL Indexing &amp; B-Tree Tuning (94 min)</option>
+<option>Module 2: Raft Consensus &amp; Distributed Leases (112 min)</option>
+<option>Module 1: High-Performance Go Memory Profiling (76 min)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none text-[20px]">expand_more</span>
+</div>
+</div>
+<!-- Drag & Drop PDF Dropzone -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Supplemental Technical Papers</span>
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col items-center justify-center text-center gap-space-xs cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[24px]">cloud_upload</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface">Drop system design whitepapers or code specs</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">PDF, Markdown, or Git Diff (up to 45MB)</p>
+</div>
+</div>
+<!-- Uploaded Documents Active Stack -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-primary text-[20px]">picture_as_pdf</span>
+<div class="flex flex-col truncate">
+<span class="font-label-sm text-label-sm text-on-surface truncate">System-Design-Primer-v3.pdf</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">32 pages • 142 vectors</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+</div>
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-primary text-[20px]">description</span>
+<div class="flex flex-col truncate">
+<span class="font-label-sm text-label-sm text-on-surface truncate">PostgreSQL-Index-Strategies.pdf</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">18 pages • 88 vectors</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+</div>
+</div>
+<!-- Synthesis Depth Control -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Summary Depth &amp; Persona</span>
+<div class="grid grid-cols-1 gap-space-xs">
+<button class="depth-btn text-left p-space-sm rounded-lg bg-primary/10 text-primary transition-all" onclick="setDepth(this, 'digest')">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md">Executive Digest</span>
+<span class="font-label-sm text-[11px] bg-primary text-on-primary px-1.5 py-0.5 rounded">2 min read</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-0.5">Core tradeoffs, invariants, and production runbook steps.</p>
+</button>
+<button class="depth-btn text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface transition-all" onclick="setDepth(this, 'arch')">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md">Comprehensive Architecture</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">8 min read</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-0.5">Deep invariants, ASCII topologies, schema migrations.</p>
+</button>
+<button class="depth-btn text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface transition-all" onclick="setDepth(this, 'cheatsheet')">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md">Code &amp; Cheatsheet Extract</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">Copy-paste</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-0.5">Idiomatic Go/Node snippets, Redis keyspaces, SQL DDLs.</p>
+</button>
+</div>
+</div>
+<button class="w-full py-2.5 px-space-md rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm flex items-center justify-center gap-space-xs transition-colors">
+<span class="material-symbols-outlined text-[18px]">psychology</span>
+<span>Regenerate Active Notes</span>
+</button>
+</div>
+<!-- Voice Memo & Reflection Widget -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">mic</span>
+<span class="font-label-md text-label-md text-on-surface">Fellow Reflection Recorder</span>
+</div>
+<span class="font-label-sm text-[11px] text-outline" id="rec-tag">Standby</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-outline" id="rec-dot"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="rec-status-text">Tap below to capture architectural memo</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-mono" id="rec-timer">00:00</span>
+</div>
+<!-- Real-time transcription preview simulation -->
+<p class="font-body-sm text-[13px] text-on-surface-variant italic bg-surface-container-lowest/80 p-space-xs rounded min-h-[44px]" id="rec-transcription">
+              "Ensure Stripe idempotency key TTL is set to at least 24 hours to prevent duplicate settlement during network partition..."
+            </p>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="flex-1 py-2 px-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md flex items-center justify-center gap-space-xs transition-colors" id="rec-btn" onclick="toggleVoiceRecording()">
+<span class="material-symbols-outlined text-error text-[18px]">radio_button_checked</span>
+<span id="rec-btn-label">Record Voice Memo</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container text-primary hover:bg-surface-container-high transition-colors" onclick="appendMemoToNotes()" title="Append to active notes">
+<span class="material-symbols-outlined text-[20px]">playlist_add</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Right Column: Interactive Tab Content (8 cols) -->
+<main class="xl:col-span-8 flex flex-col gap-space-md">
+<!-- Tab 1: AI Notes Canvas & Synthesizer -->
+<div class="flex flex-col gap-space-md" id="notes-view">
+<!-- Dedicated Audio Player Floating Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-xs">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[20px]">hearing</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface">DevAscent Neural SDE Voice</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-primary">Natural 24kHz</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Synthesized lecture digest • 4m 18s total</p>
+</div>
+</div>
+<!-- Speed and Options -->
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Speed:</span>
+<div class="flex bg-surface-container-low rounded-lg p-0.5">
+<button class="px-2 py-0.5 rounded text-on-surface-variant text-[12px] font-label-sm hover:text-on-surface">1.0x</button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest text-primary text-[12px] font-label-sm shadow-sm">1.25x</button>
+<button class="px-2 py-0.5 rounded text-on-surface-variant text-[12px] font-label-sm hover:text-on-surface">1.5x</button>
+</div>
+</div>
+</div>
+<!-- Waveform & Scrubber -->
+<div class="flex items-center gap-space-sm pt-space-xs">
+<button class="w-10 h-10 rounded-full bg-primary hover:bg-primary-container text-on-primary flex items-center justify-center transition-colors" id="audio-play-btn" onclick="toggleAudioPlay()">
+<span class="material-symbols-outlined text-[22px]" id="audio-icon">play_arrow</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface p-1" onclick="seekAudio(-15)" title="Rewind 15s">
+<span class="material-symbols-outlined text-[20px]">export_notes</span>
+</button>
+<!-- Waveform SVG representation -->
+<div class="flex-1 flex flex-col gap-1">
+<div class="w-full h-8 flex items-center gap-[3px] px-1 bg-surface-container-low rounded-lg overflow-hidden cursor-pointer" onclick="scrubAudio(event)">
+<!-- 36 bar simulated waveform with distinct heights -->
+<div class="w-1 h-3 bg-primary rounded-full"></div>
+<div class="w-1 h-5 bg-primary rounded-full"></div>
+<div class="w-1 h-6 bg-primary rounded-full"></div>
+<div class="w-1 h-4 bg-primary rounded-full"></div>
+<div class="w-1 h-7 bg-primary rounded-full"></div>
+<div class="w-1 h-8 bg-primary rounded-full"></div>
+<div class="w-1 h-5 bg-primary rounded-full"></div>
+<div class="w-1 h-6 bg-primary rounded-full"></div>
+<div class="w-1 h-4 bg-primary rounded-full"></div>
+<div class="w-1 h-7 bg-primary rounded-full"></div>
+<div class="w-1 h-8 bg-primary/40 rounded-full"></div>
+<div class="w-1 h-6 bg-primary/30 rounded-full"></div>
+<div class="w-1 h-4 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-5 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-7 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-3 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-8 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-6 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-5 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-4 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-7 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-5 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-3 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-6 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-8 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-4 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-6 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-7 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-5 bg-outline-variant rounded-full"></div>
+<div class="w-1 h-3 bg-outline-variant rounded-full"></div>
+</div>
+<div class="flex justify-between text-[11px] font-mono text-on-surface-variant px-1">
+<span id="current-audio-time">01:14</span>
+<span>04:18</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface p-1" onclick="seekAudio(15)" title="Forward 15s">
+<span class="material-symbols-outlined text-[20px]">apps</span>
+</button>
+</div>
+</div>
+<!-- Main Generated Notes Canvas (Technical Markdown Surface) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg">
+<!-- Notes Toolbar -->
+<div class="flex flex-wrap items-center justify-between pb-space-sm gap-space-sm bg-surface-container-low/40 -mx-space-xl -mt-space-xl px-space-xl py-space-sm rounded-t-xl">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">article</span>
+<span class="font-label-md text-label-md text-on-surface">Synthesis Canvas: Module 4 Invariants</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container-lowest text-on-surface hover:text-primary font-label-sm text-label-sm shadow-sm flex items-center gap-1 transition-all" onclick="copyNotesContent()">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span id="copy-btn-text">Copy</span>
+</button>
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container-lowest text-on-surface hover:text-primary font-label-sm text-label-sm shadow-sm flex items-center gap-1 transition-all" onclick="exportToNotion()">
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+<span>Export to Notion</span>
+</button>
+<button class="px-space-sm py-1.5 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm shadow-sm flex items-center gap-1 hover:bg-primary-container transition-all" onclick="downloadMarkdown()">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>.MD</span>
+</button>
+</div>
+</div>
+<!-- Document Metadata & Key Metrics Banner -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm">
+<div class="bg-surface-container-low p-space-sm rounded-lg flex items-center gap-space-sm">
+<div class="p-2 rounded bg-surface-container-lowest text-primary">
+<span class="material-symbols-outlined text-[20px]">dataset</span>
+</div>
+<div>
+<span class="font-label-sm text-[11px] text-on-surface-variant block uppercase">Pattern Type</span>
+<span class="font-headline-sm text-[15px] text-on-surface font-semibold">Idempotent Consumer</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded-lg flex items-center gap-space-sm">
+<div class="p-2 rounded bg-surface-container-lowest text-secondary">
+<span class="material-symbols-outlined text-[20px]">timer</span>
+</div>
+<div>
+<span class="font-label-sm text-[11px] text-on-surface-variant block uppercase">Lock Window</span>
+<span class="font-headline-sm text-[15px] text-on-surface font-semibold">Redis Redlock 120s</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded-lg flex items-center gap-space-sm">
+<div class="p-2 rounded bg-surface-container-lowest text-tertiary">
+<span class="material-symbols-outlined text-[20px]">security</span>
+</div>
+<div>
+<span class="font-label-sm text-[11px] text-on-surface-variant block uppercase">Semantics</span>
+<span class="font-headline-sm text-[15px] text-on-surface font-semibold">At-Least-Once Delivery</span>
+</div>
+</div>
+</div>
+<!-- Notes Section 1: Executive Key Takeaways -->
+<div class="flex flex-col gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-space-xs">
+<span class="text-primary font-mono text-[18px]">01.</span>
+<span>Distributed Idempotency Invariants</span>
+</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                In real-world payment and event architectures, network faults cause duplicate POST requests. Idempotency guarantees that multiple identical requests produce the identical side effect on state as a single invocation.
+              </p>
+<ul class="list-none flex flex-col gap-space-xs pt-space-xs">
+<li class="flex items-start gap-space-sm bg-surface-container-low/50 p-space-sm rounded-lg">
+<span class="material-symbols-outlined text-secondary text-[20px] shrink-0 mt-0.5">verified</span>
+<span class="font-body-sm text-body-sm text-on-surface"><strong>Client-Generated Keys:</strong> Use v4 UUID generated at client boundary (`Idempotency-Key: b7f90c42-...`), never derived solely from payload hashes to allow intentional repeated checkouts.</span>
+</li>
+<li class="flex items-start gap-space-sm bg-surface-container-low/50 p-space-sm rounded-lg">
+<span class="material-symbols-outlined text-secondary text-[20px] shrink-0 mt-0.5">verified</span>
+<span class="font-body-sm text-body-sm text-on-surface"><strong>Two-Phase State Machine:</strong> Register state as `PROCESSING` with a lease TTL before firing external RPCs. Transition to `RESOLVED` caching the exact response body.</span>
+</li>
+</ul>
+</div>
+<!-- Notes Section 2: Architecture ASCII / Mermaid Visualizer -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-space-xs">
+<span class="text-primary font-mono text-[18px]">02.</span>
+<span>Execution Topology &amp; Lock Protocol</span>
+</h3>
+<span class="font-label-sm text-[11px] text-on-surface-variant font-mono">Mermaid Sequence Diagram</span>
+</div>
+<!-- Dark IDE Surface for Diagram -->
+<div class="bg-[#0B0F19] rounded-xl p-space-md text-emerald-400 font-mono text-[13px] leading-snug overflow-x-auto shadow-md">
+<div class="text-slate-500 pb-2">// Razorpay / Stripe Ingestion Pipeline Flow</div>
+<div class="text-on-primary">Client API              API Gateway             Redis Cache              PostgreSQL Orders</div>
+<div class="text-slate-600">   |                        |                       |                           |</div>
+<div class="text-indigo-400">   |--- POST /checkout ----&gt;|                       |                           |</div>
+<div class="text-indigo-400">   |  (Idempotency-Key: X)  |                       |                           |</div>
+<div class="text-slate-300">   |                        |--- SETNX key:X "PROC"-&gt;|                           |</div>
+<div class="text-amber-400">   |                        |&lt;-- OK (Lease 60s) ----|                           |</div>
+<div class="text-emerald-400">   |                        |------------------- BEGIN TX ---------------------&gt;|</div>
+<div class="text-emerald-400">   |                        |                   INSERT order_events             |</div>
+<div class="text-emerald-400">   |                        |&lt;------------------ COMMIT OK ---------------------|</div>
+<div class="text-slate-300">   |                        |--- SET key:X "DONE" body ---&gt;|                   |</div>
+<div class="text-secondary-container">   |&lt;-- 200 OK (Payload) ---|                       |                           |</div>
+<div class="text-slate-600">   |                        |                       |                           |</div>
+<div class="text-amber-300">   |--- POST /checkout ----&gt;|  (Retry scenario)      |                           |</div>
+<div class="text-amber-300">   |                        |--- GET key:X ---------&gt;|                           |</div>
+<div class="text-secondary-container">   |&lt;-- 200 OK (Cached) ----|&lt;-- Cached Body -------|                           |</div>
+</div>
+</div>
+<!-- Notes Section 3: Idiomatic Go Production Snippet -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-space-xs">
+<span class="text-primary font-mono text-[18px]">03.</span>
+<span>Production Implementation (Golang + Redis)</span>
+</h3>
+<span class="font-label-sm text-[11px] text-primary bg-primary/10 px-2 py-0.5 rounded font-mono">idempotent_handler.go</span>
+</div>
+<div class="bg-[#0B0F19] rounded-xl p-space-md font-mono text-[13px] text-slate-300 overflow-x-auto shadow-md">
+<span class="text-pink-400">func</span> <span class="text-blue-400">HandleOrderWithLock</span>(ctx context.Context, rdb *redis.Client, idempKey <span class="text-cyan-300">string</span>) (*OrderResponse, <span class="text-cyan-300">error</span>) {
+    lockKey := fmt.Sprintf(<span class="text-emerald-300">"idemp:%s"</span>, idempKey)
+    
+    <span class="text-slate-500">// 1. Atomic SETNX with 120-second recovery TTL</span>
+    acquired, err := rdb.SetNX(ctx, lockKey, <span class="text-emerald-300">"LOCKED_PROCESSING"</span>, <span class="text-purple-400">120</span>*time.Second).Result()
+    <span class="text-pink-400">if</span> err != <span class="text-pink-400">nil</span> {
+        <span class="text-pink-400">return nil</span>, fmt.Errorf(<span class="text-emerald-300">"redis cluster unreachable: %w"</span>, err)
+    }
+    <span class="text-pink-400">if</span> !acquired {
+        <span class="text-slate-500">// 2. Poll or poll cache for settled response</span>
+        cachedResponse, _ := rdb.Get(ctx, fmt.Sprintf(<span class="text-emerald-300">"res:%s"</span>, idempKey)).Bytes()
+        <span class="text-pink-400">return</span> UnmarshalOrder(cachedResponse), ErrConcurrentDuplicate
+    }
+    <span class="text-pink-400">defer</span> rdb.Del(ctx, lockKey)
+    
+    <span class="text-slate-500">// 3. Execute Postgres business mutation</span>
+<span class="text-pink-400">return</span> ExecuteOrderTransaction(ctx, idempKey)
+}</div>
+</div>
+<!-- Notes Section 4: Architecture Pitfalls Callout -->
+<div class="bg-error-container/25 rounded-xl p-space-md flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-error text-[24px] shrink-0 mt-0.5">warning</span>
+<div class="flex flex-col gap-1">
+<span class="font-headline-sm text-[16px] text-error font-semibold">Tier-1 Production Pitfall: The Zombie Key Deadlock</span>
+<p class="font-body-sm text-body-sm text-on-surface leading-relaxed">
+                  Never register an idempotency record without a hard TTL in Redis or an expiration timestamp in PostgreSQL. If the process terminates abnormally (e.g., OOMKilled by Kubernetes) during payment processing, a key without TTL stays locked permanently, preventing clients from ever safely re-submitting.
+                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Tab 2: AI Q&A Generator & Mock Interview Drill (Initially Hidden or Switchable) -->
+<div class="hidden flex-col gap-space-md" id="qa-view">
+<!-- Generator Configuration Strip -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-wrap items-center justify-between gap-space-sm">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Interactive AI Knowledge Drill</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Synthesized directly from Module 4 lecture notes and active PDF whitepapers</p>
+</div>
+<button class="px-space-md py-2 bg-primary hover:bg-primary-container text-on-primary rounded-lg font-label-md text-label-md flex items-center gap-space-xs shadow-sm transition-colors" onclick="generateMockInterviewPrompt()">
+<span class="material-symbols-outlined text-[18px]">psychology_alt</span>
+<span>Generate Mock Interview Question</span>
+</button>
+</div>
+<!-- Question 1: System Design Multiple Choice with Immediate Feedback -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="px-space-xs py-0.5 rounded bg-primary/10 text-primary font-label-sm text-[12px] font-mono">Q1 of 5</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">• System Tradeoffs</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">bolt</span> +25 XP
+              </span>
+</div>
+<p class="font-headline-sm text-[17px] text-on-surface font-semibold">
+              In an idempotency key implementation using Redis, what occurs if the lock acquisition succeeds but the downstream database transaction times out after 10 seconds?
+            </p>
+<div class="flex flex-col gap-space-xs" id="quiz-options-group">
+<button class="quiz-opt w-full text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container font-body-sm text-body-sm text-on-surface transition-all flex items-start gap-space-sm" onclick="selectQuizAnswer(this, false)">
+<span class="w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center font-mono text-[12px] text-on-surface shrink-0 mt-0.5">A</span>
+<span>The client automatically receives an HTTP 200 with an empty body because Redis holds the lock.</span>
+</button>
+<button class="quiz-opt w-full text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container font-body-sm text-body-sm text-on-surface transition-all flex items-start gap-space-sm" onclick="selectQuizAnswer(this, true)">
+<span class="w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center font-mono text-[12px] text-on-surface shrink-0 mt-0.5">B</span>
+<span>The lock key remains in a PROCESSING state until its lease TTL expires; subsequent retries receive HTTP 409 Conflict.</span>
+</button>
+<button class="quiz-opt w-full text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container font-body-sm text-body-sm text-on-surface transition-all flex items-start gap-space-sm" onclick="selectQuizAnswer(this, false)">
+<span class="w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center font-mono text-[12px] text-on-surface shrink-0 mt-0.5">C</span>
+<span>Redis immediately triggers a two-phase rollback on Postgres through the WAL listener.</span>
+</button>
+</div>
+<!-- Quiz Explanation Alert Box (Dynamic display) -->
+<div class="hidden p-space-sm rounded-lg bg-secondary-container/25 text-on-secondary-container text-body-sm font-body-sm" id="quiz-feedback">
+<span class="font-bold flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-[18px] text-secondary">check_circle</span> Correct! 
+              </span>
+              Subsequent incoming requests see `PROCESSING` and return a standard 409 Conflict with a `Retry-After: 5` header, preventing duplicate downstream mutation.
+            </div>
+</div>
+<!-- Question 2: Code Debugging Flashcard Drill -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="px-space-xs py-0.5 rounded bg-error/10 text-error font-label-sm text-[12px] font-mono">Debugging Drill</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">• Concurrency Race Condition</span>
+</div>
+<button class="text-primary font-label-sm text-label-sm hover:underline" onclick="revealCodeFix()">Reveal AI Solution</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface">
+              Identify the race condition in this naive SQL idempotency check under high concurrent load:
+            </p>
+<div class="bg-[#0B0F19] rounded-xl p-space-md font-mono text-[13px] text-slate-300 shadow-md">
+<span class="text-slate-500">-- Vulnerable implementation without atomic upsert</span>
+<span class="text-pink-400">SELECT</span> status <span class="text-pink-400">FROM</span> idempotency_keys <span class="text-pink-400">WHERE</span> key = <span class="text-emerald-300">'req_8829'</span>;
+<span class="text-slate-500">-- [GAP: Concurrent threads both see 0 records here]</span>
+<span class="text-pink-400">INSERT INTO</span> idempotency_keys (key, status) <span class="text-pink-400">VALUES</span> (<span class="text-emerald-300">'req_8829'</span>, <span class="text-emerald-300">'PENDING'</span>);
+            </div>
+<div class="hidden p-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs" id="solution-box">
+<span class="font-label-md text-label-md text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+                Production Fix: PostgreSQL ON CONFLICT DO NOTHING
+              </span>
+<div class="bg-[#0B0F19] rounded-lg p-space-sm font-mono text-[12px] text-slate-300">
+<span class="text-pink-400">INSERT INTO</span> idempotency_keys (key, status, created_at)
+<span class="text-pink-400">VALUES</span> (<span class="text-emerald-300">'req_8829'</span>, <span class="text-emerald-300">'PENDING'</span>, NOW())
+<span class="text-pink-400">ON CONFLICT</span> (key) <span class="text-pink-400">DO NOTHING</span>;
+<span class="text-slate-500">-- Check row_count(); if 0, key already claimed atomically.</span>
+</div>
+</div>
+</div>
+<!-- Dynamic Mock Interview Simulator Modal/Card -->
+<div class="hidden bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-sm border-l-4 border-primary" id="mock-interview-card">
+<div class="flex items-center justify-between">
+<span class="px-space-xs py-0.5 rounded bg-primary text-on-primary font-label-sm text-[11px] uppercase tracking-wider">Live Mock Interviewer Persona: Staff Architect</span>
+<button class="text-on-surface-variant hover:text-on-surface" onclick="document.getElementById('mock-interview-card').classList.add('hidden')">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-headline-sm text-[16px] text-on-surface font-semibold mt-1">
+              "Design an idempotency system for a distributed food delivery platform where 50,000 riders are submitting geofence checkout requests simultaneously. How do you handle clock skew across Redis cluster nodes?"
+            </p>
+<div class="flex items-center gap-space-xs pt-space-xs">
+<button class="px-space-sm py-1.5 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm">
+                Voice Answer (Record)
+              </button>
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm">
+                View Rubric &amp; L6 Evaluation Grid
+              </button>
+</div>
+</div>
+</div>
+<!-- Tab 3: Dedicated Voice Lab & Notebook Audio Archive -->
+<div class="hidden flex-col gap-space-md" id="audio-view">
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Fellow Audio Repository &amp; Deep-Work Feed</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Listen to your synthetic lectures, peer discussions, and saved architectural memos</p>
+</div>
+<span class="material-symbols-outlined text-primary text-[28px]">graphic_eq</span>
+</div>
+<!-- Audio Catalog Table -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-sm">
+<button class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<div>
+<span class="font-label-md text-label-md text-on-surface block">Module 4: Idempotency Digest (Neural SDE)</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">04m 18s • Synthesized today • High Priority</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="px-2 py-0.5 rounded bg-secondary-container/30 text-secondary font-label-sm text-[11px]">Ready</span>
+<button class="text-on-surface-variant hover:text-on-surface p-1"><span class="material-symbols-outlined text-[18px]">download</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-sm">
+<button class="w-8 h-8 rounded-full bg-surface-container text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<div>
+<span class="font-label-md text-label-md text-on-surface block">PostgreSQL Index Strategies: B-Tree vs BRIN (Whitepaper Audio)</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">11m 40s • Synthesized yesterday</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-[11px]">Archived</span>
+<button class="text-on-surface-variant hover:text-on-surface p-1"><span class="material-symbols-outlined text-[18px]">download</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-sm">
+<button class="w-8 h-8 rounded-full bg-surface-container text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<div>
+<span class="font-label-md text-label-md text-on-surface block">Personal Reflection: Stripe Webhook Re-entrancy Bugs</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">01m 24s • Recorded by Aarav Sharma</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary font-label-sm text-[11px]">Voice Memo</span>
+<button class="text-on-surface-variant hover:text-on-surface p-1"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+<!-- Interactive JavaScript Controller -->
+<script>
+    // Tab switcher
+    function switchMainTab(tab) {
+      const notesView = document.getElementById('notes-view');
+      const qaView = document.getElementById('qa-view');
+      const audioView = document.getElementById('audio-view');
+      
+      const tabNotesBtn = document.getElementById('tab-notes-btn');
+      const tabQaBtn = document.getElementById('tab-qa-btn');
+      const tabAudioBtn = document.getElementById('tab-audio-btn');
+
+      // Reset tabs visual state
+      [tabNotesBtn, tabQaBtn, tabAudioBtn].forEach(btn => {
+        btn.className = "px-space-sm py-1 rounded font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all";
+      });
+
+      notesView.classList.add('hidden');
+      qaView.classList.add('hidden');
+      audioView.classList.add('hidden');
+
+      if (tab === 'notes') {
+        notesView.classList.remove('hidden');
+        tabNotesBtn.className = "px-space-sm py-1 rounded font-label-sm text-label-sm bg-surface-container-lowest text-primary shadow-sm transition-all";
+      } else if (tab === 'qa') {
+        qaView.classList.remove('hidden');
+        tabQaBtn.className = "px-space-sm py-1 rounded font-label-sm text-label-sm bg-surface-container-lowest text-primary shadow-sm transition-all";
+      } else if (tab === 'audio') {
+        audioView.classList.remove('hidden');
+        tabAudioBtn.className = "px-space-sm py-1 rounded font-label-sm text-label-sm bg-surface-container-lowest text-primary shadow-sm transition-all flex items-center gap-1";
+      }
+    }
+
+    // Depth preset selector
+    function setDepth(buttonElement, depth) {
+      document.querySelectorAll('.depth-btn').forEach(btn => {
+        btn.className = "depth-btn text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface transition-all";
+      });
+      buttonElement.className = "depth-btn text-left p-space-sm rounded-lg bg-primary/10 text-primary transition-all";
+    }
+
+    // Voice recorder state machine
+    let isRecording = false;
+    let recInterval = null;
+    let secondsRecorded = 0;
+
+    function toggleVoiceRecording() {
+      const dot = document.getElementById('rec-dot');
+      const label = document.getElementById('rec-btn-label');
+      const tag = document.getElementById('rec-tag');
+      const statusText = document.getElementById('rec-status-text');
+      const timer = document.getElementById('rec-timer');
+      const transcription = document.getElementById('rec-transcription');
+
+      isRecording = !isRecording;
+
+      if (isRecording) {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-error animate-ping";
+        label.innerText = "Stop & Synthesize";
+        tag.innerText = "Listening...";
+        tag.className = "font-label-sm text-[11px] text-error font-semibold";
+        statusText.innerText = "AI Streaming Audio (Deepgram Nova-2)...";
+
+        secondsRecorded = 0;
+        recInterval = setInterval(() => {
+          secondsRecorded++;
+          const mins = String(Math.floor(secondsRecorded / 60)).padStart(2, '0');
+          const secs = String(secondsRecorded % 60).padStart(2, '0');
+          timer.innerText = `${mins}:${secs}`;
+          
+          if (secondsRecorded === 3) {
+            transcription.innerText = '"Also note that using Redis Redlock requires quorum across at least 3 master nodes..."';
+          }
+        }, 1000);
+      } else {
+        clearInterval(recInterval);
+        dot.className = "w-2.5 h-2.5 rounded-full bg-secondary";
+        label.innerText = "Record Voice Memo";
+        tag.innerText = "Auto-Transcribed";
+        tag.className = "font-label-sm text-[11px] text-secondary font-semibold";
+        statusText.innerText = "Reflection tagged: #Idempotency #Locking";
+      }
+    }
+
+    function appendMemoToNotes() {
+      alert("Added voice reflection to active Module 4 notebook!");
+    }
+
+    // Audio Player Toggle
+    let isPlaying = false;
+    function toggleAudioPlay() {
+      isPlaying = !isPlaying;
+      const icon = document.getElementById('audio-icon');
+      if (isPlaying) {
+        icon.innerText = "pause";
+      } else {
+        icon.innerText = "play_arrow";
+      }
+    }
+
+    function seekAudio(delta) {
+      const timeElem = document.getElementById('current-audio-time');
+      timeElem.innerText = delta > 0 ? "01:29" : "00:59";
+    }
+
+    function scrubAudio(e) {
+      document.getElementById('current-audio-time').innerText = "02:15";
+    }
+
+    // Interactive Quiz Option Checker
+    function selectQuizAnswer(button, isCorrect) {
+      const feedback = document.getElementById('quiz-feedback');
+      const options = document.querySelectorAll('.quiz-opt');
+
+      options.forEach(opt => {
+        opt.className = "quiz-opt w-full text-left p-space-sm rounded-lg bg-surface-container-low font-body-sm text-body-sm text-on-surface transition-all flex items-start gap-space-sm opacity-50 cursor-not-allowed";
+      });
+
+      if (isCorrect) {
+        button.className = "quiz-opt w-full text-left p-space-sm rounded-lg bg-secondary-container/40 text-on-secondary-container font-body-sm text-body-sm transition-all flex items-start gap-space-sm ring-1 ring-secondary";
+        feedback.classList.remove('hidden');
+      } else {
+        button.className = "quiz-opt w-full text-left p-space-sm rounded-lg bg-error-container/40 text-on-error-container font-body-sm text-body-sm transition-all flex items-start gap-space-sm";
+      }
+    }
+
+    function revealCodeFix() {
+      document.getElementById('solution-box').classList.toggle('hidden');
+    }
+
+    function generateMockInterviewPrompt() {
+      const card = document.getElementById('mock-interview-card');
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Copy / Export Utilities
+    function copyNotesContent() {
+      const copyBtn = document.getElementById('copy-btn-text');
+      navigator.clipboard.writeText("DevAscent Module 4 Notes: Distributed Idempotency and Webhooks. Client generated UUIDs, Redis Redlock, Two Phase Commit.");
+      copyBtn.innerText = "Copied!";
+      setTimeout(() => { copyBtn.innerText = "Copy"; }, 2000);
+    }
+
+    function exportToNotion() {
+      alert("Successfully pushed workspace payload to connected Notion account: 'Aarav's System Design Bible'!");
+    }
+
+    function downloadMarkdown() {
+      const blob = new Blob(["# DevAscent Module 4: Distributed Idempotency\n\n- Key: Client v4 UUID\n- Store: Redis NX TTL"], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "Module-4-Distributed-Idempotency.md";
+      a.click();
+    }
+  </script>
+</div></main><footer class="w-full bg-surface-container-low mt-space-2xl"><div class="max-w-[1200px] mx-auto px-gutter py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-4 gap-space-xl pb-space-xl"><div class="md:col-span-1 flex flex-col gap-space-sm"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-primary">DevAscent Academy</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Engineering-grade accelerator for India's premier software builders, systems architects, and AI developers.</p><div class="flex items-center gap-space-xs pt-space-xs"><span class="px-space-sm py-space-xs rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">ISO 9001:2015</span><span class="px-space-sm py-space-xs rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Razorpay Secured</span></div></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Curriculum</span><div class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><a class="hover:text-on-surface transition-colors" href="#">Full-Stack System Design</a><a class="hover:text-on-surface transition-colors" href="#">Distributed Systems &amp; Cloud</a><a class="hover:text-on-surface transition-colors" href="#">Applied LLMs &amp; GenAI</a><a class="hover:text-on-surface transition-colors" href="#">High-Performance Go &amp; Rust</a></div></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Ecosystem</span><div class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><a class="hover:text-on-surface transition-colors" href="#">AI Sandbox &amp; Compute</a><a class="hover:text-on-surface transition-colors" href="#">Hiring Partner Network</a><a class="hover:text-on-surface transition-colors" href="#">Technical Roadmap Engine</a><a class="hover:text-on-surface transition-colors" href="#">Fellowship Alumni Portal</a></div></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Governance &amp; Trust</span><div class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><a class="hover:text-on-surface transition-colors" href="#">Academic Integrity Policy</a><a class="hover:text-on-surface transition-colors" href="#">Fee Refund &amp; Escrow Guarantee</a><a class="hover:text-on-surface transition-colors" href="#">Placement Verification Protocol</a><a class="hover:text-on-surface transition-colors" href="#">Terms of Service &amp; Privacy</a></div></div></div><div class="pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md text-center sm:text-left"><p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 DevAscent Academy Pvt Ltd. All rights reserved.</p><div class="flex items-center gap-space-md font-label-sm text-label-sm text-on-surface-variant"><span class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span> 256-bit Encrypted Checkout</span><span class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[16px] text-primary">bolt</span> Direct UPI &amp; No-Cost EMI</span></div></div></div></footer></body></html>

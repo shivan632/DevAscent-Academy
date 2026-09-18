@@ -1,0 +1,252 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String
+  name            String
+  phone           String?
+  role            String    @default("STUDENT") // "STUDENT" | "ADMIN" | "INSTRUCTOR"
+  degree          String?   // "BCA" | "MCA" | "BTECH" | "OTHER"
+  college         String?
+  isEmailVerified Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  enrollments            Enrollment[]
+  payments               Payment[]
+  certificates           Certificate[]
+  refunds                Refund[]
+  lessonProgress         LessonProgress[]
+  quizSubmissions        QuizSubmission[]
+  internshipApplications InternshipApplication[]
+  completionSubmissions  CompletionSubmission[]
+}
+
+model OtpVerification {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  code      String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Course {
+  id                    String    @id @default(cuid())
+  slug                  String    @unique
+  title                 String
+  description           String
+  priceInPaise          Int       @default(499900) // ₹4,999
+  earlyBirdPriceInPaise Int       @default(149900) // ₹1,499
+  domain                String    @default("fullstack")
+  level                 String    @default("Intermediate")
+  thumbnail             String
+  cohortNumber          Int       @default(14)
+  seatsRemaining        Int       @default(9)
+  totalSeats            Int       @default(40)
+  cohortStartsOn        DateTime?
+  isPublished           Boolean   @default(true)
+
+  // Enriched course & internship fields
+  type                  String    @default("COURSE") // "COURSE" | "INTERNSHIP"
+  isFree                Boolean   @default(false)
+  objectives            String    @default("[]") // JSON string[]
+  projects              String    @default("[]") // JSON string[]
+  assignments           String    @default("[]") // JSON string[]
+  requirements          String    @default("[]") // JSON string[]
+  durationWeeks         Int?      @default(8)
+  isPaidInternship      Boolean   @default(false)
+  stipendDetails        String?
+  requiresApproval      Boolean   @default(false) // Admin approval required for paid cohort/internship
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  modules                Module[]
+  enrollments            Enrollment[]
+  payments               Payment[]
+  certificates           Certificate[]
+  internshipApplications InternshipApplication[]
+  completionSubmissions  CompletionSubmission[]
+}
+
+model Module {
+  id           String   @id @default(cuid())
+  courseId     String
+  moduleNumber Int
+  title        String
+  description  String?
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons      Lesson[]
+  quiz         Quiz?
+}
+
+model Lesson {
+  id              String   @id @default(cuid())
+  moduleId        String
+  lessonNumber    Int
+  title           String
+  durationMinutes Int
+  videoUrl        String
+  isFreePreview   Boolean  @default(false)
+  summary         String?
+  module          Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  progressRecords LessonProgress[]
+}
+
+model Quiz {
+  id           String         @id @default(cuid())
+  moduleId     String         @unique
+  title        String
+  passingScore Int            @default(70)
+  module       Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questions    QuizQuestion[]
+  submissions  QuizSubmission[]
+}
+
+model QuizQuestion {
+  id                 String  @id @default(cuid())
+  quizId             String
+  question           String
+  optionsJson        String  // Serialized string[]
+  correctOptionIndex Int
+  explanation        String?
+  codeSnippet        String?
+  quiz               Quiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model QuizSubmission {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  scorePct    Int
+  passed      Boolean
+  submittedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model Enrollment {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  progressPct Int      @default(0)
+  status      String   @default("ACTIVE") // "ACTIVE" | "REFUNDED" | "COMPLETED"
+  enrolledAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model LessonProgress {
+  id             String   @id @default(cuid())
+  userId         String
+  lessonId       String
+  watchedSeconds Int      @default(0)
+  isCompleted    Boolean  @default(false)
+  lastWatchedAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  userId            String
+  courseId          String
+  razorpayOrderId   String   @unique
+  razorpayPaymentId String?  @unique
+  razorpaySignature String?
+  amountInPaise     Int
+  currency          String   @default("INR")
+  status            String   @default("PENDING") // "PENDING" | "PAID" | "FAILED" | "REFUNDED"
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  refunds Refund[]
+}
+
+model Certificate {
+  id            String   @id @default(cuid())
+  certId        String   @unique // e.g. "DEV-2025-BC8491"
+  userId        String
+  courseId      String
+  recipientName String
+  courseTitle   String
+  sha256Hash    String   @unique
+  grade         String   @default("A+")
+  pdfUrl        String?
+  issuedAt      DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+model Refund {
+  id              String    @id @default(cuid())
+  paymentId       String
+  userId          String
+  amountInPaise   Int
+  reason          String
+  upiId           String?
+  status          String    @default("SUBMITTED") // "SUBMITTED" | "APPROVED" | "PROCESSED" | "REJECTED"
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  processedAt     DateTime?
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model InternshipApplication {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  status      String   @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
+  adminNote   String?
+  appliedAt   DateTime @default(now())
+  reviewedAt  DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model CompletionSubmission {
+  id              String    @id @default(cuid())
+  userId          String
+  courseId        String
+  name            String
+  email           String
+  batch           String
+  projectName     String
+  gitRepoUrl      String
+  linkedinPostUrl String
+  status          String    @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
+  adminNote       String?
+  submittedAt     DateTime  @default(now())
+  reviewedAt      DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}

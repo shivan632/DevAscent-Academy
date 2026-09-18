@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary": "#006c49", "on-error-container": "#93000a", "secondary-fixed": "#6ffbbe", "tertiary": "#454854", "surface-container-low": "#eff4ff", "surface": "#f8f9ff", "on-primary-container": "#dad7ff", "on-error": "#ffffff", "on-background": "#0b1c30", "error": "#ba1a1a", "surface-dim": "#cbdbf5", "on-primary": "#ffffff", "on-secondary": "#ffffff", "on-secondary-fixed": "#002113", "primary-fixed": "#e2dfff", "secondary-container": "#6cf8bb", "background": "#f8f9ff", "surface-container-lowest": "#ffffff", "tertiary-container": "#5c606c", "on-tertiary": "#ffffff", "on-tertiary-fixed": "#171b26", "surface-container-high": "#dce9ff", "on-tertiary-fixed-variant": "#434652", "primary-fixed-dim": "#c3c0ff", "outline": "#777587", "tertiary-fixed": "#dfe2f1", "tertiary-fixed-dim": "#c3c6d4", "primary": "#3525cd", "inverse-primary": "#c3c0ff", "on-surface": "#0b1c30", "outline-variant": "#c7c4d8", "on-primary-fixed-variant": "#3323cc", "on-primary-fixed": "#0f0069", "surface-tint": "#4d44e3", "surface-variant": "#d3e4fe", "on-surface-variant": "#464555", "on-secondary-container": "#00714d", "surface-container": "#e5eeff", "secondary-fixed-dim": "#4edea3", "inverse-surface": "#213145", "error-container": "#ffdad6", "on-tertiary-container": "#d8dbea", "surface-container-highest": "#d3e4fe", "inverse-on-surface": "#eaf1ff", "on-secondary-fixed-variant": "#005236", "surface-bright": "#f8f9ff", "primary-container": "#4f46e5" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-2xl": "4rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-md": "1rem", "margin": "2rem", "gutter": "1.5rem", "space-xs": "0.25rem", "space-xl": "2.5rem", "gutter-sm": "1rem", "margin-sm": "1rem" }, "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "label-md": ["Inter"], "body-sm": ["Inter"], "price-hero": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"] }, "fontSize": { "headline-lg": ["40px", { "lineHeight": "48px", "fontWeight": "700" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "price-hero": ["48px", { "lineHeight": "52px", "fontWeight": "800" }], "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }], "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "600" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "fontWeight": "800" }], "display-hero": ["56px", { "lineHeight": "64px", "fontWeight": "800" }] } } } }</script></head><body class="bg-background font-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm shrink-0"><a class="flex items-center gap-space-sm" data-path="courses" href="#"><img alt="DevAscent Academy Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface leading-none">DevAscent</span><span class="font-label-sm text-label-sm text-primary tracking-wide leading-tight uppercase">Academy</span></div></a></div><nav class="hidden xl:flex items-center gap-space-md" data-active-classes="text-primary font-bold"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="courses" href="#">Courses</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="ai-notes" href="#">Notes Generator</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="ai-qa" href="#">AI Q&amp;A</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="pdf-summarizer" href="#">PDF Summarizer</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="roadmap" href="#">Roadmap</a><a aria-current="page" class="transition-colors text-primary font-bold" data-path="voice-tts" href="#">Voice &amp; TTS</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="analytics" href="#">Analytics</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="achievements" href="#">Achievements</a></nav><div class="flex items-center gap-space-sm shrink-0"><div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm text-[11px] font-bold tracking-wide"><span class="material-symbols-outlined text-[14px]">verified</span><span>Verified Cohort • Starts Monday</span></div><button class="p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" onclick="document.documentElement.classList.toggle('dark')" title="Toggle Dark / Light Mode" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><a class="hidden sm:flex items-center gap-space-xs bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md px-space-md py-space-sm rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition-all" data-path="pricing" href="#"><span>Enroll Now (₹1,499)</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span></a><div class="relative group flex items-center pl-space-xs"><button class="flex items-center gap-1.5 focus:outline-none p-1 rounded-full hover:bg-surface-container-high transition-colors" type="button"><img alt="Student Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyuN7Ngh2YgpmPsJ3RuKZX9aFSINrfY7yuH2KNnvetZV8uAKXG2eOcTspJr1-afr2xk9Xi0uHHeJCQ5kmY60aVLhKisE4fFZveYafG3eVTKmVcbdyhpdp0ekSUpJRcov2JlEWFmCoyIKIH3eh_b1HqvLPSRP62IdBftRqHstqNnE9WFLbhYegxncQ-Kc6a34eaG04fizRe2-U4T8GE6yUynrSdAlX4VxK4J-eiCFn2tn0o4haZsog"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></button><div class="absolute right-0 top-full mt-2 w-52 py-2 bg-surface-container-lowest rounded-xl shadow-[0_10px_15px_-3px_rgba(15,23,42,0.08),0_4px_6px_-4px_rgba(15,23,42,0.04)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col z-50"><div class="px-4 py-2 bg-surface-container-low mx-2 rounded-lg mb-1"><p class="font-label-sm text-label-sm text-on-surface font-semibold truncate">Dev Student</p><p class="font-label-sm text-label-sm text-on-surface-variant text-[11px] truncate">student@devascent.io</p></div><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="analytics" href="#"><span class="material-symbols-outlined text-[18px]">insights</span>Analytics</a><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="achievements" href="#"><span class="material-symbols-outlined text-[18px]">workspace_premium</span>Achievements</a><a class="flex items-center gap-2 px-4 py-2 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="roadmap" href="#"><span class="material-symbols-outlined text-[18px]">alt_route</span>My Roadmap</a></div></div></div></div></header><main class="w-full pt-20 bg-background"><div class="flex flex-col w-full">
+<!-- Subtle Ambient Glow Orbs -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-32 -left-20 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
+<div class="absolute top-64 right-[-5rem] w-[28rem] h-[28rem] rounded-full bg-secondary-container/30 blur-3xl pointer-events-none"></div>
+<div class="max-w-7xl mx-auto px-margin pt-space-xl pb-space-2xl">
+<!-- Breadcrumb & Header Hero -->
+<header class="flex flex-col gap-space-sm mb-space-xl">
+<nav aria-label="Breadcrumbs" class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<a class="hover:text-primary transition-colors flex items-center gap-1" data-path="courses" href="#">
+<span class="material-symbols-outlined text-[16px]">home</span>
+            DevAscent AI Suite
+          </a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface font-medium">Voice Notes &amp; Text-to-Speech</span>
+</nav>
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex flex-wrap items-center gap-space-sm">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+                Voice Notes &amp; Neural Audio Companion
+              </h1>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold shadow-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                Whisper v3 + Neural SDE TTS
+              </span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
+              Record hands-free architectural reflections while coding, and listen to generated lecture summaries on the go.
+            </p>
+</div>
+<!-- Quick Metrics Ribbon -->
+<div class="flex items-center gap-space-md bg-surface-container-low p-space-sm rounded-xl shadow-sm shrink-0">
+<div class="flex items-center gap-3 pr-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">graphic_eq</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm leading-tight text-on-surface">38.4m</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Transcribed</span>
+</div>
+</div>
+<div class="h-8 w-px bg-surface-variant"></div>
+<div class="flex items-center gap-3 pl-space-xs">
+<div class="w-10 h-10 rounded-lg bg-secondary-container/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[22px]">headphones</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm leading-tight text-on-surface">14 Units</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Synced Offline</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Two-Column Primary Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- Left Section (50% desktop): Hands-Free Voice Note Recorder & Audio Vault -->
+<section class="lg:col-span-6 flex flex-col gap-space-lg">
+<!-- Big Modern Interactive Recorder Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-xl shadow-md relative overflow-hidden">
+<!-- Mode Selection Tabs -->
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">mic</span>
+                  Voice Memo Console
+                </span>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+                  Latency: 180ms
+                </span>
+</div>
+<!-- Mode Pills -->
+<div class="grid grid-cols-3 gap-space-xs p-1 bg-surface-container-low rounded-lg">
+<button class="mode-btn py-2 px-1 text-center font-label-sm text-label-sm rounded bg-surface-container-lowest text-primary shadow-sm font-semibold transition-all" id="modeQuick" onclick="switchMode(this, 'Quick Architectural Memo')" type="button">
+                  Quick Memo
+                </button>
+<button class="mode-btn py-2 px-1 text-center font-label-sm text-label-sm rounded text-on-surface-variant hover:text-on-surface transition-all" id="modeBug" onclick="switchMode(this, 'Code Bug Reflection')" type="button">
+                  Bug Reflection
+                </button>
+<button class="mode-btn py-2 px-1 text-center font-label-sm text-label-sm rounded text-on-surface-variant hover:text-on-surface transition-all" id="modeInterview" onclick="switchMode(this, 'Interview Practice')" type="button">
+                  Interview Prep
+                </button>
+</div>
+</div>
+<!-- Pulsing Microphone Hub -->
+<div class="flex flex-col items-center justify-center my-space-xl relative">
+<div class="absolute w-44 h-44 rounded-full bg-primary/10 opacity-0 transition-all duration-700" id="pulseHalo"></div>
+<div class="absolute w-36 h-36 rounded-full bg-primary/15 opacity-0 transition-all duration-500" id="pulseHaloInner"></div>
+<button class="relative z-10 w-28 h-28 rounded-full bg-primary-container hover:bg-primary text-on-primary shadow-xl flex flex-col items-center justify-center transition-all duration-300 transform active:scale-95 group focus:outline-none" id="recordBtn" onclick="toggleRecording()" type="button">
+<span class="material-symbols-outlined text-[44px] transition-transform group-hover:scale-110" id="micIcon">mic</span>
+<span class="font-label-sm text-label-sm tracking-wide mt-1" id="btnLabel">START</span>
+</button>
+<!-- Recording Visual Feedback -->
+<div class="flex flex-col items-center mt-space-md text-center">
+<div class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight" id="timerDisplay">
+                  00:00
+                </div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5" id="statusSubtext">
+                  Ready to record • Hotkey: <kbd class="px-2 py-0.5 rounded bg-surface-container font-mono text-[11px] text-on-surface">Spacebar</kbd>
+</span>
+</div>
+</div>
+<!-- Speech-to-Text Live Whisper Transcription Window -->
+<div class="flex flex-col gap-space-xs mb-space-md">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-on-surface-variant font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">transcribe</span>
+                  Whisper Dynamic Transcription Stream
+                </label>
+<span class="font-label-sm text-label-sm text-secondary font-medium hidden" id="confidenceTag">Live 99.4% confidence</span>
+</div>
+<div class="w-full min-h-[96px] max-h-36 overflow-y-auto p-space-md bg-surface-container-low rounded-lg text-on-surface font-body-sm text-body-sm leading-relaxed transition-colors" id="transcriptionBox">
+<span class="text-on-surface-variant italic">Transcribed speech will render live here as you talk... Try describing a distributed system design tradeoff or an edge case you encountered.</span>
+</div>
+</div>
+<!-- Post-Recording Batch Actions -->
+<div class="flex flex-col sm:flex-row items-center gap-space-sm pt-space-xs">
+<button class="w-full sm:flex-1 py-3 px-space-md bg-primary hover:bg-primary-container text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm transition-all" onclick="saveActiveNote()" type="button">
+<span class="material-symbols-outlined text-[18px]">psychology</span>
+                Save Note &amp; Generate AI Flashcards
+              </button>
+<button class="w-full sm:w-auto py-3 px-space-md bg-surface-container hover:bg-surface-container-high text-on-surface rounded-lg font-label-md text-label-md flex items-center justify-center gap-1.5 transition-all" onclick="autoTagNote()" type="button">
+<span class="material-symbols-outlined text-[18px]">label</span>
+                Auto-Tag
+              </button>
+</div>
+</div>
+<!-- Voice Notes Library -->
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Voice Notes Library</h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold">3 Stored</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<button class="p-1.5 rounded-lg hover:bg-surface-container transition-colors" title="Filter Notes" type="button">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-surface-container transition-colors" title="Search Vault" type="button">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-space-sm" id="vaultList">
+<!-- Memo 1 (Active Scrubbing Demo) -->
+<article class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm hover:shadow-md transition-shadow flex flex-col gap-space-sm">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-3">
+<button class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary transition-all shrink-0" id="memoBtn-1" onclick="toggleMemoPlay(1)" type="button">
+<span class="material-symbols-outlined text-[22px]" id="memoIcon-1">play_arrow</span>
+</button>
+<div class="flex flex-col min-w-0">
+<h3 class="font-label-md text-label-md text-on-surface font-semibold truncate hover:text-primary cursor-pointer">
+                        Redis Concurrency &amp; Lua Scripting Invariants
+                      </h3>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant mt-0.5">
+<span class="font-medium text-primary">2m 14s</span>
+<span>•</span>
+<span>Oct 28</span>
+<span>•</span>
+<span class="text-secondary font-medium flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+                          AI Indexed
+                        </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" onclick="showTranscriptModal('Redis Concurrency memo transcript details...')" title="View AI Transcript" type="button">
+<span class="material-symbols-outlined text-[18px]">notes</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" title="Share Audio Snippet" type="button">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+</div>
+<!-- Interactive Audio Waveform Scrubbing -->
+<div class="flex items-center gap-2 px-1 pt-1">
+<span class="font-label-sm text-[11px] text-on-surface-variant font-mono w-8">0:42</span>
+<div class="flex-1 h-8 bg-surface-container-low rounded-lg p-1.5 flex items-center gap-1 cursor-pointer overflow-hidden group relative" onclick="scrubTimeline(event, this)">
+<div class="absolute left-0 top-0 bottom-0 bg-primary/10 rounded-lg pointer-events-none" style="width: 32%;"></div>
+<!-- Waveform Bars -->
+<div class="w-1 bg-primary rounded-full h-3"></div>
+<div class="w-1 bg-primary rounded-full h-5"></div>
+<div class="w-1 bg-primary rounded-full h-7"></div>
+<div class="w-1 bg-primary rounded-full h-4"></div>
+<div class="w-1 bg-primary rounded-full h-6"></div>
+<div class="w-1 bg-primary rounded-full h-8"></div>
+<div class="w-1 bg-primary rounded-full h-3"></div>
+<div class="w-1 bg-outline-variant rounded-full h-5"></div>
+<div class="w-1 bg-outline-variant rounded-full h-7"></div>
+<div class="w-1 bg-outline-variant rounded-full h-4"></div>
+<div class="w-1 bg-outline-variant rounded-full h-6"></div>
+<div class="w-1 bg-outline-variant rounded-full h-8"></div>
+<div class="w-1 bg-outline-variant rounded-full h-3"></div>
+<div class="w-1 bg-outline-variant rounded-full h-5"></div>
+<div class="w-1 bg-outline-variant rounded-full h-4"></div>
+<div class="w-1 bg-outline-variant rounded-full h-6"></div>
+<div class="w-1 bg-outline-variant rounded-full h-2"></div>
+<div class="w-1 bg-outline-variant rounded-full h-7"></div>
+<div class="w-1 bg-outline-variant rounded-full h-4"></div>
+<div class="w-1 bg-outline-variant rounded-full h-5"></div>
+</div>
+<span class="font-label-sm text-[11px] text-on-surface-variant font-mono w-8 text-right">2:14</span>
+</div>
+<!-- Tags -->
+<div class="flex items-center gap-1.5 pt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#Redis</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#Lua</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#Locks</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#DistributedSystems</span>
+</div>
+</article>
+<!-- Memo 2 -->
+<article class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm hover:shadow-md transition-shadow flex flex-col gap-space-sm">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-3">
+<button class="w-10 h-10 rounded-full bg-surface-container text-on-surface flex items-center justify-center hover:bg-surface-container-high transition-all shrink-0" id="memoBtn-2" onclick="toggleMemoPlay(2)" type="button">
+<span class="material-symbols-outlined text-[22px]" id="memoIcon-2">play_arrow</span>
+</button>
+<div class="flex flex-col min-w-0">
+<h3 class="font-label-md text-label-md text-on-surface font-semibold truncate hover:text-primary cursor-pointer">
+                        Next.js 15 App Router Server Action Pitfalls
+                      </h3>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant mt-0.5">
+<span class="font-medium">4m 02s</span>
+<span>•</span>
+<span>Oct 26</span>
+<span>•</span>
+<span class="text-secondary font-medium flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                          Indexed
+                        </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" title="View AI Transcript" type="button">
+<span class="material-symbols-outlined text-[18px]">notes</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" title="Share Audio Snippet" type="button">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+</div>
+<!-- Tags -->
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#Nextjs</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#ServerActions</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#React</span>
+</div>
+</article>
+<!-- Memo 3 -->
+<article class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm hover:shadow-md transition-shadow flex flex-col gap-space-sm">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-3">
+<button class="w-10 h-10 rounded-full bg-surface-container text-on-surface flex items-center justify-center hover:bg-surface-container-high transition-all shrink-0" id="memoBtn-3" onclick="toggleMemoPlay(3)" type="button">
+<span class="material-symbols-outlined text-[22px]" id="memoIcon-3">play_arrow</span>
+</button>
+<div class="flex flex-col min-w-0">
+<h3 class="font-label-md text-label-md text-on-surface font-semibold truncate hover:text-primary cursor-pointer">
+                        Kafka Partition Key Skew in Order Ingestion
+                      </h3>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant mt-0.5">
+<span class="font-medium">1m 45s</span>
+<span>•</span>
+<span>Oct 22</span>
+<span>•</span>
+<span class="text-secondary font-medium flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                          Indexed
+                        </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" title="View AI Transcript" type="button">
+<span class="material-symbols-outlined text-[18px]">notes</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface" title="Share Audio Snippet" type="button">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+</div>
+<!-- Tags -->
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#ApacheKafka</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#EventDriven</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-sm text-[11px] text-on-surface font-medium">#Partitioning</span>
+</div>
+</article>
+</div>
+</div>
+</section>
+<!-- Right Section (50% desktop): Neural Text-to-Speech (TTS) Studio & Audio Player -->
+<section class="lg:col-span-6 flex flex-col gap-space-lg">
+<!-- Text Ingestion Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-xl shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">auto_read_play</span>
+                Neural TTS Generator &amp; Synthesizer
+              </span>
+<span class="font-label-sm text-label-sm text-secondary font-medium bg-secondary-container/50 px-2 py-0.5 rounded-full">
+                SDE Studio v2.4
+              </span>
+</div>
+<!-- Quick Template Loads -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold">Quick Preload:</span>
+<button class="px-2.5 py-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" onclick="loadSnippet('module4')" type="button">
+<span class="material-symbols-outlined text-[14px]">menu_book</span>
+                Module 4 Summary
+              </button>
+<button class="px-2.5 py-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" onclick="loadSnippet('digest')" type="button">
+<span class="material-symbols-outlined text-[14px]">schema</span>
+                Daily System Design Digest
+              </button>
+</div>
+<!-- Text Area Input -->
+<div class="flex flex-col gap-space-xs">
+<textarea class="w-full p-space-md bg-surface-container-low rounded-lg text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container transition-all resize-none" id="ttsTextInput" placeholder="Paste lecture notes, markdown, or summary to convert into natural developer podcast..." rows="5">Distributed idempotency ensures that executing the same network request multiple times yields the exact state outcome as running it once. In payment gateways like Razorpay and Stripe, generating an Idempotency-Key header binds mutating operations to an atomic cache token inside Redis. Even during network timeouts, duplicate charge operations are completely prevented.</textarea>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant px-1">
+<span id="charCount">394 characters • ~28s spoken duration</span>
+<button class="hover:text-error transition-colors" onclick="clearTtsInput()" type="button">Clear text</button>
+</div>
+</div>
+<!-- Voice Model Selector Grid -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant font-medium">Select Neural Voice Engine</label>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-xs">
+<!-- Option 1: Active -->
+<button class="voice-card text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-1 ring-2 ring-primary" onclick="selectVoice(this)" type="button">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">DevAscent SDE Male</span>
+<span class="material-symbols-outlined text-primary text-[16px]">check_circle</span>
+</div>
+<span class="font-label-sm text-[11px] text-on-surface-variant">Natural 24kHz • Calm Tech</span>
+</button>
+<!-- Option 2 -->
+<button class="voice-card text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-1" onclick="selectVoice(this)" type="button">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Tech Lead Female</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] opacity-0">check_circle</span>
+</div>
+<span class="font-label-sm text-[11px] text-on-surface-variant">Clear, Paced • Accent Nuance</span>
+</button>
+<!-- Option 3 -->
+<button class="voice-card text-left p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-1" onclick="selectVoice(this)" type="button">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Fast Recap Engine</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] opacity-0">check_circle</span>
+</div>
+<span class="font-label-sm text-[11px] text-on-surface-variant">1.5x Optimized • Rapid Study</span>
+</button>
+</div>
+</div>
+<!-- Generate Audio Button -->
+<button class="w-full py-3 px-space-md bg-secondary text-on-secondary hover:bg-on-secondary-container rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm transition-all" id="synthesizeBtn" onclick="synthesizeSpeech()" type="button">
+<span class="material-symbols-outlined text-[20px]">graphic_eq</span>
+<span>Synthesize &amp; Load Audio Track</span>
+</button>
+</div>
+<!-- Master Audio Player Card & Visualizer -->
+<div class="bg-surface-container-lowest rounded-xl p-space-xl shadow-md flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[26px]">podcasts</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-[11px] text-primary uppercase font-bold tracking-wider">Now Playing</span>
+<h3 class="font-headline-sm text-[18px] text-on-surface font-semibold truncate" id="activeTrackTitle">
+                    Module 4: Distributed Idempotency (Audio Edition)
+                  </h3>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm self-start sm:self-auto shrink-0">
+                Bitrate: 320 kbps
+              </span>
+</div>
+<!-- Soundwave Animated Visualizer Canvas -->
+<div class="h-20 bg-surface-container-low rounded-lg p-space-md flex items-end justify-between gap-1 overflow-hidden" id="visualizerBars">
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 40%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 65%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 85%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 50%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 30%"></div>
+<div class="w-1.5 bg-secondary rounded-t transition-all duration-150" style="height: 75%"></div>
+<div class="w-1.5 bg-secondary rounded-t transition-all duration-150" style="height: 90%"></div>
+<div class="w-1.5 bg-secondary rounded-t transition-all duration-150" style="height: 60%"></div>
+<div class="w-1.5 bg-secondary rounded-t transition-all duration-150" style="height: 45%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 80%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 95%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 70%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 35%"></div>
+<div class="w-1.5 bg-secondary rounded-t transition-all duration-150" style="height: 55%"></div>
+<div class="w-1.5 bg-secondary rounded-t transition-all duration-150" style="height: 85%"></div>
+<div class="w-1.5 bg-secondary rounded-t transition-all duration-150" style="height: 40%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 65%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 50%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 25%"></div>
+<div class="w-1.5 bg-primary rounded-t transition-all duration-150" style="height: 75%"></div>
+</div>
+<!-- Timeline Scrubber -->
+<div class="flex flex-col gap-1">
+<input class="w-full accent-primary h-1.5 bg-surface-container-high rounded-lg cursor-pointer" id="masterTimeline" max="100" min="0" type="range" value="35"/>
+<div class="flex justify-between font-label-sm text-[11px] text-on-surface-variant font-mono">
+<span id="currentTime">00:10</span>
+<span id="totalDuration">00:28</span>
+</div>
+</div>
+<!-- Playback Controls Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-space-xs">
+<!-- Rewind / Play / Skip -->
+<div class="flex items-center gap-space-sm">
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" onclick="seekTrack(-15)" title="Rewind 15 seconds" type="button">
+<span class="material-symbols-outlined text-[24px]">export_notes</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container shadow-md transition-all" id="masterPlayBtn" onclick="toggleMasterPlayback()" type="button">
+<span class="material-symbols-outlined text-[28px]" id="masterPlayIcon">pause</span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" onclick="seekTrack(15)" title="Forward 15 seconds" type="button">
+<span class="material-symbols-outlined text-[24px]">apps</span>
+</button>
+</div>
+<!-- Speed Selector Pill -->
+<div class="flex items-center gap-1 bg-surface-container-low rounded-lg p-1">
+<button class="speed-btn px-2 py-1 rounded font-label-sm text-[12px] text-on-surface-variant hover:text-on-surface transition-colors" onclick="setPlaybackSpeed(1.0, this)" type="button">1.0x</button>
+<button class="speed-btn px-2 py-1 rounded font-label-sm text-[12px] bg-surface-container-lowest text-primary font-bold shadow-sm transition-colors" onclick="setPlaybackSpeed(1.25, this)" type="button">1.25x</button>
+<button class="speed-btn px-2 py-1 rounded font-label-sm text-[12px] text-on-surface-variant hover:text-on-surface transition-colors" onclick="setPlaybackSpeed(1.5, this)" type="button">1.5x</button>
+<button class="speed-btn px-2 py-1 rounded font-label-sm text-[12px] text-on-surface-variant hover:text-on-surface transition-colors" onclick="setPlaybackSpeed(2.0, this)" type="button">2.0x</button>
+</div>
+<!-- Volume & Download Actions -->
+<div class="flex items-center gap-space-sm">
+<div class="hidden sm:flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">volume_up</span>
+<input class="w-16 accent-primary h-1 bg-surface-container-high rounded cursor-pointer" max="100" min="0" type="range" value="80"/>
+</div>
+<button class="p-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center gap-1 font-label-sm text-label-sm transition-colors" onclick="downloadMp3()" title="Download Audio File" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="hidden md:inline">MP3</span>
+</button>
+</div>
+</div>
+<!-- Offline Listen & Export Section -->
+<div class="mt-space-sm pt-space-md border-t-0 bg-surface-container-low rounded-lg p-space-md flex flex-col sm:flex-row items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">cloud_sync</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Device Offline Sync</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">Cached to browser IndexedDB for flight or commute</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs w-full sm:w-auto">
+<button class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-sm text-label-sm shadow-sm transition-all flex items-center justify-center gap-1.5" onclick="toggleOfflineCache(this)" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">download_for_offline</span>
+                  Save Offline
+                </button>
+<button class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-sm text-label-sm shadow-sm transition-all flex items-center justify-center gap-1.5" onclick="generateRssFeed()" title="Generate Podcast Link" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">rss_feed</span>
+                  Podcast RSS
+                </button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Feature Highlight Bottom Banner: Real-world SDE Audio Utility -->
+<section class="mt-space-xl p-space-lg bg-surface-container-low rounded-xl flex flex-col md:flex-row items-center justify-between gap-space-md shadow-sm">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-secondary-container/50 text-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[28px]">code_blocks</span>
+</div>
+<div class="flex flex-col">
+<h4 class="font-headline-sm text-[17px] text-on-surface font-bold">Pro-tip: Speech-to-Code Keyword Highlighting</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">DevAscent automatically detects SQL statements, Docker commands, and algorithmic notation, converting your voice notes into sanitized Markdown codeblocks.</p>
+</div>
+</div>
+<a class="shrink-0 px-space-md py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1.5" data-path="ai-notes" href="#">
+<span>Open Notes Generator</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</section>
+</div>
+</div>
+<!-- Micro-interaction / Studio Scripts -->
+<script>
+    // State Variables
+    let isRecording = false;
+    let recordTimerInterval = null;
+    let secondsElapsed = 0;
+    let isMasterPlaying = true;
+    let visualizerInterval = null;
+
+    // Recording Toggle
+    function toggleRecording() {
+      const btn = document.getElementById('recordBtn');
+      const micIcon = document.getElementById('micIcon');
+      const btnLabel = document.getElementById('btnLabel');
+      const halo = document.getElementById('pulseHalo');
+      const haloInner = document.getElementById('pulseHaloInner');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const statusSubtext = document.getElementById('statusSubtext');
+      const confidenceTag = document.getElementById('confidenceTag');
+      const transcriptionBox = document.getElementById('transcriptionBox');
+
+      isRecording = !isRecording;
+
+      if (isRecording) {
+        // Active recording UI
+        btn.classList.remove('bg-primary-container', 'hover:bg-primary');
+        btn.classList.add('bg-error', 'hover:bg-error');
+        micIcon.textContent = 'stop';
+        btnLabel.textContent = 'STOP';
+        halo.classList.remove('opacity-0');
+        halo.classList.add('opacity-100', 'animate-ping');
+        haloInner.classList.remove('opacity-0');
+        haloInner.classList.add('opacity-100', 'animate-pulse');
+        statusSubtext.innerHTML = '<span class="text-error font-semibold flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">fiber_manual_record</span>Recording audio via Whisper v3 stream...</span>';
+        confidenceTag.classList.remove('hidden');
+
+        secondsElapsed = 0;
+        recordTimerInterval = setInterval(() => {
+          secondsElapsed++;
+          const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+          const secs = String(secondsElapsed % 60).padStart(2, '0');
+          timerDisplay.textContent = `${mins}:${secs}`;
+          
+          // Simulated dynamic real-time speech stream
+          if (secondsElapsed === 2) {
+            transcriptionBox.innerHTML = '<span class="text-primary font-medium">"Regarding the Redis cluster setup... "</span>';
+          } else if (secondsElapsed === 4) {
+            transcriptionBox.innerHTML = '<span class="text-primary font-medium">"Regarding the Redis cluster setup... we noticed cluster resharding triggers timeout spikes if the TTL keys..."</span>';
+          } else if (secondsElapsed === 7) {
+            transcriptionBox.innerHTML = '<span class="text-primary font-medium">"Regarding the Redis cluster setup... we noticed cluster resharding triggers timeout spikes if the TTL keys are skew-distributed across slot 14002. We need an atomic Lua script."</span>';
+          }
+        }, 1000);
+      } else {
+        // Stopped recording
+        clearInterval(recordTimerInterval);
+        btn.classList.add('bg-primary-container', 'hover:bg-primary');
+        btn.classList.remove('bg-error', 'hover:bg-error');
+        micIcon.textContent = 'mic';
+        btnLabel.textContent = 'START';
+        halo.classList.add('opacity-0');
+        halo.classList.remove('animate-ping');
+        haloInner.classList.add('opacity-0');
+        haloInner.classList.remove('animate-pulse');
+        statusSubtext.innerHTML = '<span class="text-secondary font-medium">Recording saved in local buffer &bull; Press Spacebar to record again</span>';
+      }
+    }
+
+    // Spacebar Hotkey Listener
+    window.addEventListener('keydown', (e) => {
+      // Ignore if typing in textarea or input
+      if (['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName)) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleRecording();
+      }
+    });
+
+    // Mode Selector Switcher
+    function switchMode(button, modeName) {
+      document.querySelectorAll('.mode-btn').forEach(b => {
+        b.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm', 'font-semibold');
+        b.classList.add('text-on-surface-variant');
+      });
+      button.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm', 'font-semibold');
+      button.classList.remove('text-on-surface-variant');
+    }
+
+    // Save and Auto-Tag Feedback
+    function saveActiveNote() {
+      const box = document.getElementById('transcriptionBox');
+      if (box.textContent.includes('Transcribed speech will render')) {
+        alert('Record or dictate a note first before generating flashcards!');
+        return;
+      }
+      alert('Note saved to vault! DevAscent AI generated 3 technical flashcards and saved to your Roadmap & AI Notes workspace.');
+    }
+
+    function autoTagNote() {
+      alert('Whisper analysis complete: Generated tags [#DistributedSystems, #Redis, #LatencyOptimization]');
+    }
+
+    // Memo Audio Playback Toggle
+    function toggleMemoPlay(memoId) {
+      const icon = document.getElementById(`memoIcon-${memoId}`);
+      const btn = document.getElementById(`memoBtn-${memoId}`);
+      if (icon.textContent === 'play_arrow') {
+        icon.textContent = 'pause';
+        btn.classList.add('bg-primary', 'text-on-primary');
+      } else {
+        icon.textContent = 'play_arrow';
+        btn.classList.remove('bg-primary');
+      }
+    }
+
+    // Preload Snippets
+    function loadSnippet(type) {
+      const input = document.getElementById('ttsTextInput');
+      const counter = document.getElementById('charCount');
+      if (type === 'module4') {
+        input.value = "Module 4 Summary: Distributed Idempotency guarantees safe retries across distributed networks. When processing financial webhooks or order queues, combine a client-provided UUID with a Redis distributed lock (Redlock pattern) to maintain exactly-once processing semantics.";
+      } else if (type === 'digest') {
+        input.value = "Daily System Design Digest: Designing high-throughput write systems requires choosing between Write-Ahead Logs (WAL) and LSM trees. Cassandra and RocksDB leverage append-only SSTables to turn random writes into sequential disk operations.";
+      }
+      counter.textContent = `${input.value.length} characters • ~${Math.round(input.value.length / 14)}s spoken duration`;
+    }
+
+    function clearTtsInput() {
+      const input = document.getElementById('ttsTextInput');
+      input.value = '';
+      document.getElementById('charCount').textContent = '0 characters • 0s duration';
+    }
+
+    // Voice Card Selection
+    function selectVoice(button) {
+      document.querySelectorAll('.voice-card').forEach(card => {
+        card.classList.remove('ring-2', 'ring-primary');
+        const icon = card.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.classList.add('opacity-0');
+          icon.classList.remove('text-primary');
+        }
+      });
+      button.classList.add('ring-2', 'ring-primary');
+      const activeIcon = button.querySelector('.material-symbols-outlined');
+      if (activeIcon) {
+        activeIcon.classList.remove('opacity-0');
+        activeIcon.classList.add('text-primary');
+      }
+    }
+
+    // Synthesize Speech
+    function synthesizeSpeech() {
+      const input = document.getElementById('ttsTextInput').value.trim();
+      if (!input) {
+        alert('Please enter or preload text to synthesize.');
+        return;
+      }
+      const titleElem = document.getElementById('activeTrackTitle');
+      titleElem.textContent = input.slice(0, 48) + '... (Synthesized)';
+      
+      // Trigger subtle pulse in visualizer
+      const bars = document.getElementById('visualizerBars').children;
+      for (let bar of bars) {
+        bar.style.height = (Math.random() * 80 + 20) + '%';
+      }
+      alert('Neural Speech generated successfully at 24kHz! Loaded to master player.');
+    }
+
+    // Master Player Controls
+    function toggleMasterPlayback() {
+      const icon = document.getElementById('masterPlayIcon');
+      isMasterPlaying = !isMasterPlaying;
+      icon.textContent = isMasterPlaying ? 'pause' : 'play_arrow';
+    }
+
+    function seekTrack(delta) {
+      const slider = document.getElementById('masterTimeline');
+      let val = parseInt(slider.value) + (delta > 0 ? 15 : -15);
+      if (val < 0) val = 0;
+      if (val > 100) val = 100;
+      slider.value = val;
+    }
+
+    function setPlaybackSpeed(speed, btn) {
+      document.querySelectorAll('.speed-btn').forEach(b => {
+        b.classList.remove('bg-surface-container-lowest', 'text-primary', 'font-bold', 'shadow-sm');
+        b.classList.add('text-on-surface-variant');
+      });
+      btn.classList.add('bg-surface-container-lowest', 'text-primary', 'font-bold', 'shadow-sm');
+      btn.classList.remove('text-on-surface-variant');
+    }
+
+    function downloadMp3() {
+      alert('DevAscent SDE Studio: Packaging high-fidelity 320kbps MP3 with embedded chapter markers...');
+    }
+
+    function toggleOfflineCache(btn) {
+      btn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-secondary">done_all</span> Cached (4.2 MB)';
+      btn.classList.add('bg-secondary-container/40');
+    }
+
+    function generateRssFeed() {
+      navigator.clipboard.writeText('https://devascent.io/podcast/rss/u_98412').then(() => {
+        alert('Personalized Private Podcast Feed URL copied! Paste this into Apple Podcasts, Overcast, or Pocket Casts.');
+      }).catch(() => {
+        alert('Private RSS Link: https://devascent.io/podcast/rss/u_98412');
+      });
+    }
+
+    // Dynamic Live Visualizer Bar Fluctuation
+    setInterval(() => {
+      if (isMasterPlaying) {
+        const bars = document.querySelectorAll('#visualizerBars > div');
+        bars.forEach(bar => {
+          const height = Math.floor(Math.random() * 75) + 20;
+          bar.style.height = height + '%';
+        });
+      }
+    }, 280);
+  </script>
+</div></main><footer class="w-full bg-surface-container-low text-on-surface"><div class="max-w-7xl mx-auto px-margin pt-space-2xl pb-space-xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-space-xl"><div class="lg:col-span-4 flex flex-col gap-space-md"><div class="flex items-center gap-space-sm"><img alt="DevAscent Academy Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W5LlnEv-7uqRcHbCG3eJsEwBT_hkpybkdKzx1rPdC22aEXXDyZLEGynEj-h1H-yTEPr_vhL07YQvfso9dAwJRikJIuKx5EAAJaLklA9yGm1kFQHpc4K7zRxc6Ei4vdrPbbNwbDNwNHPLcmDrM0r1EOO2PdKle3NwLVGZlu6a_VGgLeg5WtND5jyNJYTJqC3OH-uk56YBVznJIAmvuaF9QXw_BO1R9VCSMAG8_0GJpWvtgjTXdtB72H"/><span class="font-headline-sm text-headline-sm text-on-surface">DevAscent Academy</span></div><p class="font-body-md text-body-md text-on-surface-variant">The high-impact engineering accelerator engineered specifically for aspiring Indian developers, career-switchers, and tech leaders.</p><div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-high w-fit"><span class="material-symbols-outlined text-secondary text-[18px]">verified</span><span class="font-label-sm text-label-sm text-on-surface font-medium">Made for Indian Developers &amp; Students (BCA / MCA / B.Tech / Self-Taught)</span></div></div><div class="lg:col-span-3 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Learning Hub &amp; AI Tools</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="ai-notes" href="#">Notes Generator</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="ai-qa" href="#">AI Q&amp;A Assistant</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="pdf-summarizer" href="#">PDF Summarizer</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="roadmap" href="#">Career Roadmap</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="voice-tts" href="#">Voice &amp; Audio Studio</a></div></div><div class="lg:col-span-2 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Analytics &amp; Profile</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="analytics" href="#">Performance Analytics</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="achievements" href="#">Badges &amp; Certificates</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="terms-of-service" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="privacy-policy" href="#">Privacy Policy</a></div></div><div class="lg:col-span-3 flex flex-col gap-space-sm"><span class="font-headline-sm text-[16px] text-on-surface font-semibold">Student Support</span><p class="font-body-sm text-body-sm text-on-surface-variant">Have questions before enrolling? Our admissions mentors are available on WhatsApp and email.</p><div class="flex flex-col gap-space-xs"><a class="flex items-center gap-space-xs font-label-md text-label-md text-primary hover:text-on-primary-fixed transition-colors" href="mailto:support@devascent.io"><span class="material-symbols-outlined text-[18px]">mail</span>support@devascent.io</a><a class="flex items-center gap-space-xs font-label-md text-label-md text-secondary hover:text-on-secondary-fixed-variant transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">chat</span>WhatsApp Priority Support</a></div></div></div><div class="mt-space-xl pt-space-lg bg-surface-container rounded-xl p-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex flex-wrap items-center gap-space-md text-on-surface-variant"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">lock</span><span class="font-label-sm text-label-sm font-medium">Razorpay 256-bit SSL Encrypted Checkout</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">account_balance_wallet</span><span class="font-label-sm text-label-sm font-medium">UPI / RuPay / NetBanking Accepted</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">qr_code_2</span><span class="font-label-sm text-label-sm font-medium">Verifiable PDF Certificates with QR Verification</span></div></div><div class="font-body-sm text-body-sm text-on-surface-variant shrink-0">© 2025 DevAscent Academy. All rights reserved.</div></div></div></footer></body></html>
