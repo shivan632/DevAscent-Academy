@@ -182,7 +182,7 @@ export class AuthService {
     }
 
     // Mark user as verified
-    const user = await this.prisma.user.update({
+    const user: any = await (this.prisma.user as any).update({
       where: { email: normalizedEmail },
       data: { isEmailVerified: true },
       select: {
@@ -193,6 +193,15 @@ export class AuthService {
         degree: true,
         college: true,
         phone: true,
+        avatarUrl: true,
+        bio: true,
+        city: true,
+        graduationYear: true,
+        githubUrl: true,
+        linkedinUrl: true,
+        portfolioUrl: true,
+        isEmailVerified: true,
+        createdAt: true,
       },
     });
 
@@ -221,7 +230,7 @@ export class AuthService {
    * Login: Requires verified email before giving tokens.
    */
   async login(dto: LoginDto, res: Response) {
-    const user = await this.prisma.user.findUnique({
+    const user: any = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase().trim() },
     });
 
@@ -259,6 +268,15 @@ export class AuthService {
       degree: user.degree,
       college: user.college,
       phone: user.phone,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      city: user.city,
+      graduationYear: user.graduationYear,
+      githubUrl: user.githubUrl,
+      linkedinUrl: user.linkedinUrl,
+      portfolioUrl: user.portfolioUrl,
+      isEmailVerified: user.isEmailVerified,
+      createdAt: user.createdAt,
     };
 
     return {
@@ -322,7 +340,7 @@ export class AuthService {
     const normalizedEmail = googleUser.email.toLowerCase().trim();
 
     // Find or create user
-    let user = await this.prisma.user.findUnique({
+    let user: any = await this.prisma.user.findUnique({
       where: { email: normalizedEmail },
     });
 
@@ -364,6 +382,15 @@ export class AuthService {
       degree: user.degree,
       college: user.college,
       phone: user.phone,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      city: user.city,
+      graduationYear: user.graduationYear,
+      githubUrl: user.githubUrl,
+      linkedinUrl: user.linkedinUrl,
+      portfolioUrl: user.portfolioUrl,
+      isEmailVerified: user.isEmailVerified,
+      createdAt: user.createdAt,
     };
 
     return {
@@ -420,8 +447,11 @@ export class AuthService {
   /**
    * Returns complete user profile including stats (enrollments, certificates, submissions)
    */
+  /**
+   * Returns complete user profile including stats (enrollments, certificates, submissions)
+   */
   async getFullProfile(userId: string) {
-    const user = await this.prisma.user.findUnique({
+    const user: any = await (this.prisma.user as any).findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -458,9 +488,9 @@ export class AuthService {
     return {
       user: {
         ...user,
-        enrollmentsCount: user._count.enrollments,
-        certificatesCount: user._count.certificates,
-        submissionsCount: user._count.completionSubmissions,
+        enrollmentsCount: user._count?.enrollments || 0,
+        certificatesCount: user._count?.certificates || 0,
+        submissionsCount: user._count?.completionSubmissions || 0,
       },
     };
   }
@@ -483,7 +513,7 @@ export class AuthService {
     if (dto.linkedinUrl !== undefined) dataToUpdate.linkedinUrl = dto.linkedinUrl ? dto.linkedinUrl.trim() : null;
     if (dto.portfolioUrl !== undefined) dataToUpdate.portfolioUrl = dto.portfolioUrl ? dto.portfolioUrl.trim() : null;
 
-    const updatedUser = await this.prisma.user.update({
+    const updatedUser: any = await (this.prisma.user as any).update({
       where: { id: userId },
       data: dataToUpdate,
       select: {
@@ -517,7 +547,7 @@ export class AuthService {
    * Securely changes the user's password
    */
   async changePassword(userId: string, currentPassword: string, newPassword: string) {
-    const user = await this.prisma.user.findUnique({
+    const user: any = await this.prisma.user.findUnique({
       where: { id: userId },
     });
 
@@ -546,4 +576,5 @@ export class AuthService {
     };
   }
 }
+
 

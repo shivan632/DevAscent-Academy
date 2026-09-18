@@ -19,15 +19,7 @@ export declare class AuthController {
     }, res: Response): Promise<{
         success: boolean;
         message: string;
-        user: {
-            id: string;
-            email: string;
-            name: string;
-            phone: string;
-            role: string;
-            degree: string;
-            college: string;
-        };
+        user: any;
         accessToken: string;
     }>;
     sendOtp(body: {
@@ -41,26 +33,44 @@ export declare class AuthController {
     }>;
     login(dto: LoginDto, res: Response): Promise<{
         user: {
-            id: string;
-            email: string;
-            name: string;
-            role: string;
-            degree: string;
-            college: string;
-            phone: string;
+            id: any;
+            email: any;
+            name: any;
+            role: any;
+            degree: any;
+            college: any;
+            phone: any;
+            avatarUrl: any;
+            bio: any;
+            city: any;
+            graduationYear: any;
+            githubUrl: any;
+            linkedinUrl: any;
+            portfolioUrl: any;
+            isEmailVerified: any;
+            createdAt: any;
         };
         accessToken: string;
     }>;
     googleAuth(token: string, credential: string, res: Response): Promise<{
         success: boolean;
         user: {
-            id: string;
-            email: string;
-            name: string;
-            role: string;
-            degree: string;
-            college: string;
-            phone: string;
+            id: any;
+            email: any;
+            name: any;
+            role: any;
+            degree: any;
+            college: any;
+            phone: any;
+            avatarUrl: any;
+            bio: any;
+            city: any;
+            graduationYear: any;
+            githubUrl: any;
+            linkedinUrl: any;
+            portfolioUrl: any;
+            isEmailVerified: any;
+            createdAt: any;
         };
         accessToken: string;
     }>;
@@ -76,55 +86,11 @@ export declare class AuthController {
         user: any;
     };
     getProfile(user: any): Promise<{
-        user: {
-            enrollmentsCount: number;
-            certificatesCount: number;
-            submissionsCount: number;
-            id: string;
-            email: string;
-            name: string;
-            phone: string;
-            role: string;
-            degree: string;
-            college: string;
-            avatarUrl: string;
-            bio: string;
-            city: string;
-            graduationYear: string;
-            githubUrl: string;
-            linkedinUrl: string;
-            portfolioUrl: string;
-            isEmailVerified: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            _count: {
-                enrollments: number;
-                certificates: number;
-                completionSubmissions: number;
-            };
-        };
+        user: any;
     }>;
     updateProfile(user: any, dto: UpdateProfileDto): Promise<{
         message: string;
-        user: {
-            id: string;
-            email: string;
-            name: string;
-            phone: string;
-            role: string;
-            degree: string;
-            college: string;
-            avatarUrl: string;
-            bio: string;
-            city: string;
-            graduationYear: string;
-            githubUrl: string;
-            linkedinUrl: string;
-            portfolioUrl: string;
-            isEmailVerified: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-        };
+        user: any;
     }>;
     changePassword(user: any, dto: ChangePasswordDto): Promise<{
         message: string;

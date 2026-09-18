@@ -151,6 +151,15 @@ let AuthService = class AuthService {
                 degree: true,
                 college: true,
                 phone: true,
+                avatarUrl: true,
+                bio: true,
+                city: true,
+                graduationYear: true,
+                githubUrl: true,
+                linkedinUrl: true,
+                portfolioUrl: true,
+                isEmailVerified: true,
+                createdAt: true,
             },
         });
         await this.prisma.otpVerification.delete({ where: { email: normalizedEmail } });
@@ -201,6 +210,15 @@ let AuthService = class AuthService {
             degree: user.degree,
             college: user.college,
             phone: user.phone,
+            avatarUrl: user.avatarUrl,
+            bio: user.bio,
+            city: user.city,
+            graduationYear: user.graduationYear,
+            githubUrl: user.githubUrl,
+            linkedinUrl: user.linkedinUrl,
+            portfolioUrl: user.portfolioUrl,
+            isEmailVerified: user.isEmailVerified,
+            createdAt: user.createdAt,
         };
         return {
             user: safeUser,
@@ -292,6 +310,15 @@ let AuthService = class AuthService {
             degree: user.degree,
             college: user.college,
             phone: user.phone,
+            avatarUrl: user.avatarUrl,
+            bio: user.bio,
+            city: user.city,
+            graduationYear: user.graduationYear,
+            githubUrl: user.githubUrl,
+            linkedinUrl: user.linkedinUrl,
+            portfolioUrl: user.portfolioUrl,
+            isEmailVerified: user.isEmailVerified,
+            createdAt: user.createdAt,
         };
         return {
             success: true,
@@ -372,9 +399,9 @@ let AuthService = class AuthService {
         return {
             user: {
                 ...user,
-                enrollmentsCount: user._count.enrollments,
-                certificatesCount: user._count.certificates,
-                submissionsCount: user._count.completionSubmissions,
+                enrollmentsCount: user._count?.enrollments || 0,
+                certificatesCount: user._count?.certificates || 0,
+                submissionsCount: user._count?.completionSubmissions || 0,
             },
         };
     }
