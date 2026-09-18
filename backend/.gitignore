@@ -1,0 +1,20 @@
+# Backend environment variables
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Output
+dist/
+coverage/
+
+# Local DB & logs
+dev.db
+*.db
+*.log
+scratch_test_db.js
