@@ -25,8 +25,8 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const { setUser } = useAuthStore();
 
-  const [email, setEmail] = useState('student@devascent.io');
-  const [password, setPassword] = useState('StudentPassword@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -35,6 +35,21 @@ function LoginForm() {
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Initialize Google Sign-In SDK
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '934300544473-1ic2l93u2kirb57b7sno5kjosfis9n5c.apps.googleusercontent.com';
+    
+    // Load Google Identity Services script if not already present
+    if (!document.getElementById('google-jssdk')) {
+      const script = document.createElement('script');
+      script.id = 'google-jssdk';
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,11 +85,44 @@ function LoginForm() {
 
   const handleGoogleSignIn = () => {
     setGoogleLoading(true);
-    // Simulate / Trigger Google OAuth
-    setTimeout(() => {
-      setGoogleLoading(false);
-      setError('Google Sign-In is configured. Please enter your email credentials or contact student desk.');
-    }, 1200);
+    setError('');
+
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '934300544473-1ic2l93u2kirb57b7sno5kjosfis9n5c.apps.googleusercontent.com';
+
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
+      const tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'openid email profile',
+        callback: async (tokenResponse: any) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            try {
+              const res = await api.googleAuth(tokenResponse.access_token);
+              const rawUser = res?.data?.user || res?.user || res?.data;
+              if (rawUser) {
+                setUser(rawUser);
+                if (rawUser.role === 'ADMIN') {
+                  router.push('/admin/submissions');
+                } else {
+                  router.push('/dashboard');
+                }
+              }
+            } catch (err: any) {
+              setError(err?.message || 'Google sign-in failed. Please try again.');
+            } finally {
+              setGoogleLoading(false);
+            }
+          } else {
+            setGoogleLoading(false);
+          }
+        },
+      });
+      tokenClient.requestAccessToken();
+    } else {
+      // Fallback: Direct OAuth redirect
+      const redirectUri = encodeURIComponent(window.location.origin + '/auth/callback/google');
+      const scope = encodeURIComponent('openid email profile');
+      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&prompt=select_account`;
+    }
   };
 
   const handleSendVerificationCode = async () => {
@@ -235,7 +283,7 @@ function LoginForm() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="student@devascent.io"
+                placeholder="name@example.com"
                 className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-white/[0.08] focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl focus:outline-none transition-all"
               />
               {isEmailValid && (
@@ -260,7 +308,7 @@ function LoginForm() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-white/[0.08] focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl focus:outline-none transition-all"
               />
               <button

@@ -108,12 +108,61 @@ export default function RegisterPage() {
     }
   };
 
+  // Initialize Google Sign-In SDK
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '934300544473-1ic2l93u2kirb57b7sno5kjosfis9n5c.apps.googleusercontent.com';
+    
+    // Load Google Identity Services script if not already present
+    if (!document.getElementById('google-jssdk')) {
+      const script = document.createElement('script');
+      script.id = 'google-jssdk';
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
   const handleGoogleSignUp = () => {
     setGoogleLoading(true);
-    setTimeout(() => {
-      setGoogleLoading(false);
-      setError('Google Sign-Up is configured. Please enter your registration details to continue.');
-    }, 1200);
+    setError('');
+
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '934300544473-1ic2l93u2kirb57b7sno5kjosfis9n5c.apps.googleusercontent.com';
+
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
+      const tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'openid email profile',
+        callback: async (tokenResponse: any) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            try {
+              const res = await api.googleAuth(tokenResponse.access_token);
+              const rawUser = res?.data?.user || res?.user || res?.data;
+              if (rawUser) {
+                setUser(rawUser);
+                if (rawUser.role === 'ADMIN') {
+                  router.push('/admin/submissions');
+                } else {
+                  router.push('/dashboard');
+                }
+              }
+            } catch (err: any) {
+              setError(err?.message || 'Google registration failed. Please try again.');
+            } finally {
+              setGoogleLoading(false);
+            }
+          } else {
+            setGoogleLoading(false);
+          }
+        },
+      });
+      tokenClient.requestAccessToken();
+    } else {
+      // Fallback: Direct OAuth redirect
+      const redirectUri = encodeURIComponent(window.location.origin + '/auth/callback/google');
+      const scope = encodeURIComponent('openid email profile');
+      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&prompt=select_account`;
+    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
