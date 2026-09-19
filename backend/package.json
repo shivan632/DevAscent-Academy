@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "DevAscent Academy NestJS Backend API",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "postinstall": "prisma generate",
     "prebuild": "prisma generate",

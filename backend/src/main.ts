@@ -77,9 +77,9 @@ async function bootstrap() {
     });
   });
 
-  const port = process.env.PORT || 3001;
-  await app.listen(port);
-  logger.log(`🚀 DevAscent Backend API is running on http://localhost:${port}/api/v1`);
+  const port = parseInt(process.env.PORT || '3001', 10);
+  await app.listen(port, '0.0.0.0');
+  logger.log(`🚀 DevAscent Backend API is running on port ${port}/api/v1`);
 }
 
 bootstrap();

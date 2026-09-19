@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: devascent-backend
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: node dist/main
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # All other env vars (DATABASE_URL, JWT_SECRET, etc.) must be set
+      # manually in the Render dashboard under Environment Variables.
+      # Never commit secrets to this file.
