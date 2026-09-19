@@ -25,6 +25,10 @@ model User {
   linkedinUrl     String?
   portfolioUrl    String?
   isEmailVerified Boolean   @default(false)
+  status          String    @default("ACTIVE") // "ACTIVE" | "SUSPENDED"
+  suspendedAt     DateTime?
+  lastLoginAt     DateTime?
+  adminNote       String?   // internal notes about this student
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -36,6 +40,7 @@ model User {
   quizSubmissions        QuizSubmission[]
   internshipApplications InternshipApplication[]
   completionSubmissions  CompletionSubmission[]
+  auditLogsAsAdmin       AuditLog[] @relation("AdminAuditLogs")
 }
 
 model OtpVerification {
@@ -256,4 +261,20 @@ model CompletionSubmission {
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id])
+  action     String   // "STUDENT_SUSPENDED" | "REFUND_APPROVED" | "SUBMISSION_APPROVED" | etc.
+  targetId   String?
+  targetType String?  // "User" | "Refund" | "Submission" | "Course"
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([action, createdAt])
 }

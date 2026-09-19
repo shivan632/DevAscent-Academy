@@ -160,9 +160,9 @@ export declare class CoursesController {
         message: string;
         enrollment: {
             id: string;
+            status: string;
             courseId: string;
             progressPct: number;
-            status: string;
             enrolledAt: Date;
             userId: string;
         };
@@ -172,10 +172,10 @@ export declare class CoursesController {
         message: string;
         application: {
             id: string;
-            courseId: string;
             status: string;
-            userId: string;
             adminNote: string | null;
+            courseId: string;
+            userId: string;
             appliedAt: Date;
             reviewedAt: Date | null;
         };

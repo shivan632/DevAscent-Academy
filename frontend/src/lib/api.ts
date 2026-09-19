@@ -83,4 +83,52 @@ export const api = {
   // Refunds
   requestRefund: (refundData: any) => fetchApi('/refunds/request', { method: 'POST', body: JSON.stringify(refundData) }),
   getRefundStatus: (paymentId: string) => fetchApi(`/refunds/${paymentId}`),
+
+  // ─── Admin ───────────────────────────────────────────────────────────────────
+  admin: {
+    getOverview: () => fetchApi('/admin/overview'),
+    getBadgeCounts: () => fetchApi('/admin/badge-counts'),
+
+    getStudents: (params?: { page?: number; limit?: number; search?: string; degree?: string; status?: string }) => {
+      const q = new URLSearchParams(params as any).toString();
+      return fetchApi(`/admin/students${q ? `?${q}` : ''}`);
+    },
+    getStudentDetail: (id: string) => fetchApi(`/admin/students/${id}`),
+    suspendStudent: (id: string, reason: string) =>
+      fetchApi(`/admin/students/${id}/suspend`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
+    restoreStudent: (id: string) =>
+      fetchApi(`/admin/students/${id}/restore`, { method: 'PATCH' }),
+
+    getRefunds: (status?: string) =>
+      fetchApi(`/admin/refunds${status ? `?status=${status}` : ''}`),
+    approveRefund: (id: string) =>
+      fetchApi(`/admin/refunds/${id}/approve`, { method: 'POST' }),
+    rejectRefund: (id: string, reason: string) =>
+      fetchApi(`/admin/refunds/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) }),
+
+    getSubmissions: (params?: { status?: string; page?: number; limit?: number }) => {
+      const q = new URLSearchParams(params as any).toString();
+      return fetchApi(`/admin/submissions${q ? `?${q}` : ''}`);
+    },
+    approveSubmission: (id: string, adminNote?: string) =>
+      fetchApi(`/admin/submissions/${id}/approve`, { method: 'POST', body: JSON.stringify({ adminNote }) }),
+    rejectSubmission: (id: string, reason: string) =>
+      fetchApi(`/admin/submissions/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) }),
+    bulkApproveSubmissions: (ids: string[]) =>
+      fetchApi('/admin/submissions/bulk-approve', { method: 'POST', body: JSON.stringify({ ids }) }),
+
+    getCourseStats: () => fetchApi('/admin/courses'),
+    getAnalytics: () => fetchApi('/admin/analytics'),
+
+    getAuditLog: (params?: { page?: number; limit?: number; action?: string }) => {
+      const q = new URLSearchParams(params as any).toString();
+      return fetchApi(`/admin/audit-log${q ? `?${q}` : ''}`);
+    },
+
+    exportStudentsUrl: () => `${API_BASE_URL}/admin/export/students`,
+    exportRevenueUrl: () => `${API_BASE_URL}/admin/export/revenue`,
+
+    updateRole: (userId: string, role: string) =>
+      fetchApi(`/admin/settings/role/${userId}`, { method: 'PATCH', body: JSON.stringify({ role }) }),
+  },
 };

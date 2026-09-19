@@ -331,11 +331,11 @@ export default function Navbar() {
               {/* Admin Console Link (if signed in as ADMIN) */}
               {isAdmin && (
                 <Link
-                  href="/admin/submissions"
+                  href="/admin/dashboard"
                   className="text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 px-3 py-1 rounded-full flex items-center gap-1 hover:bg-indigo-100 transition-colors"
                 >
                   <FolderGit2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Admin Desk</span>
+                  <span>Admin Panel</span>
                 </Link>
               )}
             </nav>
@@ -443,12 +443,12 @@ export default function Navbar() {
 
                     {isAdmin && (
                       <Link
-                        href="/admin/submissions"
+                        href="/admin/dashboard"
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors"
                       >
                         <FolderGit2 className="w-3.5 h-3.5" />
-                        <span>Admin Review Console</span>
+                        <span>Admin Command Center</span>
                       </Link>
                     )}
 
