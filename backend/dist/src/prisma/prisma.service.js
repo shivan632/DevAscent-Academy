@@ -13,19 +13,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
-const adapter_neon_1 = require("@prisma/adapter-neon");
 let PrismaService = PrismaService_1 = class PrismaService extends client_1.PrismaClient {
     constructor() {
-        const connectionString = process.env.DATABASE_URL;
-        super(connectionString
-            ? { adapter: new adapter_neon_1.PrismaNeonHttp(connectionString, {}) }
-            : undefined);
+        super({
+            datasources: {
+                db: {
+                    url: process.env.DATABASE_URL,
+                },
+            },
+        });
         this.logger = new common_1.Logger(PrismaService_1.name);
     }
     async onModuleInit() {
         try {
             await this.$connect();
-            this.logger.log('Database connected successfully via Neon Serverless Adapter.');
+            this.logger.log('Database connected successfully.');
         }
         catch (err) {
             this.logger.error('Could not connect to database:', err);
