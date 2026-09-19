@@ -4,8 +4,8 @@
   "description": "DevAscent Academy NestJS Backend API",
   "private": true,
   "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=9.0.0"
+    "node": "20.x",
+    "npm": "10.x"
   },
   "scripts": {
     "postinstall": "prisma generate",
