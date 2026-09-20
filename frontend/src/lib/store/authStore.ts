@@ -62,6 +62,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch {
       // continue logout even on API failure
     }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('devascent_token');
+    }
     set({ user: null, isAuthenticated: false, isLoading: false });
   },
 }));

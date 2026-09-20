@@ -27,7 +27,7 @@ export class AuthService {
     return {
       httpOnly: true,
       secure: isProd,
-      sameSite: (isProd ? 'strict' : 'lax') as 'strict' | 'lax',
+      sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
       maxAge: maxAgeMs,
       path: '/',
     };
@@ -286,8 +286,9 @@ export class AuthService {
   }
 
   async logout(res: Response) {
-    res.clearCookie('access_token', { path: '/' });
-    res.clearCookie('refresh_token', { path: '/' });
+    const isProd = process.env.NODE_ENV === 'production';
+    res.clearCookie('access_token', { path: '/', httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'lax' });
+    res.clearCookie('refresh_token', { path: '/', httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'lax' });
     return { success: true, message: 'Logged out successfully.' };
   }
 

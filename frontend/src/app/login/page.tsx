@@ -60,6 +60,10 @@ function LoginForm() {
     try {
       const res = await api.login({ email: email.trim().toLowerCase(), password });
       const rawUser = res?.data?.user || res?.user || res?.data;
+      const token = res?.data?.accessToken || res?.accessToken;
+      if (token && typeof window !== 'undefined') {
+        localStorage.setItem('devascent_token', token);
+      }
       if (rawUser) {
         setUser(rawUser);
         if (rawUser.role === 'ADMIN') {
@@ -98,6 +102,10 @@ function LoginForm() {
             try {
               const res = await api.googleAuth(tokenResponse.access_token);
               const rawUser = res?.data?.user || res?.user || res?.data;
+              const token = res?.data?.accessToken || res?.accessToken;
+              if (token && typeof window !== 'undefined') {
+                localStorage.setItem('devascent_token', token);
+              }
               if (rawUser) {
                 setUser(rawUser);
                 if (rawUser.role === 'ADMIN') {
