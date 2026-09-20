@@ -18,6 +18,7 @@ export interface User {
   portfolioUrl?: string;
   isEmailVerified?: boolean;
   createdAt?: string;
+  updatedAt?: string;
   enrollmentsCount?: number;
   certificatesCount?: number;
   submissionsCount?: number;

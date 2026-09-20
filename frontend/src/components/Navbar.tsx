@@ -85,6 +85,9 @@ export default function Navbar() {
 
   const isActive = (path: string) => {
     if (path === '/') return pathname === '/';
+    if (path === '/courses') return pathname.startsWith('/courses') || pathname.startsWith('/learn');
+    if (path === '/verify') return pathname.startsWith('/verify');
+    if (path === '/dashboard') return pathname.startsWith('/dashboard');
     return pathname.startsWith(path);
   };
 
@@ -249,7 +252,7 @@ export default function Navbar() {
 
               {/* 3. Verify Credential */}
               <Link
-                href="/verify/DEV-2026-A1B2C3"
+                href="/verify/DEVASCENT-2025-VALID"
                 className={`text-xs xl:text-sm font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 py-1 px-2 rounded-lg ${
                   isActive('/verify') ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-300'
                 }`}
@@ -280,14 +283,14 @@ export default function Navbar() {
                 {resourcesDropdownOpen && (
                   <div className="absolute top-full left-0 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-3 z-50 animate-fadeIn space-y-1">
                     <Link
-                      href="/certificate"
+                      href="/ai-studio"
                       onClick={() => setResourcesDropdownOpen(false)}
                       className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                     >
-                      <Award className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       <div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white block">Certificate Generator Demo</span>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400">Interactive SHA-256 PDF preview</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-white block">AI Copilot Studio</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">Smart notes, mock interviews & roadmaps</span>
                       </div>
                     </Link>
 
@@ -314,18 +317,32 @@ export default function Navbar() {
                         <span className="text-[11px] text-slate-500 dark:text-slate-400">Direct assistance from mentor</span>
                       </div>
                     </Link>
+
+                    {isAdmin && (
+                      <Link
+                        href="/certificate"
+                        onClick={() => setResourcesDropdownOpen(false)}
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors border-t border-slate-100 dark:border-slate-800 pt-2"
+                      >
+                        <Award className="w-4 h-4 text-amber-500" />
+                        <div>
+                          <span className="text-xs font-bold text-amber-600 dark:text-amber-400 block">Certificate Studio (Admin)</span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400">Official PDF generator & test mint</span>
+                        </div>
+                      </Link>
+                    )}
                   </div>
                 )}
               </div>
 
-              {/* 5. Support Desk Link */}
+              {/* 5. About Page Link (Always Visible) */}
               <Link
-                href="/support"
+                href="/about"
                 className={`text-xs xl:text-sm font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 py-1 px-2 rounded-lg ${
-                  isActive('/support') ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-300'
+                  isActive('/about') ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
-                Help Desk
+                About
               </Link>
 
               {/* Admin Console Link (if signed in as ADMIN) */}
@@ -406,7 +423,7 @@ export default function Navbar() {
                     </div>
 
                     <Link
-                      href="/dashboard"
+                      href="/dashboard?tab=overview"
                       onClick={() => setProfileDropdownOpen(false)}
                       className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                     >
@@ -415,7 +432,7 @@ export default function Navbar() {
                     </Link>
 
                     <Link
-                      href="/dashboard"
+                      href="/dashboard?tab=certificates"
                       onClick={() => setProfileDropdownOpen(false)}
                       className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                     >
@@ -424,7 +441,16 @@ export default function Navbar() {
                     </Link>
 
                     <Link
-                      href="/dashboard"
+                      href="/dashboard?tab=submissions"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <FolderGit2 className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Capstone Submissions</span>
+                    </Link>
+
+                    <Link
+                      href="/dashboard?tab=profile"
                       onClick={() => setProfileDropdownOpen(false)}
                       className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                     >
@@ -433,11 +459,20 @@ export default function Navbar() {
                     </Link>
 
                     <Link
+                      href="/ai-studio"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                      <span>AI Studio Copilot</span>
+                    </Link>
+
+                    <Link
                       href="/refund-policy"
                       onClick={() => setProfileDropdownOpen(false)}
                       className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                     >
-                      <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      <RotateCcw className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                       <span>7-Day Guarantee Portal</span>
                     </Link>
 
@@ -502,12 +537,21 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <>
                   <Link
-                    href="/dashboard"
+                    href="/dashboard?tab=overview"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-semibold text-sm bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300"
                   >
                     <BookOpen className="w-4 h-4" />
                     <span>My Dashboard</span>
+                  </Link>
+
+                  <Link
+                    href="/dashboard?tab=certificates"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    <Award className="w-4 h-4 text-emerald-600" />
+                    <span>My Certificates</span>
                   </Link>
 
                   <Link
@@ -531,12 +575,30 @@ export default function Navbar() {
                   </Link>
 
                   <Link
-                    href="/verify/DEV-2026-A1B2C3"
+                    href="/ai-studio"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>AI Copilot Studio</span>
+                  </Link>
+
+                  <Link
+                    href="/verify/DEVASCENT-2025-VALID"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
                     <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span>Verify Credential Ledger</span>
+                  </Link>
+
+                  <Link
+                    href="/about"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    <Sparkles className="w-4 h-4 text-indigo-500" />
+                    <span>About DevAscent</span>
                   </Link>
 
                   <Link

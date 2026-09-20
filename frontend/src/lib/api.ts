@@ -54,7 +54,9 @@ export const api = {
   enrollFree: (slug: string) => fetchApi(`/courses/${slug}/enroll-free`, { method: 'POST' }),
   applyCohort: (slug: string, note?: string) => fetchApi(`/courses/${slug}/apply`, { method: 'POST', body: JSON.stringify({ note }) }),
 
-  // Progress
+  // Progress & Enrollments
+  getMyEnrollments: () => fetchApi('/me/enrollments'),
+  getMyStats: () => fetchApi('/me/stats'),
   getCourseProgress: (courseId: string) => fetchApi(`/progress/${courseId}`),
   completeLesson: (courseId: string, lessonId: string) => fetchApi(`/progress/${courseId}/lessons/${lessonId}/complete`, { method: 'POST' }),
   submitQuiz: (courseId: string, answers: any) => fetchApi(`/progress/${courseId}/quiz`, { method: 'POST', body: JSON.stringify({ answers }) }),
@@ -83,8 +85,8 @@ export const api = {
   getDownloadUrl: (certId: string) => `${API_BASE_URL}/certificates/${certId}/download`,
 
   // Refunds
-  requestRefund: (refundData: any) => fetchApi('/refunds/request', { method: 'POST', body: JSON.stringify(refundData) }),
-  getRefundStatus: (paymentId: string) => fetchApi(`/refunds/${paymentId}`),
+  requestRefund: (refundData: { orderId: string; reason: string; upiId?: string }) => fetchApi('/refunds/apply', { method: 'POST', body: JSON.stringify(refundData) }),
+  getRefundStatus: (refundId: string) => fetchApi(`/refunds/status/${refundId}`),
 
   // ─── Admin ───────────────────────────────────────────────────────────────────
   admin: {

@@ -26,6 +26,13 @@ interface StudentSidebarProps {
   onSelectTab?: (tab: 'overview' | 'certificates' | 'submissions' | 'profile' | 'settings' | 'support') => void;
   certificatesCount?: number;
   submissionsCount?: number;
+  enrolledCourses?: Array<{
+    id?: string;
+    courseId?: string;
+    courseSlug: string;
+    courseTitle: string;
+    progressPct?: number;
+  }>;
 }
 
 export default function StudentSidebar({
@@ -33,6 +40,7 @@ export default function StudentSidebar({
   onSelectTab,
   certificatesCount = 0,
   submissionsCount = 0,
+  enrolledCourses = [],
 }: StudentSidebarProps) {
   const { user, logout } = useAuthStore();
   const { isOpen, close } = useSidebarStore();
@@ -85,8 +93,10 @@ export default function StudentSidebar({
     close();
   };
 
+  const primarySlug = enrolledCourses.length > 0 ? enrolledCourses[0].courseSlug : 'react-foundations-free';
+
   const sidebarContent = (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 p-4 sm:p-5 shadow-sm space-y-6">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 p-4 sm:p-5 shadow-sm space-y-5">
       
       {/* Profile Card Header */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -111,6 +121,7 @@ export default function StudentSidebar({
         <button
           onClick={close}
           className="lg:hidden p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg"
+          aria-label="Close Sidebar"
         >
           <X className="w-5 h-5" />
         </button>
@@ -152,6 +163,33 @@ export default function StudentSidebar({
         })}
       </div>
 
+      {/* Enrolled Courses Section (if any) */}
+      {enrolledCourses.length > 0 && (
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
+          <div className="flex items-center justify-between px-3 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              My Enrolled Tracks ({enrolledCourses.length})
+            </span>
+          </div>
+          {enrolledCourses.slice(0, 3).map((enr, idx) => (
+            <Link
+              key={idx}
+              href={`/learn/${enr.courseSlug}`}
+              onClick={close}
+              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs transition-colors border border-slate-200/60 dark:border-slate-800"
+            >
+              <div className="flex items-center gap-2 overflow-hidden">
+                <BookOpen className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                <span className="font-semibold truncate">{enr.courseTitle}</span>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded shrink-0">
+                {enr.progressPct !== undefined ? `${enr.progressPct}%` : 'Active'}
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Quick Launch & Actions */}
       <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-1">
@@ -159,13 +197,37 @@ export default function StudentSidebar({
         </span>
 
         <Link
-          href="/learn/react-foundations-free"
+          href={`/learn/${primarySlug}`}
           onClick={close}
           className="w-full flex items-center justify-between p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 font-semibold transition-colors"
         >
           <div className="flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-            <span>React Free Track</span>
+            <span>Resume Learning Track</span>
+          </div>
+          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+        </Link>
+
+        <Link
+          href={`/learn/${primarySlug}/complete`}
+          onClick={close}
+          className="w-full flex items-center justify-between p-2.5 rounded-xl border border-amber-200/70 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100/60 font-semibold transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Award className="w-3.5 h-3.5 text-amber-500" />
+            <span>Submit Capstone Form</span>
+          </div>
+          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+        </Link>
+
+        <Link
+          href="/ai-studio"
+          onClick={close}
+          className="w-full flex items-center justify-between p-2.5 rounded-xl border border-indigo-200/70 dark:border-indigo-800 bg-indigo-50/30 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100/50 font-medium transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+            <span>AI Studio (Copilot Beta)</span>
           </div>
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </Link>

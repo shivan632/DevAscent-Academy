@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import confetti from 'canvas-confetti';
+import { useAuthStore } from '../../lib/store/authStore';
 import {
   Award,
   ShieldCheck,
@@ -20,16 +22,31 @@ import {
   BookOpen,
   Lock,
   RefreshCw,
-  Printer
+  Printer,
+  ShieldAlert
 } from 'lucide-react';
 
 export default function CertificateGeneratorPage() {
+  const router = useRouter();
+  const { user, isLoading, checkAuth } = useAuthStore();
   const [studentName, setStudentName] = useState('Shivan Mishra');
   const [courseTitle, setCourseTitle] = useState('Full-Stack Web Development & Cloud Architecture');
   const [issueDate, setIssueDate] = useState('March 15, 2025');
   const [credentialId, setCredentialId] = useState('DEVASCENT-2025-VALID');
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user || user.role !== 'ADMIN') {
+        router.replace('/dashboard?tab=certificates');
+      }
+    }
+  }, [user, isLoading, router]);
 
   const certRef = useRef<HTMLDivElement>(null);
 

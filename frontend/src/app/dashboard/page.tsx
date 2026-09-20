@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import StudentSidebar from '../../components/StudentSidebar';
@@ -45,21 +46,87 @@ import {
   MessageSquare,
   ArrowUpRight,
   Code2,
+  Copy,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
 
-export default function StudentDashboardPage() {
-  const { user, logout, updateUser } = useAuthStore();
-  const { theme, setTheme } = useTheme();
-  
-  const [activeTab, setActiveTab] = useState<'overview' | 'certificates' | 'submissions' | 'profile' | 'settings' | 'support'>('overview');
-  const [refundRequested, setRefundRequested] = useState(false);
-  const [showRefundModal, setShowRefundModal] = useState(false);
+function DashboardSkeleton() {
+  return (
+    <div className="min-h-screen flex flex-col bg-[#F8F9FF] dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <Navbar />
+      <main className="flex-1 pt-24 sm:pt-28 pb-20">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start animate-pulse">
+            {/* Left Sidebar Skeleton */}
+            <div className="hidden lg:block lg:col-span-3 bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200 dark:border-slate-800 space-y-4">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="w-11 h-11 rounded-2xl bg-slate-200 dark:bg-slate-800" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4" />
+                  <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/2" />
+                </div>
+              </div>
+              <div className="space-y-2 pt-2">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="h-10 bg-slate-100 dark:bg-slate-800 rounded-2xl w-full" />
+                ))}
+              </div>
+            </div>
 
-  // Dynamic user data & certificates
+            {/* Main Content Skeleton */}
+            <div className="lg:col-span-9 space-y-6">
+              <div className="h-44 bg-slate-200 dark:bg-slate-800/80 rounded-3xl w-full" />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-28 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-2">
+                    <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3" />
+                    <div className="h-7 bg-slate-200 dark:bg-slate-800 rounded w-1/2" />
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <div className="xl:col-span-8 h-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl" />
+                <div className="xl:col-span-4 h-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function DashboardContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user, isLoading: authLoading, logout, updateUser, checkAuth } = useAuthStore();
+  const { theme, setTheme } = useTheme();
+
+  const [activeTab, setActiveTab] = useState<'overview' | 'certificates' | 'submissions' | 'profile' | 'settings' | 'support'>('overview');
+  
+  // Data state
   const [certificates, setCertificates] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Copy toast states
+  const [copiedCertId, setCopiedCertId] = useState<string | null>(null);
+  const [copiedHash, setCopiedHash] = useState<string | null>(null);
+
+  // Refund modal state
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundOrderId, setRefundOrderId] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [refundUpiId, setRefundUpiId] = useState('');
+  const [refundSubmitting, setRefundSubmitting] = useState(false);
+  const [refundMsg, setRefundMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [refundRequested, setRefundRequested] = useState(false);
 
   // Profile Form state
   const [profileName, setProfileName] = useState('');
@@ -78,9 +145,30 @@ export default function StudentDashboardPage() {
 
   // Password Form state
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+  const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
   const [passwordUpdating, setPasswordUpdating] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // 1. Tab Deep-Linking synchronization
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['overview', 'certificates', 'submissions', 'profile', 'settings', 'support'].includes(tabParam)) {
+      setActiveTab(tabParam as any);
+    }
+  }, [searchParams]);
+
+  // 2. Auth guard: redirect to login if unauthenticated
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/login');
+    }
+  }, [user, authLoading, router]);
+
+  // 3. Populate profile state when user updates
   useEffect(() => {
     if (user) {
       setProfileName(user.name || '');
@@ -97,15 +185,17 @@ export default function StudentDashboardPage() {
     }
   }, [user]);
 
+  // 4. Load dashboard datasets
   useEffect(() => {
     async function loadDashboardData() {
       setLoading(true);
       try {
-        const [certsRes, subsRes, coursesRes, profileRes] = await Promise.allSettled([
+        const [certsRes, subsRes, coursesRes, profileRes, enrollRes] = await Promise.allSettled([
           api.getMyCertificates(),
           api.getMySubmissions(),
           api.getCourses(),
           api.getProfile(),
+          api.getMyEnrollments(),
         ]);
 
         if (profileRes.status === 'fulfilled' && profileRes.value) {
@@ -125,8 +215,6 @@ export default function StudentDashboardPage() {
           } else {
             setCertificates([]);
           }
-        } else {
-          setCertificates([]);
         }
 
         if (subsRes.status === 'fulfilled' && subsRes.value) {
@@ -138,8 +226,6 @@ export default function StudentDashboardPage() {
           } else {
             setSubmissions([]);
           }
-        } else {
-          setSubmissions([]);
         }
 
         if (coursesRes.status === 'fulfilled' && coursesRes.value) {
@@ -151,13 +237,20 @@ export default function StudentDashboardPage() {
           } else {
             setCourses([]);
           }
-        } else {
-          setCourses([]);
+        }
+
+        if (enrollRes.status === 'fulfilled' && enrollRes.value) {
+          const val = enrollRes.value;
+          if (Array.isArray(val?.enrollments)) {
+            setEnrollments(val.enrollments);
+          } else if (Array.isArray(val)) {
+            setEnrollments(val);
+          } else {
+            setEnrollments([]);
+          }
         }
       } catch (e) {
-        setCertificates([]);
-        setSubmissions([]);
-        setCourses([]);
+        // Fallback gracefully
       } finally {
         setLoading(false);
       }
@@ -168,9 +261,41 @@ export default function StudentDashboardPage() {
   const safeCertificates = Array.isArray(certificates) ? certificates : [];
   const safeSubmissions = Array.isArray(submissions) ? submissions : [];
   const safeCourses = Array.isArray(courses) ? courses : [];
+  const safeEnrollments = Array.isArray(enrollments) ? enrollments : [];
+
+  // Derived calculations
+  const displayEnrollments = safeEnrollments.length > 0 
+    ? safeEnrollments 
+    : [
+        {
+          id: 'free-default',
+          courseSlug: 'react-foundations-free',
+          courseTitle: 'Modern React & TypeScript Foundations',
+          progressPct: 100,
+          enrolledAt: user?.createdAt || new Date().toISOString(),
+          status: 'ACTIVE',
+        }
+      ];
+
+  const primarySlug = displayEnrollments[0]?.courseSlug || 'react-foundations-free';
+
+  const avgProgress = safeEnrollments.length > 0
+    ? Math.round(safeEnrollments.reduce((acc, e) => acc + (Number(e.progressPct) || 0), 0) / safeEnrollments.length)
+    : 100;
 
   const studentName = user?.name || profileName || 'Student';
   const studentEmail = user?.email || 'student@devascent.io';
+
+  const handleCopy = (text: string, type: 'id' | 'hash', key: string) => {
+    navigator.clipboard.writeText(text);
+    if (type === 'id') {
+      setCopiedCertId(key);
+      setTimeout(() => setCopiedCertId(null), 2500);
+    } else {
+      setCopiedHash(key);
+      setTimeout(() => setCopiedHash(null), 2500);
+    }
+  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -231,6 +356,55 @@ export default function StudentDashboardPage() {
     }
   };
 
+  const handleRefundSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!refundReason.trim()) {
+      setRefundMsg({ type: 'error', text: 'Please provide a brief reason for your refund request.' });
+      return;
+    }
+    setRefundSubmitting(true);
+    setRefundMsg(null);
+    try {
+      const orderIdToUse = refundOrderId.trim() || displayEnrollments[0]?.id || 'DEFAULT_ENROLLMENT';
+      await api.requestRefund({
+        orderId: orderIdToUse,
+        reason: refundReason.trim(),
+        upiId: refundUpiId.trim() || undefined,
+      });
+      setRefundRequested(true);
+      setShowRefundModal(false);
+      setRefundMsg({ type: 'success', text: 'Refund request submitted under 7-Day Guarantee. Processing within 24-48 business hours.' });
+    } catch (err: any) {
+      setRefundMsg({ type: 'error', text: err?.message || 'Failed to submit refund request. Please contact support@devascent.io.' });
+    } finally {
+      setRefundSubmitting(false);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'APPROVED':
+        return {
+          text: '✅ Approved & Verified',
+          classes: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
+        };
+      case 'REJECTED':
+        return {
+          text: '❌ Revision Requested',
+          classes: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800',
+        };
+      default:
+        return {
+          text: '⏳ Under Instructor Review',
+          classes: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800',
+        };
+    }
+  };
+
+  if (loading && authLoading) {
+    return <DashboardSkeleton />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FF] dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <Navbar />
@@ -244,9 +418,13 @@ export default function StudentDashboardPage() {
             {/* Left Sidebar Navigation (Desktop + Mobile Drawer) */}
             <StudentSidebar
               activeTab={activeTab}
-              onSelectTab={(tab) => setActiveTab(tab)}
+              onSelectTab={(tab) => {
+                setActiveTab(tab);
+                router.replace(`/dashboard?tab=${tab}`, { scroll: false });
+              }}
               certificatesCount={safeCertificates.length}
               submissionsCount={safeSubmissions.length}
+              enrolledCourses={displayEnrollments}
             />
 
             {/* Right Main Dashboard Tab Panel */}
@@ -269,17 +447,24 @@ export default function StudentDashboardPage() {
                         Welcome back, {studentName} 👋
                       </h1>
                       <p className="text-xs sm:text-sm text-indigo-200 max-w-xl leading-relaxed">
-                        Continue your coursework, inspect capstone project reviews, and download your verifiable graduation credentials.
+                        Continue your coursework, track capstone project reviews, and download your verifiable graduation credentials.
                       </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 relative z-10 shrink-0">
                       <Link
-                        href="/learn/react-foundations-free"
+                        href={`/learn/${primarySlug}`}
                         className="px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center gap-2"
                       >
                         <Play className="w-3.5 h-3.5 fill-current" />
                         <span>Resume Learning</span>
+                      </Link>
+                      <Link
+                        href="/ai-studio"
+                        className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium text-xs rounded-xl transition-colors flex items-center gap-1.5"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-300" />
+                        <span>AI Studio</span>
                       </Link>
                     </div>
                   </div>
@@ -291,8 +476,12 @@ export default function StudentDashboardPage() {
                         <BookOpen className="w-4 h-4" />
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tracks</span>
                       </div>
-                      <p className="text-2xl font-extrabold text-slate-900 dark:text-white">1 Active</p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">React & TypeScript Foundations</p>
+                      <p className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                        {displayEnrollments.length} Active
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                        {displayEnrollments[0]?.courseTitle || 'React & TypeScript Foundations'}
+                      </p>
                     </div>
 
                     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-1.5">
@@ -318,8 +507,10 @@ export default function StudentDashboardPage() {
                         <TrendingUp className="w-4 h-4" />
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Completion</span>
                       </div>
-                      <p className="text-2xl font-extrabold text-slate-900 dark:text-white">100%</p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Ready for Graduation</p>
+                      <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{avgProgress}%</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                        {avgProgress >= 100 ? 'Ready for Graduation' : 'Lessons in Progress'}
+                      </p>
                     </div>
                   </div>
 
@@ -329,46 +520,67 @@ export default function StudentDashboardPage() {
                     {/* Left Column (8 cols): Active Learning Card, Modules & Capstone Submissions */}
                     <div className="xl:col-span-8 space-y-6">
                       
-                      {/* Active Free Track Quick Launch Card */}
-                      <div className="bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-6 sm:p-7 text-white space-y-4 shadow-md border border-emerald-800/40">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 rounded-full uppercase tracking-wider">
-                            Instant Free Track
-                          </span>
-                          <span className="text-xs text-slate-400 font-medium">100% Lessons Finished</span>
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold">Modern React & TypeScript Foundations</h3>
-                          <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                            Your curriculum lessons are completed! Apply for your graduation certificate now with your GitHub capstone project repository.
-                          </p>
-                        </div>
-                        <div className="pt-2 flex flex-wrap items-center gap-3">
-                          <Link
-                            href="/learn/react-foundations-free/complete"
-                            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2"
-                          >
-                            <Award className="w-4 h-4" />
-                            <span>Submit Capstone Form & Claim Certificate</span>
-                          </Link>
-                          <Link
-                            href="/courses/react-foundations-free"
-                            className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-xl transition-colors"
-                          >
-                            View Syllabus
-                          </Link>
-                        </div>
-                      </div>
+                      {/* Active Enrolled Tracks Cards */}
+                      {displayEnrollments.map((enr, idx) => (
+                        <div
+                          key={enr.id || idx}
+                          className="bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-6 sm:p-7 text-white space-y-4 shadow-md border border-emerald-800/40"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 rounded-full uppercase tracking-wider">
+                              {enr.courseSlug.includes('free') ? 'Instant Free Track' : 'Live Cohort Track'}
+                            </span>
+                            <span className="text-xs text-slate-400 font-medium">
+                              {enr.progressPct !== undefined ? `${enr.progressPct}% Lessons Finished` : 'Active'}
+                            </span>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold">{enr.courseTitle}</h3>
+                            <div className="flex items-center gap-3 text-xs text-slate-300 mt-1">
+                              <span>Enrolled: {enr.enrolledAt ? new Date(enr.enrolledAt).toLocaleDateString() : 'Active'}</span>
+                              <span>•</span>
+                              <span>Status: <strong className="text-emerald-400">{enr.status || 'Active'}</strong></span>
+                            </div>
+                          </div>
 
-                      {/* Interactive Curriculum Modules Completed */}
+                          {/* Progress Bar */}
+                          <div className="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden border border-slate-700/60">
+                            <div
+                              className="bg-gradient-to-r from-emerald-400 to-teal-400 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${Math.min(enr.progressPct || 0, 100)}%` }}
+                            />
+                          </div>
+
+                          <div className="pt-2 flex flex-wrap items-center gap-3">
+                            <Link
+                              href={`/learn/${enr.courseSlug}`}
+                              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2"
+                            >
+                              <Play className="w-3.5 h-3.5 fill-current" />
+                              <span>Continue Course Lessons</span>
+                            </Link>
+                            <Link
+                              href={`/learn/${enr.courseSlug}/complete`}
+                              className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-xl transition-colors flex items-center gap-1.5"
+                            >
+                              <Award className="w-3.5 h-3.5 text-amber-400" />
+                              <span>Submit Capstone Form</span>
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Interactive Curriculum Modules Breakdown */}
                       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
                         <div className="flex items-center justify-between">
                           <div>
                             <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Curriculum Breakdown</span>
-                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">Modern React & TypeScript Foundations</h3>
+                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">
+                              {displayEnrollments[0]?.courseTitle || 'Modern React & TypeScript Foundations'}
+                            </h3>
                           </div>
                           <span className="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded-xl">
-                            4 / 4 Modules Complete
+                            4 / 4 Core Modules
                           </span>
                         </div>
 
@@ -415,10 +627,10 @@ export default function StudentDashboardPage() {
                             <span>My Capstone Project Submissions</span>
                           </h3>
                           <Link
-                            href="/learn/react-foundations-free/complete"
+                            href={`/learn/${primarySlug}/complete`}
                             className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
                           >
-                            + Submit Capstone
+                            + Submit Capstone Form
                           </Link>
                         </div>
 
@@ -429,34 +641,55 @@ export default function StudentDashboardPage() {
                             <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
                               Ready to graduate? Submit your GitHub capstone repository to trigger instant instructor review.
                             </p>
+                            <div className="pt-2">
+                              <Link
+                                href={`/learn/${primarySlug}/complete`}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700"
+                              >
+                                <span>Submit Capstone Now</span>
+                                <ArrowUpRight className="w-3.5 h-3.5" />
+                              </Link>
+                            </div>
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {safeSubmissions.map((sub) => (
-                              <div key={sub.id} className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                                <div>
-                                  <p className="font-bold text-slate-900 dark:text-white">{sub.projectName}</p>
-                                  <p className="text-slate-500 dark:text-slate-400 text-[11px]">Course: {sub.course?.title || 'React Foundations'} ({sub.batch})</p>
-                                  <div className="flex items-center gap-3 pt-1">
-                                    <a href={sub.gitRepoUrl} target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-mono text-[11px]">
-                                      <span>GitHub Repo ↗</span>
-                                    </a>
-                                    <a href={sub.linkedinPostUrl} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-[11px]">
-                                      <span>LinkedIn Post ↗</span>
-                                    </a>
+                            {safeSubmissions.map((sub) => {
+                              const badge = getStatusBadge(sub.status);
+                              return (
+                                <div
+                                  key={sub.id}
+                                  className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                                >
+                                  <div>
+                                    <p className="font-bold text-slate-900 dark:text-white">{sub.projectName}</p>
+                                    <p className="text-slate-500 dark:text-slate-400 text-[11px]">
+                                      Course: {sub.course?.title || 'React Foundations'} ({sub.batch})
+                                    </p>
+                                    <div className="flex items-center gap-3 pt-1">
+                                      <a
+                                        href={sub.gitRepoUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-mono text-[11px]"
+                                      >
+                                        <span>GitHub Repo ↗</span>
+                                      </a>
+                                      <a
+                                        href={sub.linkedinPostUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-[11px]"
+                                      >
+                                        <span>LinkedIn Post ↗</span>
+                                      </a>
+                                    </div>
                                   </div>
+                                  <span className={`font-bold px-3 py-1 rounded-full text-[10px] uppercase tracking-wider self-start sm:self-auto ${badge.classes}`}>
+                                    {badge.text}
+                                  </span>
                                 </div>
-                                <span className={`font-bold px-3 py-1 rounded-full text-[10px] uppercase tracking-wider self-start sm:self-auto ${
-                                  sub.status === 'APPROVED'
-                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                                    : sub.status === 'REJECTED'
-                                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
-                                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                                }`}>
-                                  {sub.status}
-                                </span>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         )}
                       </div>
@@ -492,25 +725,52 @@ export default function StudentDashboardPage() {
                         </div>
                       </div>
 
-                      {/* Graduation Milestone Roadmap */}
+                      {/* Graduation Milestone Roadmap (Dynamic) */}
                       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-3">
                         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Graduation Pathway</h4>
-                        <div className="space-y-2 text-xs">
+                        <div className="space-y-2.5 text-xs">
+                          {/* Step 1 */}
                           <div className="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400">
                             <CheckCircle2 className="w-4 h-4 shrink-0" />
-                            <span className="font-medium text-slate-800 dark:text-slate-200">1. OTP Email Verification</span>
+                            <span className="font-medium text-slate-800 dark:text-slate-200">1. OTP Email Identity Verified</span>
                           </div>
-                          <div className="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400">
-                            <CheckCircle2 className="w-4 h-4 shrink-0" />
-                            <span className="font-medium text-slate-800 dark:text-slate-200">2. Interactive React Curriculum (100%)</span>
+
+                          {/* Step 2 */}
+                          <div className={`flex items-center gap-2.5 ${avgProgress >= 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-500'}`}>
+                            {avgProgress >= 100 ? (
+                              <CheckCircle2 className="w-4 h-4 shrink-0" />
+                            ) : (
+                              <Clock className="w-4 h-4 shrink-0 animate-pulse" />
+                            )}
+                            <span className="font-medium text-slate-800 dark:text-slate-200">
+                              2. Complete Curriculum ({avgProgress}%)
+                            </span>
                           </div>
-                          <div className="flex items-center gap-2.5 text-amber-500">
-                            <Sparkles className="w-4 h-4 shrink-0 animate-pulse" />
-                            <span className="font-bold text-slate-900 dark:text-white">3. Submit GitHub Capstone Link</span>
+
+                          {/* Step 3 */}
+                          <div className={`flex items-center gap-2.5 ${safeSubmissions.length > 0 ? 'text-emerald-600 dark:text-emerald-400' : (avgProgress >= 100 ? 'text-amber-500' : 'text-slate-400')}`}>
+                            {safeSubmissions.length > 0 ? (
+                              <CheckCircle2 className="w-4 h-4 shrink-0" />
+                            ) : avgProgress >= 100 ? (
+                              <Sparkles className="w-4 h-4 shrink-0 animate-pulse" />
+                            ) : (
+                              <FolderGit2 className="w-4 h-4 shrink-0" />
+                            )}
+                            <span className={avgProgress >= 100 && safeSubmissions.length === 0 ? 'font-bold text-slate-900 dark:text-white' : ''}>
+                              3. Submit GitHub Capstone Link
+                            </span>
                           </div>
-                          <div className="flex items-center gap-2.5 text-slate-400">
-                            <Award className="w-4 h-4 shrink-0" />
-                            <span>4. Mint Verifiable SHA-256 Certificate</span>
+
+                          {/* Step 4 */}
+                          <div className={`flex items-center gap-2.5 ${safeCertificates.length > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
+                            {safeCertificates.length > 0 ? (
+                              <CheckCircle2 className="w-4 h-4 shrink-0" />
+                            ) : (
+                              <Award className="w-4 h-4 shrink-0" />
+                            )}
+                            <span className={safeCertificates.length > 0 ? 'font-bold' : ''}>
+                              4. Mint Verifiable SHA-256 Certificate
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -522,11 +782,11 @@ export default function StudentDashboardPage() {
                           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">7-Day Guarantee Protection</h4>
                         </div>
                         <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                          Your learning is backed by our 100% money-back guarantee. If you are not satisfied, request an instant full refund.
+                          Your enrollment is protected by our 100% money-back guarantee. If you are not satisfied, request a full refund to your original payment method.
                         </p>
                         {refundRequested ? (
                           <div className="p-2.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-800 dark:text-amber-300 font-semibold">
-                            Refund request submitted. Processing within 24h.
+                            Refund request submitted. Processing within 24–48 hours.
                           </div>
                         ) : (
                           <button
@@ -543,18 +803,18 @@ export default function StudentDashboardPage() {
                         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Student Resources</h4>
                         <div className="space-y-2 text-xs">
                           <Link
-                            href="/certificate"
+                            href="/ai-studio"
                             className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                           >
                             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                              <Award className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                              <span>Certificate Generator Demo</span>
+                              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                              <span>AI Study Notes & Interview Copilot</span>
                             </div>
                             <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
                           </Link>
 
                           <Link
-                            href="/verify/DEV-2026-A1B2C3"
+                            href="/verify/DEVASCENT-2025-VALID"
                             className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                           >
                             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
@@ -583,7 +843,7 @@ export default function StudentDashboardPage() {
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">My Verifiable Certificates</h2>
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                        Issued upon graduation review. Includes QR code and tamper-proof SHA-256 fingerprint on the DevAscent Public Ledger.
+                        Issued upon graduation review. Includes tamper-proof SHA-256 fingerprint verified on the DevAscent Public Ledger.
                       </p>
                     </div>
                     <span className="text-xs font-semibold px-3 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300 rounded-full border border-indigo-100 dark:border-indigo-800 self-start sm:self-auto">
@@ -596,11 +856,11 @@ export default function StudentDashboardPage() {
                       <Award className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
                       <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">No Certificates Issued Yet</h3>
                       <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                        Complete 100% of your course or internship curriculum, then submit your capstone project for instructor review.
+                        Complete 100% of your course or internship curriculum, then submit your capstone project repository for instructor review.
                       </p>
                       <div className="pt-2">
                         <Link
-                          href="/learn/react-foundations-free/complete"
+                          href={`/learn/${primarySlug}/complete`}
                           className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
                         >
                           <span>Submit Capstone Form Now →</span>
@@ -609,56 +869,85 @@ export default function StudentDashboardPage() {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {safeCertificates.map((cert) => (
-                        <div
-                          key={cert.certId}
-                          className="p-5 rounded-2xl border-2 border-indigo-100 dark:border-indigo-900/60 bg-gradient-to-br from-white via-indigo-50/20 to-indigo-50/40 dark:from-slate-900 dark:via-indigo-950/30 dark:to-slate-900 space-y-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all shadow-sm"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded uppercase tracking-wider">
-                                Official Credential
+                      {safeCertificates.map((cert) => {
+                        const hash = cert.certificateHash || 'e5370db083db47569c4fdb4f5110c2ac6cf8bb4f46e53525cd006c4993000a';
+                        return (
+                          <div
+                            key={cert.certId || cert.id}
+                            className="p-5 rounded-2xl border-2 border-indigo-100 dark:border-indigo-900/60 bg-gradient-to-br from-white via-indigo-50/20 to-indigo-50/40 dark:from-slate-900 dark:via-indigo-950/30 dark:to-slate-900 space-y-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all shadow-sm"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded uppercase tracking-wider">
+                                  Official Credential
+                                </span>
+                                <h4 className="font-bold text-sm text-slate-900 dark:text-white mt-1.5">{cert.courseTitle}</h4>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    ID: <span className="font-mono font-semibold text-indigo-600 dark:text-indigo-400">{cert.certId}</span>
+                                  </p>
+                                  <button
+                                    onClick={() => handleCopy(cert.certId, 'id', cert.certId)}
+                                    className="text-[10px] text-slate-400 hover:text-indigo-600 flex items-center gap-0.5"
+                                    title="Copy Credential ID"
+                                  >
+                                    {copiedCertId === cert.certId ? (
+                                      <span className="text-emerald-500 font-bold">Copied!</span>
+                                    ) : (
+                                      <Copy className="w-3 h-3" />
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+                              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-xl">
+                                {cert.grade || 'A+'}
                               </span>
-                              <h4 className="font-bold text-sm text-slate-900 dark:text-white mt-1.5">{cert.courseTitle}</h4>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">Credential ID: <span className="font-mono font-semibold text-indigo-600 dark:text-indigo-400">{cert.certId}</span></p>
                             </div>
-                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-xl">
-                              {cert.grade || 'A+'}
-                            </span>
-                          </div>
 
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1 bg-white/80 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                            <div className="flex justify-between">
-                              <span>Issued To:</span>
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{cert.recipientName}</span>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5 bg-white/80 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                              <div className="flex justify-between">
+                                <span>Issued To:</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{cert.recipientName || studentName}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Issued On:</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{new Date(cert.issuedAt || cert.createdAt).toLocaleDateString()}</span>
+                              </div>
+                              <div className="pt-1 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between font-mono text-[10px]">
+                                <span className="truncate max-w-[200px]" title={hash}>
+                                  SHA-256: {hash.slice(0, 16)}...
+                                </span>
+                                <button
+                                  onClick={() => handleCopy(hash, 'hash', cert.certId)}
+                                  className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-sans text-[10px]"
+                                >
+                                  {copiedHash === cert.certId ? 'Hash Copied!' : 'Copy Hash'}
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span>Issued On:</span>
-                              <span className="font-semibold text-slate-800 dark:text-slate-200">{new Date(cert.issuedAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
 
-                          <div className="flex items-center gap-2 pt-1">
-                            <a
-                              href={api.getDownloadUrl(cert.certId)}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 transition-all"
-                            >
-                              <Download className="w-3.5 h-3.5" />
-                              <span>Download PDF</span>
-                            </a>
-                            <Link
-                              href={`/verify/${cert.certId}`}
-                              target="_blank"
-                              className="py-2.5 px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center gap-1 transition-colors"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              <span>Public Ledger</span>
-                            </Link>
+                            <div className="flex items-center gap-2 pt-1">
+                              <a
+                                href={api.getDownloadUrl(cert.certId)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 transition-all"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Download PDF</span>
+                              </a>
+                              <Link
+                                href={`/verify/${cert.certId}`}
+                                target="_blank"
+                                className="py-2.5 px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl flex items-center gap-1 transition-colors"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                                <span>Public Ledger</span>
+                              </Link>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -678,7 +967,7 @@ export default function StudentDashboardPage() {
                       </p>
                     </div>
                     <Link
-                      href="/learn/react-foundations-free/complete"
+                      href={`/learn/${primarySlug}/complete`}
                       className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-md transition-all self-start sm:self-auto flex items-center gap-2"
                     >
                       <Award className="w-4 h-4" />
@@ -696,46 +985,45 @@ export default function StudentDashboardPage() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {safeSubmissions.map((sub) => (
-                        <div
-                          key={sub.id}
-                          className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 space-y-3"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div>
-                              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">{sub.projectName}</h4>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">Course: {sub.course?.title || 'React Foundations'} • Batch: {sub.batch}</p>
+                      {safeSubmissions.map((sub) => {
+                        const badge = getStatusBadge(sub.status);
+                        return (
+                          <div
+                            key={sub.id}
+                            className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 space-y-3"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div>
+                                <h4 className="font-extrabold text-base text-slate-900 dark:text-white">{sub.projectName}</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                  Course: {sub.course?.title || 'React Foundations'} • Batch: {sub.batch}
+                                </p>
+                              </div>
+                              <span className={`font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider self-start sm:self-auto ${badge.classes}`}>
+                                {badge.text}
+                              </span>
                             </div>
-                            <span className={`font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider self-start sm:self-auto ${
-                              sub.status === 'APPROVED'
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                                : sub.status === 'REJECTED'
-                                ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
-                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                            }`}>
-                              {sub.status}
-                            </span>
-                          </div>
 
-                          <div className="flex flex-wrap items-center gap-4 text-xs pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
-                            <a href={sub.gitRepoUrl} target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-mono">
-                              <GithubIcon className="w-3.5 h-3.5" />
-                              <span>GitHub Repository ↗</span>
-                            </a>
-                            <a href={sub.linkedinPostUrl} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-                              <LinkedinIcon className="w-3.5 h-3.5" />
-                              <span>LinkedIn Post ↗</span>
-                            </a>
-                          </div>
-
-                          {sub.adminNote && (
-                            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs text-amber-900 dark:text-amber-300">
-                              <p className="font-semibold mb-0.5">Instructor Feedback:</p>
-                              <p>{sub.adminNote}</p>
+                            <div className="flex flex-wrap items-center gap-4 text-xs pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                              <a href={sub.gitRepoUrl} target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-mono">
+                                <GithubIcon className="w-3.5 h-3.5" />
+                                <span>GitHub Repository ↗</span>
+                              </a>
+                              <a href={sub.linkedinPostUrl} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                                <LinkedinIcon className="w-3.5 h-3.5" />
+                                <span>LinkedIn Post ↗</span>
+                              </a>
                             </div>
-                          )}
-                        </div>
-                      ))}
+
+                            {sub.adminNote && (
+                              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs text-amber-900 dark:text-amber-300">
+                                <p className="font-semibold mb-0.5">Instructor Feedback:</p>
+                                <p>{sub.adminNote}</p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -1026,7 +1314,7 @@ export default function StudentDashboardPage() {
                       {/* Submit Action Button */}
                       <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                         <p className="text-[11px] text-slate-400">
-                          Last updated: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active'}
+                          Last updated: {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : (user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active')}
                         </p>
                         <button
                           type="submit"
@@ -1113,13 +1401,22 @@ export default function StudentDashboardPage() {
                         <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                           Current Password
                         </label>
-                        <input
-                          type="password"
-                          value={passwords.current}
-                          onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-                          required
-                          className="w-full max-w-md px-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        />
+                        <div className="relative max-w-md">
+                          <input
+                            type={showPasswords.current ? 'text' : 'password'}
+                            value={passwords.current}
+                            onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                            required
+                            className="w-full px-4 py-2 pr-10 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                            className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                          >
+                            {showPasswords.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
@@ -1127,34 +1424,54 @@ export default function StudentDashboardPage() {
                           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                             New Password
                           </label>
-                          <input
-                            type="password"
-                            value={passwords.new}
-                            onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-                            required
-                            className="w-full px-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
+                          <div className="relative">
+                            <input
+                              type={showPasswords.new ? 'text' : 'password'}
+                              value={passwords.new}
+                              onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                              required
+                              className="w-full px-4 py-2 pr-10 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            >
+                              {showPasswords.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
                         </div>
 
                         <div>
                           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                             Confirm New Password
                           </label>
-                          <input
-                            type="password"
-                            value={passwords.confirm}
-                            onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-                            required
-                            className="w-full px-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          />
+                          <div className="relative">
+                            <input
+                              type={showPasswords.confirm ? 'text' : 'password'}
+                              value={passwords.confirm}
+                              onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                              required
+                              className="w-full px-4 py-2 pr-10 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            >
+                              {showPasswords.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
                         </div>
                       </div>
 
                       <button
                         type="submit"
-                        className="px-5 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold text-xs rounded-xl hover:bg-slate-800 transition-colors"
+                        disabled={passwordUpdating}
+                        className="px-5 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold text-xs rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
-                        Update Password
+                        {passwordUpdating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                        <span>{passwordUpdating ? 'Updating Password...' : 'Update Password'}</span>
                       </button>
                     </form>
                   </div>
@@ -1174,13 +1491,13 @@ export default function StudentDashboardPage() {
                     </div>
 
                     <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
-                      You are 100% covered under our 7-day no-questions-asked refund policy. If you are not completely satisfied with the course material, you can request a full refund to your original payment method.
+                      You are 100% covered under our 7-day no-questions-asked refund policy. If you are not completely satisfied with the course material, you can submit a direct refund request to your original payment method.
                     </p>
 
                     {refundRequested ? (
                       <div className="p-4 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 rounded-2xl text-xs text-amber-900 dark:text-amber-300 space-y-1">
                         <p className="font-bold">Refund Request Submitted</p>
-                        <p>Our desk will process your refund to your original payment method within 24 hours.</p>
+                        <p>Our desk processes refund requests within 24–48 business hours back to your original payment method or UPI.</p>
                       </div>
                     ) : (
                       <button
@@ -1199,11 +1516,17 @@ export default function StudentDashboardPage() {
                       All capstone project reviews and certification approvals are personally verified by founder <strong>Shivan Mishra</strong>.
                     </p>
                     <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs space-y-2">
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center">
                         <span className="text-slate-500">Instructor Email:</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">support@devascent.io</span>
+                        <a
+                          href="mailto:support@devascent.io"
+                          className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                          <span>support@devascent.io</span>
+                        </a>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center">
                         <span className="text-slate-500">Review Turnaround:</span>
                         <span className="font-semibold text-indigo-600 dark:text-indigo-400">24 – 48 Hours</span>
                       </div>
@@ -1220,39 +1543,86 @@ export default function StudentDashboardPage() {
         </div>
       </main>
 
-      {/* Refund Modal */}
+      {/* Enhanced Refund Modal with reason and UPI input */}
       {showRefundModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800 animate-fadeIn">
             <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
               <RotateCcw className="w-6 h-6" />
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Request 7-Day Full Refund</h3>
             </div>
+
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              We are sorry to see you go! As per our 7-day policy, your payment will be credited back via Razorpay.
+              We are sorry to see you go! As per our 7-day money-back guarantee, please submit your feedback and refund details below.
             </p>
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => {
-                  setRefundRequested(true);
-                  setShowRefundModal(false);
-                }}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md"
-              >
-                Confirm Full Refund
-              </button>
-              <button
-                onClick={() => setShowRefundModal(false)}
-                className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold py-2.5 rounded-xl text-xs"
-              >
-                Keep Learning
-              </button>
-            </div>
+
+            {refundMsg && (
+              <div className={`p-3 rounded-xl text-xs font-semibold ${
+                refundMsg.type === 'error' ? 'bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-200' : 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+              }`}>
+                {refundMsg.text}
+              </div>
+            )}
+
+            <form onSubmit={handleRefundSubmit} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  Reason for Refund Request *
+                </label>
+                <textarea
+                  rows={3}
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  required
+                  placeholder="Please let us know how we can improve our course..."
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  UPI ID for Instant Direct Credit (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={refundUpiId}
+                  onChange={(e) => setRefundUpiId(e.target.value)}
+                  placeholder="e.g. shivan@upi / 9935806722@paytm"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-[11px]"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={refundSubmitting}
+                  className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl text-xs shadow-md flex items-center justify-center gap-1.5"
+                >
+                  {refundSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{refundSubmitting ? 'Submitting...' : 'Confirm Full Refund'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowRefundModal(false)}
+                  className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold py-2.5 rounded-xl text-xs"
+                >
+                  Keep Learning
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
       <Footer />
     </div>
+  );
+}
+
+export default function StudentDashboardPage() {
+  return (
+    <Suspense fallback={<DashboardSkeleton />}>
+      <DashboardContent />
+    </Suspense>
   );
 }
