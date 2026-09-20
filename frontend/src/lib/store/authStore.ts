@@ -34,19 +34,49 @@ interface AuthState {
   logout: () => Promise<void>;
 }
 
+const getInitialUser = (): User | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const saved = localStorage.getItem('devascent_user');
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
+
+const hasToken = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return !!localStorage.getItem('devascent_token');
+};
+
+const initialUser = getInitialUser();
+
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  isLoading: true,
-  isAuthenticated: false,
-  setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
+  user: initialUser,
+  isLoading: !initialUser,
+  isAuthenticated: !!initialUser || hasToken(),
+  setUser: (user) => {
+    if (typeof window !== 'undefined') {
+      if (user) {
+        localStorage.setItem('devascent_user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('devascent_user');
+      }
+    }
+    set({ user, isAuthenticated: !!user, isLoading: false });
+  },
   updateUser: (data) =>
-    set((state) => ({
-      user: state.user ? { ...state.user, ...data } : null,
-    })),
+    set((state) => {
+      const updated = state.user ? { ...state.user, ...data } : null;
+      if (typeof window !== 'undefined' && updated) {
+        localStorage.setItem('devascent_user', JSON.stringify(updated));
+      }
+      return { user: updated };
+    }),
   checkAuth: async () => {
-    // If no token exists in localStorage, skip the API call entirely.
-    // This prevents noisy 401 errors on public pages for unauthenticated visitors.
+    // If no token exists in localStorage, skip API call to avoid unauthenticated noise
     if (typeof window !== 'undefined' && !localStorage.getItem('devascent_token')) {
+      // If we don't have a token, ensure state reflects unauthenticated
       set({ user: null, isAuthenticated: false, isLoading: false });
       return;
     }
@@ -55,16 +85,25 @@ export const useAuthStore = create<AuthState>((set) => ({
       const raw = response?.data || response;
       const user = raw?.user || raw;
       if (user && user.id) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('devascent_user', JSON.stringify(user));
+        }
         set({ user, isAuthenticated: true, isLoading: false });
       } else {
         set({ user: null, isAuthenticated: false, isLoading: false });
       }
-    } catch {
-      // Token invalid or expired — clear it
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('devascent_token');
+    } catch (err: any) {
+      // ONLY clear session if strictly 401 (Unauthorized) or 403 (Forbidden)
+      if (err?.status === 401 || err?.status === 403) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('devascent_token');
+          localStorage.removeItem('devascent_user');
+        }
+        set({ user: null, isAuthenticated: false, isLoading: false });
+      } else {
+        // Transient network or server reboot issue: keep cached session active
+        set({ isLoading: false });
       }
-      set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
   logout: async () => {
@@ -75,6 +114,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     if (typeof window !== 'undefined') {
       localStorage.removeItem('devascent_token');
+      localStorage.removeItem('devascent_user');
     }
     set({ user: null, isAuthenticated: false, isLoading: false });
   },

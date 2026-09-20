@@ -11,7 +11,7 @@ import { MailService } from '../../shared/mail.service';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'devascent_jwt_secret_key_change_in_production_min_64_characters_long',
-      signOptions: { expiresIn: '15m' },
+      signOptions: { expiresIn: '7d' },
     }),
   ],
   controllers: [AuthController],

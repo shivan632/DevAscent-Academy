@@ -37,11 +37,13 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false);
+  const [internshipsDropdownOpen, setInternshipsDropdownOpen] = useState(false);
   const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   const coursesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const internshipsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const resourcesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -142,13 +144,13 @@ export default function Navbar() {
 
           {/* Center: Desktop Navigation Links (Visible only when logged in) */}
           {isAuthenticated ? (
-            <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-              {/* 1. Dashboard / My Learning */}
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
+              {/* 1. Dashboard */}
               <Link
                 href="/dashboard"
-                className={`text-xs xl:text-sm font-semibold transition-all flex items-center gap-1.5 py-1 px-2 rounded-lg ${
+                className={`text-xs xl:text-sm font-semibold transition-all flex items-center gap-1.5 py-1.5 px-2.5 rounded-lg ${
                   isActive('/dashboard')
-                    ? 'text-indigo-600 dark:text-indigo-400'
+                    ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/40'
                     : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
                 }`}
               >
@@ -156,110 +158,86 @@ export default function Navbar() {
                 <span>Dashboard</span>
               </Link>
 
-              {/* 2. Programs & Cohorts Dropdown */}
+              {/* 2. Enrolled Course (Direct link) */}
+              <Link
+                href="/enrolled-courses"
+                className={`text-xs xl:text-sm font-semibold transition-all flex items-center gap-1.5 py-1.5 px-2.5 rounded-lg ${
+                  isActive('/enrolled-courses')
+                    ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/40'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
+                }`}
+              >
+                <Award className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Enrolled Course</span>
+              </Link>
+
+              {/* 3. Virtual Internships/Course Dropdown */}
               <div
                 className="relative"
                 onMouseEnter={() => {
-                  if (coursesTimeoutRef.current) clearTimeout(coursesTimeoutRef.current);
-                  setCoursesDropdownOpen(true);
+                  if (internshipsTimeoutRef.current) clearTimeout(internshipsTimeoutRef.current);
+                  setInternshipsDropdownOpen(true);
                 }}
                 onMouseLeave={() => {
-                  coursesTimeoutRef.current = setTimeout(() => setCoursesDropdownOpen(false), 150);
+                  internshipsTimeoutRef.current = setTimeout(() => setInternshipsDropdownOpen(false), 150);
                 }}
               >
                 <button
-                  onClick={() => setCoursesDropdownOpen(!coursesDropdownOpen)}
-                  className={`text-xs xl:text-sm font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1.5 py-1 px-2 rounded-lg ${
-                    isActive('/courses') ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-300'
+                  onClick={() => setInternshipsDropdownOpen(!internshipsDropdownOpen)}
+                  className={`text-xs xl:text-sm font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1.5 py-1.5 px-2.5 rounded-lg ${
+                    pathname.startsWith('/courses') || pathname.startsWith('/internships') || pathname.startsWith('/learn')
+                      ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
+                      : 'text-slate-600 dark:text-slate-300'
                   }`}
                 >
-                  <Briefcase className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Programs & Cohorts</span>
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded uppercase">
-                    Free Track
-                  </span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${coursesDropdownOpen ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} />
+                  <Briefcase className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Virtual Internships/Course</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${internshipsDropdownOpen ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} />
                 </button>
 
-                {coursesDropdownOpen && (
-                  <div className="absolute top-full left-0 w-84 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-3 z-50 animate-fadeIn space-y-1">
+                {internshipsDropdownOpen && (
+                  <div className="absolute top-full left-0 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-2.5 z-50 animate-fadeIn space-y-1.5">
+                    {/* Item 1: Internship -> /internships (Coming Soon) */}
+                    <Link
+                      href="/internships"
+                      onClick={() => setInternshipsDropdownOpen(false)}
+                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-amber-50/80 dark:hover:bg-amber-950/30 transition-colors group/item"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <Briefcase className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/item:text-amber-600 dark:group-hover/item:text-amber-400">
+                            💼 Internship
+                          </span>
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 rounded">
+                            Coming Soon
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">Industrial tracks with verified assessment</span>
+                      </div>
+                    </Link>
+
+                    {/* Item 2: Course -> /courses */}
                     <Link
                       href="/courses"
-                      onClick={() => setCoursesDropdownOpen(false)}
-                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group/item"
+                      onClick={() => setInternshipsDropdownOpen(false)}
+                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 dark:hover:bg-indigo-950/30 transition-colors group/item"
                     >
                       <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                         <BookOpen className="w-4 h-4" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/item:text-indigo-600 dark:group-hover/item:text-indigo-400 block">
-                          All Cohorts & Tracks
+                          📚 Course
                         </span>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400">Explore live accelerator cohorts & virtual internships</span>
-                      </div>
-                    </Link>
-
-                    <Link
-                      href="/learn/react-foundations-free"
-                      onClick={() => setCoursesDropdownOpen(false)}
-                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors group/item"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 font-bold text-xs">
-                        FREE
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300 group-hover/item:text-emerald-700 block">
-                          Modern React & TypeScript Foundations
-                        </span>
-                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80">100% Free interactive lessons + verifiable certificate</span>
-                      </div>
-                    </Link>
-
-                    <Link
-                      href="/courses/full-stack-accelerator"
-                      onClick={() => setCoursesDropdownOpen(false)}
-                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors group/item"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 font-bold text-xs">
-                        🔥
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/item:text-indigo-600 block">
-                          Full-Stack Accelerator (Cohort 4)
-                        </span>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400">Next.js 15, NestJS, Redis, Razorpay, Postgres</span>
-                      </div>
-                    </Link>
-
-                    <Link
-                      href="/courses/backend-cloud-internship"
-                      onClick={() => setCoursesDropdownOpen(false)}
-                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors group/item"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 font-bold text-xs">
-                        💼
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-amber-900 dark:text-amber-300 group-hover/item:text-amber-700 block">
-                          Backend & Cloud Internship
-                        </span>
-                        <span className="text-[11px] text-amber-700/80 dark:text-amber-400/80">Stipend up to ₹8,000 & verified offer letter</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">All Courses & developer roadmaps listing</span>
                       </div>
                     </Link>
                   </div>
                 )}
               </div>
-
-              {/* 3. Verify Credential */}
-              <Link
-                href="/verify/DEVASCENT-2025-VALID"
-                className={`text-xs xl:text-sm font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 py-1 px-2 rounded-lg ${
-                  isActive('/verify') ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-300'
-                }`}
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Verify Credential</span>
-              </Link>
 
               {/* 4. Resources Dropdown */}
               <div
@@ -274,47 +252,67 @@ export default function Navbar() {
               >
                 <button
                   onClick={() => setResourcesDropdownOpen(!resourcesDropdownOpen)}
-                  className="text-xs xl:text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1 py-1 px-2 rounded-lg"
+                  className={`text-xs xl:text-sm font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1.5 py-1.5 px-2.5 rounded-lg ${
+                    pathname === '/ai-studio' || pathname === '/refund-policy' || pathname === '/support'
+                      ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
+                      : 'text-slate-600 dark:text-slate-300'
+                  }`}
                 >
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
                   <span>Resources</span>
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${resourcesDropdownOpen ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`} />
                 </button>
 
                 {resourcesDropdownOpen && (
-                  <div className="absolute top-full left-0 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-3 z-50 animate-fadeIn space-y-1">
+                  <div className="absolute top-full left-0 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-2.5 z-50 animate-fadeIn space-y-1.5">
+                    {/* Item 1: AI Copilot Studio */}
                     <Link
                       href="/ai-studio"
                       onClick={() => setResourcesDropdownOpen(false)}
-                      className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 dark:hover:bg-indigo-950/30 transition-colors group/item"
                     >
-                      <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
                       <div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white block">AI Copilot Studio</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/item:text-indigo-600 dark:group-hover/item:text-indigo-400 block">
+                          🤖 AI Copilot Studio
+                        </span>
                         <span className="text-[11px] text-slate-500 dark:text-slate-400">Smart notes, mock interviews & roadmaps</span>
                       </div>
                     </Link>
 
+                    {/* Item 2: 7-Day Money-Back Policy */}
                     <Link
                       href="/refund-policy"
                       onClick={() => setResourcesDropdownOpen(false)}
-                      className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-emerald-50/80 dark:hover:bg-emerald-950/30 transition-colors group/item"
                     >
-                      <RotateCcw className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <RotateCcw className="w-4 h-4" />
+                      </div>
                       <div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white block">7-Day Money-Back Policy</span>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400">No questions asked refund terms</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 block">
+                          💚 7-Day Money-Back Policy
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">No questions asked refund</span>
                       </div>
                     </Link>
 
+                    {/* Item 3: Help & Support Desk */}
                     <Link
                       href="/support"
                       onClick={() => setResourcesDropdownOpen(false)}
-                      className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                      className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-amber-50/80 dark:hover:bg-amber-950/30 transition-colors group/item"
                     >
-                      <HelpCircle className="w-4 h-4 text-amber-500" />
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <HelpCircle className="w-4 h-4" />
+                      </div>
                       <div>
-                        <span className="text-xs font-bold text-slate-900 dark:text-white block">Help & Support Desk</span>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400">Direct assistance from mentor</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/item:text-amber-600 dark:group-hover/item:text-amber-400 block">
+                          ⭕ Help & Support Desk
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">Direct mentor assistance</span>
                       </div>
                     </Link>
 
@@ -335,11 +333,11 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* 5. About Page Link (Always Visible) */}
+              {/* 5. About Page Link */}
               <Link
                 href="/about"
-                className={`text-xs xl:text-sm font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 py-1 px-2 rounded-lg ${
-                  isActive('/about') ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-600 dark:text-slate-300'
+                className={`text-xs xl:text-sm font-semibold transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 py-1.5 px-2.5 rounded-lg ${
+                  isActive('/about') ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/40' : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
                 About
@@ -352,12 +350,23 @@ export default function Navbar() {
                   className="text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 px-3 py-1 rounded-full flex items-center gap-1 hover:bg-indigo-100 transition-colors"
                 >
                   <FolderGit2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Admin Panel</span>
+                  <span>Admin</span>
                 </Link>
               )}
             </nav>
           ) : (
             <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+              <Link
+                href="/courses"
+                className={`text-xs xl:text-sm font-semibold transition-all flex items-center gap-1.5 py-1.5 px-3 rounded-lg ${
+                  isActive('/courses')
+                    ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/50'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>Explore Courses</span>
+              </Link>
               <Link
                 href="/about"
                 className={`text-xs xl:text-sm font-semibold transition-all flex items-center gap-1.5 py-1.5 px-3 rounded-lg ${
@@ -537,41 +546,44 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <>
                   <Link
-                    href="/dashboard?tab=overview"
+                    href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-semibold text-sm bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300"
                   >
                     <BookOpen className="w-4 h-4" />
-                    <span>My Dashboard</span>
+                    <span>Dashboard</span>
                   </Link>
 
                   <Link
-                    href="/dashboard?tab=certificates"
+                    href="/enrolled-courses"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
                     <Award className="w-4 h-4 text-emerald-600" />
-                    <span>My Certificates</span>
+                    <span>Enrolled Course</span>
+                  </Link>
+
+                  <Link
+                    href="/internships"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 text-amber-500" />
+                      <span>💼 Internship</span>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 rounded">
+                      Coming Soon
+                    </span>
                   </Link>
 
                   <Link
                     href="/courses"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
-                    <span>Programs & Cohorts</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">
-                      Free Track
-                    </span>
-                  </Link>
-
-                  <Link
-                    href="/learn/react-foundations-free"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    <span>React Foundations (Free Track)</span>
+                    <BookOpen className="w-4 h-4 text-indigo-600" />
+                    <span>📚 Course (All Courses)</span>
                   </Link>
 
                   <Link
@@ -580,16 +592,25 @@ export default function Navbar() {
                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
                   >
                     <Sparkles className="w-4 h-4" />
-                    <span>AI Copilot Studio</span>
+                    <span>🤖 AI Copilot Studio</span>
                   </Link>
 
                   <Link
-                    href="/verify/DEVASCENT-2025-VALID"
+                    href="/refund-policy"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                    <span>Verify Credential Ledger</span>
+                    <RotateCcw className="w-4 h-4 text-emerald-600" />
+                    <span>💚 7-Day Money-Back Policy</span>
+                  </Link>
+
+                  <Link
+                    href="/support"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    <HelpCircle className="w-4 h-4 text-amber-500" />
+                    <span>⭕ Help & Support Desk</span>
                   </Link>
 
                   <Link
@@ -599,24 +620,6 @@ export default function Navbar() {
                   >
                     <Sparkles className="w-4 h-4 text-indigo-500" />
                     <span>About DevAscent</span>
-                  </Link>
-
-                  <Link
-                    href="/refund-policy"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
-                  >
-                    <RotateCcw className="w-4 h-4 text-indigo-600" />
-                    <span>7-Day Money-Back Guarantee</span>
-                  </Link>
-
-                  <Link
-                    href="/support"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
-                  >
-                    <HelpCircle className="w-4 h-4 text-slate-500" />
-                    <span>Help Desk & Support</span>
                   </Link>
                 </>
               ) : (

@@ -520,21 +520,37 @@ function DashboardContent() {
                     {/* Left Column (8 cols): Active Learning Card, Modules & Capstone Submissions */}
                     <div className="xl:col-span-8 space-y-6">
                       
-                      {/* Active Enrolled Tracks Cards */}
+                      {/* Header for My Enrolled Tracks & Ongoing Learning */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                            Learning Workspace
+                          </span>
+                          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
+                            My Enrolled Tracks & Ongoing Programs
+                          </h2>
+                        </div>
+                        <span className="text-xs font-bold px-3 py-1 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300 rounded-full border border-indigo-200/80 dark:border-indigo-800">
+                          {displayEnrollments.length} Active Tracks
+                        </span>
+                      </div>
+
+                      {/* Primary Active Track Progress Banner (if enrolled) */}
                       {displayEnrollments.map((enr, idx) => (
                         <div
                           key={enr.id || idx}
-                          className="bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-6 sm:p-7 text-white space-y-4 shadow-md border border-emerald-800/40"
+                          className="bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 rounded-3xl p-6 sm:p-7 text-white space-y-4 shadow-xl border border-indigo-800/40 relative overflow-hidden"
                         >
-                          <div className="flex items-center justify-between">
+                          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+                          <div className="relative z-10 flex items-center justify-between">
                             <span className="text-xs font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 rounded-full uppercase tracking-wider">
-                              {enr.courseSlug.includes('free') ? 'Instant Free Track' : 'Live Cohort Track'}
+                              {enr.courseSlug.includes('free') ? 'Active Free Track' : 'Live Industrial Track'}
                             </span>
                             <span className="text-xs text-slate-400 font-medium">
                               {enr.progressPct !== undefined ? `${enr.progressPct}% Lessons Finished` : 'Active'}
                             </span>
                           </div>
-                          <div>
+                          <div className="relative z-10">
                             <h3 className="text-xl font-bold">{enr.courseTitle}</h3>
                             <div className="flex items-center gap-3 text-xs text-slate-300 mt-1">
                               <span>Enrolled: {enr.enrolledAt ? new Date(enr.enrolledAt).toLocaleDateString() : 'Active'}</span>
@@ -544,31 +560,177 @@ function DashboardContent() {
                           </div>
 
                           {/* Progress Bar */}
-                          <div className="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden border border-slate-700/60">
+                          <div className="relative z-10 w-full bg-slate-800/80 rounded-full h-2 overflow-hidden border border-slate-700/60">
                             <div
-                              className="bg-gradient-to-r from-emerald-400 to-teal-400 h-full rounded-full transition-all duration-500"
+                              className="bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-400 h-full rounded-full transition-all duration-500"
                               style={{ width: `${Math.min(enr.progressPct || 0, 100)}%` }}
                             />
                           </div>
 
-                          <div className="pt-2 flex flex-wrap items-center gap-3">
+                          <div className="relative z-10 pt-2 flex flex-wrap items-center gap-3">
                             <Link
                               href={`/learn/${enr.courseSlug}`}
-                              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2"
+                              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2"
                             >
                               <Play className="w-3.5 h-3.5 fill-current" />
-                              <span>Continue Course Lessons</span>
+                              <span>Continue Lessons</span>
                             </Link>
-                            <Link
-                              href={`/learn/${enr.courseSlug}/complete`}
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab('submissions')}
                               className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-xl transition-colors flex items-center gap-1.5"
                             >
                               <Award className="w-3.5 h-3.5 text-amber-400" />
                               <span>Submit Capstone Form</span>
-                            </Link>
+                            </button>
                           </div>
                         </div>
                       ))}
+
+                      {/* All Ongoing Courses & Internships Grid (Matching Image 2 Style) */}
+                      <div className="space-y-3 pt-2">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                            <span>Curated Roadmaps & Ongoing Cohorts</span>
+                          </h3>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Structured topic roadmaps
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {[
+                            {
+                              id: 'python-beg',
+                              badge: '🌱 Beginner',
+                              badgeStyle: 'bg-emerald-950/80 border-emerald-500/30 text-emerald-400',
+                              topics: '25 Topics',
+                              icon: '📖',
+                              title: 'Python',
+                              desc: 'A comprehensive beginner level roadmap with specific topics to master Python fundamentals and scripting.',
+                              date: 'Apr 2, 2026',
+                              link: '/courses/python-programming-internship',
+                            },
+                            {
+                              id: 'python-adv',
+                              badge: '🚀 Advanced',
+                              badgeStyle: 'bg-rose-950/80 border-rose-500/30 text-rose-400',
+                              topics: '25 Topics',
+                              icon: '📖',
+                              title: 'Python',
+                              desc: 'A comprehensive advanced level roadmap with specific topics to master Python async, OOP, and data pipelines.',
+                              date: 'Mar 31, 2026',
+                              link: '/courses/python-programming-internship',
+                            },
+                            {
+                              id: 'ml-beg',
+                              badge: '🌱 Beginner',
+                              badgeStyle: 'bg-emerald-950/80 border-emerald-500/30 text-emerald-400',
+                              topics: '25 Topics',
+                              icon: '📖',
+                              title: 'Machine Learning',
+                              desc: 'A comprehensive beginner level roadmap with specific topics to master Machine Learning & AI workflows.',
+                              date: 'Mar 31, 2026',
+                              link: '/courses/machine-learning-internship',
+                            },
+                            {
+                              id: 'react-beg',
+                              badge: '🌱 Beginner',
+                              badgeStyle: 'bg-emerald-950/80 border-emerald-500/30 text-emerald-400',
+                              topics: '13 Topics',
+                              icon: '📖',
+                              title: 'React',
+                              desc: 'A beginner level roadmap to master React 19, hooks, component lifecycle and modern state engineering.',
+                              date: 'Mar 30, 2026',
+                              link: '/learn/react-foundations-free',
+                            },
+                            {
+                              id: 'webdev-intern',
+                              badge: '⚡ Intermediate',
+                              badgeStyle: 'bg-blue-950/80 border-blue-500/30 text-blue-400',
+                              topics: '18 Topics',
+                              icon: '🌐',
+                              title: 'Web Development Internship',
+                              desc: 'Hands-on industrial tasks, responsive UI layouts, ES6+ architecture and 3 milestone production deliverables.',
+                              date: 'Mar 25, 2026',
+                              link: '/courses/web-development-internship',
+                            },
+                            {
+                              id: 'backend-cloud',
+                              badge: '🔥 Advanced',
+                              badgeStyle: 'bg-amber-950/80 border-amber-500/30 text-amber-400',
+                              topics: '22 Topics',
+                              icon: '💼',
+                              title: 'Backend & Cloud Internship',
+                              desc: 'NestJS microservices, Redis distributed caching, PostgreSQL schema optimization & verified stipend offer.',
+                              date: 'Mar 20, 2026',
+                              link: '/courses/backend-cloud-internship',
+                            },
+                          ].map((track) => (
+                            <div
+                              key={track.id}
+                              className="bg-[#0F1420] dark:bg-[#0F1420] bg-white border border-slate-200 dark:border-slate-800 hover:border-indigo-500/60 rounded-2xl p-5 shadow-md flex flex-col justify-between transition-all duration-200 group hover:-translate-y-0.5"
+                            >
+                              <div>
+                                {/* Top Badge & Icon */}
+                                <div className="flex items-start justify-between">
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${track.badgeStyle}`}>
+                                    {track.badge}
+                                  </span>
+                                </div>
+
+                                {/* Center Folded Map Illustration */}
+                                <div className="my-3 flex flex-col items-center justify-center">
+                                  <div className="w-14 h-10 flex items-center justify-center text-indigo-400/80 group-hover:text-indigo-300 transition-colors">
+                                    <svg
+                                      className="w-10 h-10 stroke-current"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      strokeWidth="1.5"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+                                      <line x1="9" y1="3" x2="9" y2="18" />
+                                      <line x1="15" y1="6" x2="15" y2="21" />
+                                    </svg>
+                                  </div>
+                                  <span className="text-[11px] font-medium text-slate-400 mt-1">
+                                    {track.topics}
+                                  </span>
+                                </div>
+
+                                {/* Title and Description */}
+                                <div className="space-y-1 text-left">
+                                  <h4 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-1.5 group-hover:text-indigo-400 transition-colors">
+                                    <span>{track.icon}</span>
+                                    <span>{track.title}</span>
+                                  </h4>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">
+                                    {track.desc}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Footer: Date & View Roadmap Button */}
+                              <div className="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                                <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                                  <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                                  <span>{track.date}</span>
+                                </div>
+                                <Link
+                                  href={track.link}
+                                  className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl shadow-md shadow-indigo-600/30 transition-all flex items-center gap-1 group-hover:shadow-indigo-600/50"
+                                >
+                                  <span>View Roadmap</span>
+                                  <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                                </Link>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
 
                       {/* Interactive Curriculum Modules Breakdown */}
                       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">

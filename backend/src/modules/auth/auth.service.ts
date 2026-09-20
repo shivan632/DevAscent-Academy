@@ -34,12 +34,12 @@ export class AuthService {
   }
 
   private setAuthCookies(res: Response, accessToken: string, refreshToken?: string) {
-    // 15 minutes for access token
-    res.cookie('access_token', accessToken, this.getCookieOptions(15 * 60 * 1000));
+    // 7 days for access token
+    res.cookie('access_token', accessToken, this.getCookieOptions(7 * 24 * 60 * 60 * 1000));
 
-    // 7 days for refresh token
+    // 30 days for refresh token
     if (refreshToken) {
-      res.cookie('refresh_token', refreshToken, this.getCookieOptions(7 * 24 * 60 * 60 * 1000));
+      res.cookie('refresh_token', refreshToken, this.getCookieOptions(30 * 24 * 60 * 60 * 1000));
     }
   }
 
@@ -210,10 +210,10 @@ export class AuthService {
 
     // Issue JWT tokens
     const payload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET || 'devascent_refresh_jwt_secret_key_change_in_production_min_64_characters_long',
-      expiresIn: '7d',
+      expiresIn: '30d',
     });
 
     this.setAuthCookies(res, accessToken, refreshToken);
@@ -252,10 +252,10 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET || 'devascent_refresh_jwt_secret_key_change_in_production_min_64_characters_long',
-      expiresIn: '7d',
+      expiresIn: '30d',
     });
 
     this.setAuthCookies(res, accessToken, refreshToken);
@@ -367,10 +367,10 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET || 'devascent_refresh_jwt_secret_key_change_in_production_min_64_characters_long',
-      expiresIn: '7d',
+      expiresIn: '30d',
     });
 
     this.setAuthCookies(res, accessToken, refreshToken);
@@ -429,10 +429,10 @@ export class AuthService {
       }
 
       const newPayload = { sub: user.id, email: user.email, role: user.role };
-      const newAccessToken = this.jwtService.sign(newPayload, { expiresIn: '15m' });
+      const newAccessToken = this.jwtService.sign(newPayload, { expiresIn: '7d' });
       const newRefreshToken = this.jwtService.sign(newPayload, {
         secret: process.env.JWT_REFRESH_SECRET || 'devascent_refresh_jwt_secret_key_change_in_production_min_64_characters_long',
-        expiresIn: '7d',
+        expiresIn: '30d',
       });
 
       this.setAuthCookies(res, newAccessToken, newRefreshToken);

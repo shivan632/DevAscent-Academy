@@ -208,17 +208,31 @@ export default function StudentSidebar({
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </Link>
 
-        <Link
-          href={`/learn/${primarySlug}/complete`}
-          onClick={close}
-          className="w-full flex items-center justify-between p-2.5 rounded-xl border border-amber-200/70 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100/60 font-semibold transition-colors"
-        >
-          <div className="flex items-center gap-2">
-            <Award className="w-3.5 h-3.5 text-amber-500" />
-            <span>Submit Capstone Form</span>
-          </div>
-          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-        </Link>
+        {onSelectTab ? (
+          <button
+            type="button"
+            onClick={() => handleItemClick('submissions')}
+            className="w-full flex items-center justify-between p-2.5 rounded-xl border border-amber-200/70 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100/60 font-semibold transition-colors text-left"
+          >
+            <div className="flex items-center gap-2">
+              <Award className="w-3.5 h-3.5 text-amber-500" />
+              <span>Submit Capstone Form</span>
+            </div>
+            <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+          </button>
+        ) : (
+          <Link
+            href="/dashboard?tab=submissions"
+            onClick={close}
+            className="w-full flex items-center justify-between p-2.5 rounded-xl border border-amber-200/70 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100/60 font-semibold transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Award className="w-3.5 h-3.5 text-amber-500" />
+              <span>Submit Capstone Form</span>
+            </div>
+            <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+          </Link>
+        )}
 
         <Link
           href="/ai-studio"

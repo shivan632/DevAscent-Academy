@@ -11,6 +11,7 @@ import {
 import { SubmissionsService } from './submissions.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { SubmitCompletionDto } from './dto/submit-completion.dto';
 
 @Controller('submissions')
 export class SubmissionsController {
@@ -20,14 +21,7 @@ export class SubmissionsController {
   @UseGuards(JwtAuthGuard)
   async submitCompletion(
     @CurrentUser('id') userId: string,
-    @Body()
-    body: {
-      courseId: string;
-      batch: string;
-      projectName: string;
-      gitRepoUrl: string;
-      linkedinPostUrl: string;
-    },
+    @Body() body: SubmitCompletionDto,
   ) {
     return this.submissionsService.submitCompletion(userId, body);
   }

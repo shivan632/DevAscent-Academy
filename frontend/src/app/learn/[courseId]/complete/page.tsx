@@ -24,7 +24,7 @@ export default function CompletionFormPage() {
   const params = useParams();
   const router = useRouter();
   const courseId = params?.courseId as string;
-  const { user } = useAuthStore();
+  const { user, isLoading: authLoading, checkAuth } = useAuthStore();
 
   const [course, setCourse] = useState<any>(null);
   const [enrollment, setEnrollment] = useState<any>(null);
@@ -41,7 +41,12 @@ export default function CompletionFormPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
     async function loadData() {
+      if (authLoading) return;
       if (!user) {
         router.push(`/login?redirect=/learn/${courseId}/complete`);
         return;
@@ -68,7 +73,7 @@ export default function CompletionFormPage() {
       }
     }
     loadData();
-  }, [courseId, user, router]);
+  }, [courseId, user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +103,10 @@ export default function CompletionFormPage() {
       });
       setSuccess(true);
     } catch (err: any) {
-      setError(err?.message || 'Failed to submit completion form.');
+      const msg = err?.message;
+      setError(
+        Array.isArray(msg) ? msg.join(', ') : (msg || 'Failed to submit completion form.')
+      );
     } finally {
       setSubmitting(false);
     }
