@@ -178,6 +178,10 @@ export default function RegisterPage() {
     try {
       const res = await api.verifyOtp(email.trim().toLowerCase(), otpCode.trim());
       const rawUser = res?.data?.user || res?.user;
+      const token = res?.data?.accessToken || res?.accessToken;
+      if (token && typeof window !== 'undefined') {
+        localStorage.setItem('devascent_token', token);
+      }
       if (rawUser) {
         setUser(rawUser);
         router.push('/dashboard');
