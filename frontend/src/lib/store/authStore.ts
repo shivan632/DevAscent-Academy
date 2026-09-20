@@ -43,6 +43,12 @@ export const useAuthStore = create<AuthState>((set) => ({
       user: state.user ? { ...state.user, ...data } : null,
     })),
   checkAuth: async () => {
+    // If no token exists in localStorage, skip the API call entirely.
+    // This prevents noisy 401 errors on public pages for unauthenticated visitors.
+    if (typeof window !== 'undefined' && !localStorage.getItem('devascent_token')) {
+      set({ user: null, isAuthenticated: false, isLoading: false });
+      return;
+    }
     try {
       const response = await api.getProfile();
       const raw = response?.data || response;
@@ -53,6 +59,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ user: null, isAuthenticated: false, isLoading: false });
       }
     } catch {
+      // Token invalid or expired — clear it
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('devascent_token');
+      }
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
