@@ -40,6 +40,7 @@ model User {
   internshipApplications InternshipApplication[]
   completionSubmissions  CompletionSubmission[]
   auditLogsAsAdmin       AuditLog[] @relation("AdminAuditLogs")
+  doubts                 Doubt[]
 }
 
 model OtpVerification {
@@ -102,25 +103,33 @@ model Module {
 }
 
 model Lesson {
-  id              String   @id @default(cuid())
-  moduleId        String
-  lessonNumber    Int
-  title           String
-  durationMinutes Int
-  videoUrl        String
-  isFreePreview   Boolean  @default(false)
-  summary         String?
-  module          Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-
-  progressRecords LessonProgress[]
+  id                  String   @id @default(cuid())
+  moduleId            String
+  lessonNumber        Int
+  title               String
+  durationMinutes     Int      @default(15)
+  videoUrl            String?  // Nullable: AI video provided by Admin
+  isFreePreview       Boolean  @default(false)
+  summary             String?
+  writtenContent      String?  @db.Text // GeeksforGeeks style notes/reading content
+  exercisePdfUrl      String?  // PDF link uploaded by Admin
+  exercisePdfTitle    String?  // e.g. "5 Basic Projects with Tech Stacks"
+  exerciseProjects    String?  @default("[]") // JSON list of 5 projects for GitHub/LinkedIn
+  
+  module              Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  quiz                Quiz?
+  progressRecords     LessonProgress[]
+  doubts              Doubt[]
 }
 
 model Quiz {
   id           String         @id @default(cuid())
-  moduleId     String         @unique
+  moduleId     String?        @unique
+  lessonId     String?        @unique
   title        String
-  passingScore Int            @default(70)
-  module       Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  passingScore Int            @default(60)
+  module       Module?        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lesson       Lesson?        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   questions    QuizQuestion[]
   submissions  QuizSubmission[]
 }
@@ -146,6 +155,23 @@ model QuizSubmission {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model Doubt {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  question  String   @db.Text
+  answer    String?  @db.Text
+  status    String   @default("PENDING") // "PENDING" | "ANSWERED"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+  @@index([userId])
 }
 
 model Enrollment {
@@ -185,6 +211,7 @@ model Payment {
   razorpaySignature String?
   amountInPaise     Int
   currency          String   @default("INR")
+  couponCode        String?
   status            String   @default("PENDING") // "PENDING" | "PAID" | "FAILED" | "REFUNDED"
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

@@ -10,34 +10,86 @@ import { Request } from 'express';
 import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { IsString, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class StudentDetailsDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  college?: string;
+
+  @IsOptional()
+  @IsString()
+  degree?: string;
+}
+
+export class CreateOrderDto {
+  @IsNotEmpty()
+  @IsString()
+  courseId: string;
+
+  @IsOptional()
+  @IsString()
+  couponCode?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => StudentDetailsDto)
+  studentDetails?: StudentDetailsDto;
+}
+
+export class VerifyPaymentDto {
+  @IsNotEmpty()
+  @IsString()
+  razorpayOrderId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  razorpayPaymentId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  razorpaySignature: string;
+}
 
 @Controller('payments')
 export class PaymentsController {
   constructor(private paymentsService: PaymentsService) {}
 
   @Post('create-order')
-  @UseGuards(JwtAuthGuard)
   async createOrder(
-    @CurrentUser('id') userId: string,
-    @Body('courseId') courseId: string,
-    @Body('couponCode') couponCode?: string,
+    @Req() req: Request,
+    @Body() dto: CreateOrderDto,
   ) {
-    return this.paymentsService.createOrder(userId, courseId, couponCode);
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+    return this.paymentsService.createOrderWithTokenOrGuest(token, dto.courseId, dto.couponCode, dto.studentDetails);
   }
 
   @Post('verify')
-  @UseGuards(JwtAuthGuard)
   async verifyPayment(
-    @CurrentUser('id') userId: string,
-    @Body('razorpayOrderId') razorpayOrderId: string,
-    @Body('razorpayPaymentId') razorpayPaymentId: string,
-    @Body('razorpaySignature') razorpaySignature: string,
+    @Req() req: Request,
+    @Body() dto: VerifyPaymentDto,
   ) {
-    return this.paymentsService.verifyPayment(
-      userId,
-      razorpayOrderId,
-      razorpayPaymentId,
-      razorpaySignature,
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+    return this.paymentsService.verifyPaymentWithTokenOrGuest(
+      token,
+      dto.razorpayOrderId,
+      dto.razorpayPaymentId,
+      dto.razorpaySignature,
     );
   }
 

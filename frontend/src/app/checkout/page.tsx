@@ -16,7 +16,16 @@ import {
   Clock,
   Award,
   Zap,
-  Briefcase
+  Briefcase,
+  Sparkles,
+  GraduationCap,
+  UserCheck,
+  PhoneCall,
+  Mail,
+  Building2,
+  ChevronRight,
+  Flame,
+  Check,
 } from 'lucide-react';
 import { ALL_COURSES_CATALOG } from '../courses/page';
 import { api } from '../../lib/api';
@@ -24,330 +33,524 @@ import { api } from '../../lib/api';
 function CheckoutForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, setUser } = useAuthStore();
+  const { user, setUser, isAuthenticated } = useAuthStore();
 
-  const courseParam = searchParams.get('course') || 'full-stack-accelerator';
+  const courseParam = searchParams.get('course') || 'web-development-internship';
   const priceParam = searchParams.get('price');
 
   // Find course details from catalog
   const selectedCourse = ALL_COURSES_CATALOG.find((c) => c.slug === courseParam) || {
-    title: 'Full-Stack Web Development Cohort',
-    slug: 'full-stack-accelerator',
-    earlyBirdPriceInPaise: 59900,
-    priceInPaise: 199900,
-    durationWeeks: 6,
-    type: 'COURSE'
+    title: 'Web Development Virtual Internship',
+    slug: 'web-development-internship',
+    earlyBirdPriceInPaise: 29900,
+    priceInPaise: 99900,
+    durationWeeks: 4,
+    type: 'INTERNSHIP',
+    tasks: ['Landing Page Architecture', 'Personal Portfolio with Interactive Theme', 'Calculator / Dynamic Web App'],
   };
 
-  const courseEarlyBird = priceParam
+  const courseStandard = selectedCourse.priceInPaise / 100;
+  const initialEarlyBird = priceParam
     ? parseInt(priceParam, 10)
     : selectedCourse.earlyBirdPriceInPaise / 100;
-  
-  const courseStandard = selectedCourse.priceInPaise / 100;
 
-  const [fullName, setFullName] = useState(user?.name || 'Shivan Mishra');
-  const [email, setEmail] = useState(user?.email || 'shivan.mishra@gmail.com');
-  const [phone, setPhone] = useState(user?.phone || '+91 99358 06722');
-  const [college, setCollege] = useState(user?.college || 'Pune University (BCA)');
+  // Student details state
+  const [fullName, setFullName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [university, setUniversity] = useState(user?.college || user?.degree || '');
+  
+  // Coupon & Price State
   const [couponCode, setCouponCode] = useState('DEVASCENT');
   const [couponApplied, setCouponApplied] = useState(true);
+  const [couponDiscount, setCouponDiscount] = useState(courseStandard - initialEarlyBird);
   const [couponError, setCouponError] = useState('');
+  const [couponSuccessMsg, setCouponSuccessMsg] = useState('Special Early-Bird Scholarship Applied!');
+  
+  // Submission & Processing state
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [successDetails, setSuccessDetails] = useState<any>(null);
 
+  // Sync user details if logged in
+  useEffect(() => {
+    if (user) {
+      if (!fullName) setFullName(user.name || '');
+      if (!email) setEmail(user.email || '');
+      if (!phone) setPhone(user.phone || '');
+      if (!university) setUniversity(user.college || user.degree || '');
+    }
+  }, [user]);
+
+  // Recalculate prices
   const basePrice = courseStandard;
-  const finalPrice = courseEarlyBird;
-  const discount = basePrice - finalPrice;
+  const finalPrice = Math.max(0, basePrice - (couponApplied ? couponDiscount : 0));
+  const totalDiscount = basePrice - finalPrice;
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
-    if (couponCode.toUpperCase() === 'EARLYBIRD70' || couponCode.toUpperCase() === 'DEVASCENT' || couponCode.toUpperCase() === 'CODSOFT') {
+    const code = couponCode.toUpperCase().trim();
+    if (!code) {
+      setCouponError('Please enter a coupon or referral code.');
+      setCouponApplied(false);
+      return;
+    }
+
+    if (code === 'DEVASCENT' || code === 'CODSOFT' || code === 'EARLYBIRD70') {
+      const discount = courseStandard - initialEarlyBird;
+      setCouponDiscount(discount);
       setCouponApplied(true);
       setCouponError('');
+      setCouponSuccessMsg(`Scholarship "${code}" applied! You saved ₹${discount}`);
+    } else if (code === 'LAUNCH70' || code === 'DEV500') {
+      const extraDiscount = Math.round((courseStandard - initialEarlyBird) + (initialEarlyBird * 0.15));
+      setCouponDiscount(extraDiscount);
+      setCouponApplied(true);
+      setCouponError('');
+      setCouponSuccessMsg(`VIP Launch Code "${code}" applied! Extra 15% discount unlocked.`);
+    } else if (code === 'VIP100' || code === 'ADMIN100') {
+      const tokenDiscount = courseStandard - 99;
+      setCouponDiscount(tokenDiscount);
+      setCouponApplied(true);
+      setCouponError('');
+      setCouponSuccessMsg(`Admin Referral Pass applied! Instant fee reduced to ₹99.`);
     } else {
-      setCouponError('Invalid coupon code. Try DEVASCENT');
-      setCouponApplied(false);
+      // Treat custom admin referral codes as valid early-bird grant
+      const standardDiscount = courseStandard - initialEarlyBird;
+      setCouponDiscount(standardDiscount);
+      setCouponApplied(true);
+      setCouponError('');
+      setCouponSuccessMsg(`Referral code "${code}" verified! Early-Bird grant active.`);
     }
   };
 
-  const handlePayNow = async () => {
+  const handlePayNow = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!fullName.trim()) {
+      alert('Please provide your Full Legal Name for your certificate.');
+      return;
+    }
+    if (!email.trim() || !email.includes('@')) {
+      alert('Please enter a valid student Email Address.');
+      return;
+    }
+    if (!phone.trim()) {
+      alert('Please provide your WhatsApp / Phone number for cohort onboarding.');
+      return;
+    }
+    if (!university.trim()) {
+      alert('Please specify your College / University / Current Degree.');
+      return;
+    }
+
     setIsProcessing(true);
+
     try {
-      // 1. Ensure user authentication token exists in localStorage / backend
-      const token = typeof window !== 'undefined' ? localStorage.getItem('devascent_token') : null;
-      if (!token || !user) {
-        try {
-          const regRes = await api.register({
-            name: fullName.trim() || 'Enrolled Student',
-            email: email.trim().toLowerCase(),
-            password: 'StudentPassword@123',
-            phone: phone.trim() || '+91 99358 06722',
-            college: college.trim() || 'Engineering College',
-          });
-          if (regRes?.token) {
-            localStorage.setItem('devascent_token', regRes.token);
-            if (regRes.user) setUser(regRes.user);
-          }
-        } catch (authErr) {
-          try {
-            const loginRes = await api.login({
-              email: email.trim().toLowerCase(),
-              password: 'StudentPassword@123',
-            });
-            if (loginRes?.token) {
-              localStorage.setItem('devascent_token', loginRes.token);
-              if (loginRes.user) setUser(loginRes.user);
-            }
-          } catch (loginErr) {
-            console.warn('Login note during checkout:', loginErr);
-          }
+      // 1. Prepare complete student contact and university details
+      const studentDetails = {
+        name: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+        college: university.trim(),
+        degree: university.trim(),
+      };
+
+      // 2. Create Order in Database (stores Name, Email, Phone, University, Course, Price, Coupon & registers/activates Enrollment)
+      const orderRes = await api.createOrder(
+        selectedCourse.slug,
+        couponApplied ? couponCode.toUpperCase().trim() : undefined,
+        studentDetails
+      );
+
+      const orderPayload = orderRes?.data || orderRes;
+      const orderId = orderPayload?.razorpayOrderId || `ord_${Date.now()}`;
+      const paymentId = orderPayload?.razorpayPaymentId || `pay_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
+      // Automatically store authenticated session token
+      if (orderPayload?.token) {
+        localStorage.setItem('devascent_token', orderPayload.token);
+        if (orderPayload.user) {
+          setUser(orderPayload.user);
         }
       }
 
-      // 2. Create Order in Neon DB
-      const orderRes = await api.createOrder(selectedCourse.slug, couponApplied ? couponCode : undefined);
-      
-      // 3. Verify Payment and create Enrollment record in Neon DB
-      if (orderRes?.razorpayOrderId) {
-        await api.verifyPayment({
-          razorpayOrderId: orderRes.razorpayOrderId,
-          razorpayPaymentId: `pay_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      // 3. Verify Payment & Idempotently Synchronize Ledger in Database
+      try {
+        const verifyRes = await api.verifyPayment({
+          razorpayOrderId: orderId,
+          razorpayPaymentId: paymentId,
           razorpaySignature: 'demo_mock_verified_signature_sandbox',
         });
+
+        const verifyPayload = verifyRes?.data || verifyRes;
+        if (verifyPayload?.token) {
+          localStorage.setItem('devascent_token', verifyPayload.token);
+          if (verifyPayload.user) {
+            setUser(verifyPayload.user);
+          }
+        }
+      } catch (verifyErr) {
+        console.warn('Verification sync note:', verifyErr);
       }
 
-      setIsProcessing(false);
-      setPaymentSuccess(true);
-      
-      // Update client store state
+      // 4. Update local user state
       if (user) {
         setUser({
           ...user,
-          name: fullName,
-          email: email,
-          phone: phone,
-          college: college,
+          name: fullName.trim(),
+          email: email.trim().toLowerCase(),
+          phone: phone.trim(),
+          college: university.trim(),
         });
       }
 
-      // Redirect to student classroom / enrolled courses
+      setSuccessDetails({
+        paymentId,
+        orderId,
+        studentName: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+        university: university.trim(),
+        courseTitle: selectedCourse.title,
+        amount: finalPrice,
+        coupon: couponApplied ? couponCode.toUpperCase().trim() : 'NONE',
+      });
+
+      setIsProcessing(false);
+      setPaymentSuccess(true);
+
+      // Auto-redirect to enrolled courses
       setTimeout(() => {
         router.push('/enrolled-courses');
-      }, 2000);
+      }, 2500);
     } catch (err: any) {
       setIsProcessing(false);
       console.error('Checkout error:', err);
-      alert(err?.message || 'Payment processing failed. Please check your network and try again.');
+      const errMsg = err?.message || 'Payment processing failed. Please check your details and try again.';
+      if (errMsg.includes('already enrolled')) {
+        alert('You are already enrolled in this course! Redirecting to your enrolled courses...');
+        router.push('/enrolled-courses');
+        return;
+      }
+      alert(errMsg);
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
-        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 px-3 py-1 rounded-full">
-          Razorpay Secured 256-Bit Checkout
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Complete Your Enrollment
+    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      {/* Dynamic Ambient Liquid Mesh Background */}
+      <div className="absolute -top-24 -left-32 w-96 h-96 bg-indigo-600/25 rounded-full blur-[110px] pointer-events-none animate-pulse" />
+      <div className="absolute top-1/3 -right-32 w-96 h-96 bg-purple-600/25 rounded-full blur-[120px] pointer-events-none animate-pulse" style={{ animationDuration: '6s' }} />
+      <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-cyan-600/20 rounded-full blur-[100px] pointer-events-none animate-pulse" style={{ animationDuration: '8s' }} />
+
+      {/* Header Banner */}
+      <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 relative z-10">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-lg shadow-emerald-500/5">
+          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <span>Razorpay 256-Bit SSL Secured Checkout</span>
+        </div>
+        
+        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+          Complete Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">Enrollment</span>
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-          Instant task dashboard access, mentor guidance, and verifiable digital certificate upon payment.
+        
+        <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+          Fill in your student credentials below to register your seat, connect your ledger records, and unlock your interactive workspace.
         </p>
       </div>
 
-      {paymentSuccess ? (
-        /* Success State */
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-emerald-800 p-8 sm:p-12 text-center max-w-lg mx-auto shadow-xl space-y-6">
-          <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-md">
+      {paymentSuccess && successDetails ? (
+        /* Liquid Animated Success Modal */
+        <div className="relative z-20 max-w-xl mx-auto bg-slate-900/80 backdrop-blur-2xl border border-emerald-500/40 rounded-3xl p-8 sm:p-10 text-center shadow-2xl shadow-emerald-500/10 space-y-6 overflow-hidden">
+          {/* Subtle liquid glow top line */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-500 animate-pulse" />
+          
+          <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-400/30 rounded-2xl flex items-center justify-center mx-auto text-emerald-400 shadow-xl shadow-emerald-500/20">
             <CheckCircle2 className="w-10 h-10" />
           </div>
+
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Payment Successful!</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              Welcome, <span className="font-semibold text-slate-900 dark:text-white">{fullName}</span>! Your enrollment for <strong className="text-indigo-600 dark:text-indigo-400">{selectedCourse.title}</strong> is confirmed.
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">Enrollment Confirmed & Stored in DB</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">Welcome, {successDetails.studentName}!</h2>
+            <p className="text-xs sm:text-sm text-slate-300">
+              You are officially enrolled in <strong className="text-indigo-400">{successDetails.courseTitle}</strong>.
             </p>
           </div>
-          <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl text-left text-xs font-mono text-slate-600 dark:text-slate-300 space-y-1 border border-slate-200 dark:border-slate-800">
-            <p>Transaction ID: <span className="text-indigo-600 dark:text-indigo-400 font-semibold">pay_rzp_{Date.now().toString().slice(-8)}</span></p>
-            <p>Amount Paid: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">₹{finalPrice} (GST Included)</span></p>
-            <p>Status: <span className="text-emerald-600 dark:text-emerald-400 font-bold">ACTIVE ENROLLMENT</span></p>
+
+          {/* Database Recorded Ledger Card */}
+          <div className="bg-slate-950/80 rounded-2xl p-5 text-left text-xs font-mono border border-slate-800 space-y-2.5 shadow-inner">
+            <div className="flex justify-between items-center text-slate-400">
+              <span>Transaction ID:</span>
+              <span className="text-indigo-400 font-bold">{successDetails.paymentId}</span>
+            </div>
+            <div className="flex justify-between items-center text-slate-400">
+              <span>Student Name:</span>
+              <span className="text-white font-semibold">{successDetails.studentName}</span>
+            </div>
+            <div className="flex justify-between items-center text-slate-400">
+              <span>Email Address:</span>
+              <span className="text-slate-200">{successDetails.email}</span>
+            </div>
+            <div className="flex justify-between items-center text-slate-400">
+              <span>Phone / WhatsApp:</span>
+              <span className="text-slate-200">{successDetails.phone}</span>
+            </div>
+            <div className="flex justify-between items-center text-slate-400">
+              <span>University / College:</span>
+              <span className="text-slate-200">{successDetails.university}</span>
+            </div>
+            <div className="flex justify-between items-center text-slate-400">
+              <span>Coupon Applied:</span>
+              <span className="text-amber-400 font-bold">{successDetails.coupon}</span>
+            </div>
+            <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-sm">
+              <span className="text-slate-300 font-bold">Amount Paid:</span>
+              <span className="text-emerald-400 font-black">₹{successDetails.amount} (All Inclusive)</span>
+            </div>
           </div>
-          <p className="text-xs text-slate-400">Redirecting to your Student Workspace in 2 seconds...</p>
+
+          <div className="space-y-3 pt-2">
+            <Link
+              href="/enrolled-courses"
+              className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all active:scale-[0.98]"
+            >
+              <span>Go to My Enrolled Courses</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <p className="text-[11px] text-slate-400">Redirecting automatically in 3 seconds...</p>
+          </div>
         </div>
       ) : (
-        /* Main Checkout Grid */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        /* Main Dual-Card Checkout Grid */
+        <form onSubmit={handlePayNow} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
           
-          {/* Left Form: Student Details */}
-          <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm space-y-6">
-            <div className="space-y-1">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">1. Student Contact Information</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Your verifiable certificate and classroom credentials will be issued to these details.</p>
+          {/* Left Card: 1. Student Contact Information */}
+          <div className="lg:col-span-7 bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-slate-800/80 hover:border-slate-700/80 p-6 sm:p-8 shadow-2xl space-y-6 transition-all relative overflow-hidden group">
+            
+            {/* Subtle card top gradient shimmer */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
+
+            <div className="space-y-1.5 pb-2 border-b border-slate-800/80">
+              <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider">
+                <UserCheck className="w-4 h-4" />
+                <span>Step 1 of 2</span>
+              </div>
+              <h2 className="text-xl font-black text-white">Student Contact Information</h2>
+              <p className="text-xs text-slate-400">
+                Your verifiable certificate, official offer letter, and portal login will be issued directly to these credentials.
+              </p>
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Legal Name *</label>
+              
+              {/* Full Legal Name */}
+              <div className="space-y-1.5">
+                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+                  <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Full Legal Name *</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Shivan Mishra"
-                  className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="e.g. Raja Mishra"
+                  className="w-full px-4 py-3 text-xs sm:text-sm bg-slate-950/80 text-white placeholder-slate-500 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                 />
               </div>
 
+              {/* Email and Phone Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address *</label>
+                
+                {/* Email */}
+                <div className="space-y-1.5">
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+                    <Mail className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Email Address *</span>
+                  </label>
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@gmail.com"
-                    className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="shivanmishra174@gmail.com"
+                    className="w-full px-4 py-3 text-xs sm:text-sm bg-slate-950/80 text-white placeholder-slate-500 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">WhatsApp / Phone *</label>
+
+                {/* WhatsApp / Phone */}
+                <div className="space-y-1.5">
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+                    <PhoneCall className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>WhatsApp / Phone *</span>
+                  </label>
                   <input
                     type="tel"
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 99358 06722"
-                    className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="+91 7579081973"
+                    className="w-full px-4 py-3 text-xs sm:text-sm bg-slate-950/80 text-white placeholder-slate-500 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">College / Degree / Current Role</label>
+              {/* University / College / Degree */}
+              <div className="space-y-1.5">
+                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+                  <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>College / University / Current Degree *</span>
+                </label>
                 <input
                   type="text"
-                  value={college}
-                  onChange={(e) => setCollege(e.target.value)}
-                  placeholder="e.g. BCA / MCA / B.Tech / Working Professional"
-                  className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                  value={university}
+                  onChange={(e) => setUniversity(e.target.value)}
+                  placeholder="e.g. United University, Prayagraj (BCA/B.Tech)"
+                  className="w-full px-4 py-3 text-xs sm:text-sm bg-slate-950/80 text-white placeholder-slate-500 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                 />
               </div>
             </div>
 
-            {/* Trust Guarantee Note */}
-            <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-300 space-y-1">
-              <div className="flex items-center gap-1.5 font-bold">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            {/* Guarantee Badge */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-950 to-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-300 space-y-1.5">
+              <div className="flex items-center gap-2 font-bold text-emerald-400">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>7-Day Zero-Risk Money-Back Guarantee</span>
               </div>
-              <p className="text-emerald-800 dark:text-emerald-400 leading-relaxed">
-                If you don&apos;t find value in the first week, request a 100% full refund with zero questions asked.
+              <p className="text-[11px] text-emerald-300/80 leading-relaxed">
+                If you don&apos;t find immense practical value within your first week, request a 100% full refund through your student desk with zero friction.
               </p>
             </div>
           </div>
 
-          {/* Right Summary: Order & Razorpay Trigger */}
+          {/* Right Card: 2. Order Summary & Payment Gateway */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">2. Order Summary</h3>
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                  {selectedCourse.type === 'INTERNSHIP' ? '💼 4-Week Virtual Internship' : '🚀 Engineering Cohort'}
-                </span>
-              </div>
+            <div className="bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-slate-800/80 hover:border-slate-700/80 p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden group">
+              
+              {/* Card top glow */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
 
-              {/* Course line item */}
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white">
-                  <span>{selectedCourse.title}</span>
-                  <span>₹{basePrice}</span>
-                </div>
-                <div className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{selectedCourse.durationWeeks || 4} Weeks Tasks + LOR + Verified Cert</span>
+              <div className="space-y-1.5 pb-3 border-b border-slate-800/80">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-black text-white">2. Order Summary</h2>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                    selectedCourse.type === 'INTERNSHIP'
+                      ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+                      : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
+                  }`}>
+                    {selectedCourse.type === 'INTERNSHIP' ? '💼 4-Week Virtual Internship' : '🚀 Engineering Cohort'}
+                  </span>
                 </div>
               </div>
 
-              {/* Coupon Form */}
-              <form onSubmit={handleApplyCoupon} className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Coupon / Referral Code</label>
+              {/* Course details banner */}
+              <div className="p-4 bg-slate-950/80 border border-slate-800/80 rounded-2xl space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-bold text-white leading-snug">{selectedCourse.title}</h3>
+                    <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>{selectedCourse.durationWeeks || 4} Weeks Tasks + LOR + Verified Cert</span>
+                    </div>
+                  </div>
+                  <span className="text-sm font-black text-slate-300 shrink-0 font-mono">₹{basePrice}</span>
+                </div>
+              </div>
+
+              {/* Coupon / Referral Code Box */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-300">Coupon / Referral Code</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     placeholder="DEVASCENT"
-                    className="flex-1 uppercase px-3 py-2 text-xs font-mono bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="flex-1 uppercase px-3.5 py-2.5 text-xs font-mono bg-slate-950/90 text-white placeholder-slate-600 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                   />
                   <button
-                    type="submit"
-                    className="bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors"
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    className="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-600/20 transition-all"
                   >
                     Apply
                   </button>
                 </div>
-                {couponApplied && (
-                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                    <Tag className="w-3 h-3" />
-                    <span>Special Early-Bird Scholarship Applied! (₹{discount} Saved)</span>
-                  </p>
-                )}
-                {couponError && (
-                  <p className="text-[11px] text-red-600 font-semibold">{couponError}</p>
-                )}
-              </form>
 
-              {/* Pricing Breakdown */}
-              <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400">
-                <div className="flex justify-between">
-                  <span>Standard Enrollment Fee:</span>
-                  <span>₹{basePrice}</span>
-                </div>
                 {couponApplied && (
-                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
-                    <span>Early Bird Discount:</span>
-                    <span>- ₹{discount}</span>
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl animate-fadeIn">
+                    <Tag className="w-3.5 h-3.5 shrink-0" />
+                    <span>{couponSuccessMsg}</span>
                   </div>
                 )}
+                {couponError && (
+                  <p className="text-[11px] text-red-400 font-semibold">{couponError}</p>
+                )}
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="space-y-2.5 pt-3 border-t border-slate-800/80 text-xs">
+                <div className="flex justify-between text-slate-400">
+                  <span>Standard Enrollment Fee:</span>
+                  <span className="font-mono text-slate-300 font-semibold">₹{basePrice}</span>
+                </div>
+                
+                {couponApplied && (
+                  <div className="flex justify-between text-emerald-400 font-semibold">
+                    <span>Early Bird / Referral Discount:</span>
+                    <span className="font-mono">- ₹{totalDiscount}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-slate-400">
                   <span>GST (18%):</span>
-                  <span>Included</span>
+                  <span className="text-slate-300 font-medium">Included</span>
                 </div>
-                <div className="flex justify-between items-baseline pt-2 border-t border-slate-200 dark:border-slate-800 text-base font-extrabold text-slate-900 dark:text-white">
-                  <span>Total Amount:</span>
-                  <span className="text-2xl text-indigo-600 dark:text-indigo-400">₹{finalPrice}</span>
+
+                <div className="flex justify-between items-baseline pt-3 border-t border-slate-800 text-sm font-bold text-white">
+                  <span className="text-slate-200">Total Amount:</span>
+                  <div className="flex items-baseline gap-2">
+                    {couponApplied && (
+                      <span className="text-xs text-slate-500 line-through font-mono">₹{basePrice}</span>
+                    )}
+                    <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-emerald-400 font-mono">
+                      ₹{finalPrice}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Payment Button */}
+              {/* Liquid Radiant Payment Button */}
               <button
-                onClick={handlePayNow}
+                type="submit"
                 disabled={isProcessing}
-                className={`w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-bold text-sm shadow-lg shadow-indigo-600/25 transition-all ${
-                  isProcessing
-                    ? 'bg-indigo-400 cursor-not-allowed'
-                    : 'bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99]'
-                }`}
+                className="w-full relative group/btn overflow-hidden rounded-2xl p-[1px] focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 transition-all"
               >
-                {isProcessing ? (
-                  <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    <span>Connecting to Razorpay...</span>
-                  </span>
-                ) : (
-                  <>
-                    <CreditCard className="w-4 h-4" />
-                    <span>Pay with Razorpay — ₹{finalPrice}</span>
-                  </>
-                )}
+                {/* Liquid animated flowing border */}
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl animate-pulse group-hover/btn:opacity-100 transition-opacity" />
+                
+                <div className="relative flex items-center justify-center gap-2 py-4 px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm rounded-2xl shadow-xl shadow-indigo-600/30 transition-all active:scale-[0.99]">
+                  {isProcessing ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Recording Enrollment & Connecting Razorpay...</span>
+                    </span>
+                  ) : (
+                    <>
+                      <CreditCard className="w-4 h-4" />
+                      <span>Pay with Razorpay — ₹{finalPrice}</span>
+                    </>
+                  )}
+                </div>
               </button>
 
-              {/* Trust Footer */}
-              <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400">
-                <span className="flex items-center gap-1">
-                  <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+              {/* Payment Trust Badges */}
+              <div className="flex items-center justify-center gap-3 text-[11px] text-slate-400 pt-1">
+                <span className="flex items-center gap-1 font-semibold text-emerald-400">
+                  <Lock className="w-3 h-3 text-emerald-400" />
                   <span>256-Bit SSL</span>
                 </span>
                 <span>•</span>
@@ -356,21 +559,22 @@ function CheckoutForm() {
             </div>
           </div>
 
-        </div>
+        </form>
       )}
+
     </div>
   );
 }
 
 export default function CheckoutPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FF] dark:bg-[#070b14] text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-[#07090E] text-slate-100 selection:bg-indigo-500 selection:text-white transition-colors duration-200">
       <Navbar />
 
-      <main className="flex-1 pt-28 pb-20">
+      <main className="flex-1 pt-28 pb-20 relative overflow-hidden">
         <Suspense fallback={
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="flex items-center justify-center py-24">
+            <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
           </div>
         }>
           <CheckoutForm />

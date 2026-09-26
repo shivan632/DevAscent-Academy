@@ -20,8 +20,21 @@ export async function fetchApi<T = any>(endpoint: string, options: RequestInit =
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      const errorMsg = data?.message || data?.error || 'An unexpected error occurred';
-      const error: any = new Error(Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg);
+      let errorMsg = 'An unexpected error occurred';
+      if (typeof data?.message === 'string') {
+        errorMsg = data.message;
+      } else if (Array.isArray(data?.message)) {
+        errorMsg = data.message.map((m: any) => (typeof m === 'string' ? m : (m?.message || JSON.stringify(m)))).join(', ');
+      } else if (data?.message && typeof data.message === 'object') {
+        errorMsg = data.message.message || JSON.stringify(data.message);
+      } else if (typeof data?.error === 'string') {
+        errorMsg = data.error;
+      } else if (data?.error && typeof data.error === 'object') {
+        errorMsg = data.error.message || JSON.stringify(data.error);
+      } else if (response.statusText) {
+        errorMsg = `Server error (${response.status}: ${response.statusText})`;
+      }
+      const error: any = new Error(errorMsg);
       error.status = response.status;
       error.data = data;
       throw error;
@@ -75,7 +88,8 @@ export const api = {
   rejectSubmission: (id: string, reason: string) => fetchApi(`/submissions/${id}/reject`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
 
   // Payments
-  createOrder: (courseId: string, couponCode?: string) => fetchApi('/payments/create-order', { method: 'POST', body: JSON.stringify({ courseId, couponCode }) }),
+  createOrder: (courseId: string, couponCode?: string, studentDetails?: any) =>
+    fetchApi('/payments/create-order', { method: 'POST', body: JSON.stringify({ courseId, couponCode, studentDetails }) }),
   verifyPayment: (paymentData: any) => fetchApi('/payments/verify', { method: 'POST', body: JSON.stringify(paymentData) }),
 
   // Certificates

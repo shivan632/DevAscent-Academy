@@ -121,7 +121,17 @@ function DashboardContent() {
   const [certificates, setCertificates] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
-  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('devascent_enrollments_cache');
+        return cached ? JSON.parse(cached) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
   const [loading, setLoading] = useState(true);
 
   // Copy toast states
@@ -242,10 +252,13 @@ function DashboardContent() {
 
         if (coursesRes.status === 'fulfilled' && coursesRes.value) {
           const val = coursesRes.value;
-          if (Array.isArray(val?.courses)) {
+          const payload = val?.data || val;
+          if (Array.isArray(payload?.courses)) {
+            setCourses(payload.courses);
+          } else if (Array.isArray(payload)) {
+            setCourses(payload);
+          } else if (Array.isArray(val?.courses)) {
             setCourses(val.courses);
-          } else if (Array.isArray(val)) {
-            setCourses(val);
           } else {
             setCourses([]);
           }
@@ -253,12 +266,13 @@ function DashboardContent() {
 
         if (enrollRes.status === 'fulfilled' && enrollRes.value) {
           const val = enrollRes.value;
-          if (Array.isArray(val?.enrollments)) {
-            setEnrollments(val.enrollments);
-          } else if (Array.isArray(val)) {
-            setEnrollments(val);
-          } else {
-            setEnrollments([]);
+          const payload = val?.data || val;
+          const list = Array.isArray(payload?.enrollments)
+            ? payload.enrollments
+            : (Array.isArray(payload) ? payload : (Array.isArray(val?.enrollments) ? val.enrollments : []));
+          setEnrollments(list);
+          if (typeof window !== 'undefined' && list.length > 0) {
+            localStorage.setItem('devascent_enrollments_cache', JSON.stringify(list));
           }
         }
 

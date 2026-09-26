@@ -32,39 +32,57 @@ export default function EnrolledCoursesPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading, checkAuth } = useAuthStore();
   const [mounted, setMounted] = useState(false);
-  const [enrollments, setEnrollments] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [enrollments, setEnrollments] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('devascent_enrollments_cache');
+        return cached ? JSON.parse(cached) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('devascent_enrollments_cache');
+      return !cached;
+    }
+    return true;
+  });
   const [activeFilter, setActiveFilter] = useState<'all' | 'courses' | 'internships' | 'completed'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     setMounted(true);
     checkAuth();
-  }, [checkAuth]);
 
-  useEffect(() => {
-    if (!mounted) return;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('devascent_token') : null;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     async function fetchEnrollments() {
-      if (!isAuthenticated && !authLoading) {
-        setLoading(false);
-        return;
-      }
       try {
         const res = await api.getMyEnrollments();
-        const rawList = Array.isArray(res) ? res : res?.enrollments || res?.data || [];
-        setEnrollments(Array.isArray(rawList) ? rawList : []);
+        const payload = res?.data || res;
+        const list = Array.isArray(payload?.enrollments)
+          ? payload.enrollments
+          : (Array.isArray(payload) ? payload : (Array.isArray(res?.enrollments) ? res.enrollments : []));
+        setEnrollments(list);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('devascent_enrollments_cache', JSON.stringify(list));
+        }
       } catch (err) {
-        setEnrollments([]);
+        // Keep existing cached data
       } finally {
         setLoading(false);
       }
     }
 
-    if (!authLoading) {
-      fetchEnrollments();
-    }
-  }, [mounted, isAuthenticated, authLoading]);
+    fetchEnrollments();
+  }, [checkAuth]);
 
   const filteredEnrollments = enrollments.filter((item) => {
     const title = (item.courseTitle || item.title || '').toLowerCase();

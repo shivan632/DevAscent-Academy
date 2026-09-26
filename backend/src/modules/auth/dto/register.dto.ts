@@ -17,8 +17,8 @@ export class RegisterDto {
   phone?: string;
 
   @IsOptional()
-  @IsIn(['BCA', 'MCA', 'BTECH', 'OTHER'], { message: 'Degree must be BCA, MCA, BTECH, or OTHER' })
-  degree?: 'BCA' | 'MCA' | 'BTECH' | 'OTHER';
+  @IsString()
+  degree?: string;
 
   @IsOptional()
   @IsString()
