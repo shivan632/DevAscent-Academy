@@ -47,11 +47,13 @@ export default function Navbar() {
   const resourcesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { user, isAuthenticated, logout, checkAuth } = useAuthStore();
   const { toggle: toggleSidebar } = useSidebarStore();
 
   useEffect(() => {
+    setMounted(true);
     checkAuth();
     const handleScroll = () => {
       setScrolled(window.scrollY > 15);
@@ -83,7 +85,9 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const isAdmin = user?.role === 'ADMIN';
+  const isAuth = mounted && isAuthenticated;
+  const isAdmin = mounted && user?.role === 'ADMIN';
+  const currentUser = mounted ? user : null;
 
   const isActive = (path: string) => {
     if (path === '/') return pathname === '/';
@@ -143,7 +147,7 @@ export default function Navbar() {
           </div>
 
           {/* Center: Desktop Navigation Links (Visible only when logged in) */}
-          {isAuthenticated ? (
+          {isAuth ? (
             <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
               {/* 1. Dashboard */}
               <Link
@@ -385,7 +389,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2.5 sm:gap-3">
             
             {/* Global Search Button with ⌘K Badge (Only when logged in) */}
-            {isAuthenticated && (
+            {isAuth && (
               <button
                 onClick={() => setSearchModalOpen(true)}
                 aria-label="Search"
@@ -400,23 +404,23 @@ export default function Navbar() {
             )}
 
             {/* Notifications Dropdown (Only when logged in) */}
-            {isAuthenticated && <NotificationsDropdown />}
+            {isAuth && <NotificationsDropdown />}
 
             {/* Theme Toggle Button */}
             <ThemeToggle />
 
             {/* User Profile Dropdown OR Guest CTA */}
-            {isAuthenticated && user ? (
+            {isAuth && currentUser ? (
               <div className="relative" ref={profileDropdownRef}>
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                    {user.name ? user.name.charAt(0).toUpperCase() : 'S'}
+                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'S'}
                   </div>
                   <span className="hidden sm:inline text-xs font-semibold text-slate-800 dark:text-slate-200 max-w-[100px] truncate">
-                    {user.name || 'Student'}
+                    {currentUser.name || 'Student'}
                   </span>
                   <ChevronDown className="hidden sm:inline w-3 h-3 text-slate-400" />
                 </button>
@@ -424,10 +428,10 @@ export default function Navbar() {
                 {profileDropdownOpen && (
                   <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 z-50 animate-fadeIn space-y-1">
                     <div className="p-3 border-b border-slate-100 dark:border-slate-800">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{user.name}</p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{currentUser.name}</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{currentUser.email}</p>
                       <span className="inline-block mt-1 text-[9px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5 rounded uppercase">
-                        {user.role}
+                        {currentUser.role}
                       </span>
                     </div>
 
@@ -543,7 +547,7 @@ export default function Navbar() {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-6 space-y-4 animate-fadeIn">
             <div className="space-y-2">
-              {isAuthenticated ? (
+              {isAuth ? (
                 <>
                   <Link
                     href="/dashboard"
@@ -639,7 +643,7 @@ export default function Navbar() {
             </div>
 
             <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-              {!isAuthenticated ? (
+              {!isAuth ? (
                 <>
                   <Link
                     href="/register"

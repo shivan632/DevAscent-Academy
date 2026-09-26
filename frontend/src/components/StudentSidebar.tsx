@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '../lib/store/authStore';
@@ -46,8 +46,12 @@ export default function StudentSidebar({
   const { isOpen, close } = useSidebarStore();
   const pathname = usePathname();
 
-  const studentName = user?.name || 'Student';
-  const studentEmail = user?.email || 'student@devascent.io';
+  // Hydration guard: defer client-only state reads until after mount
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const studentName = mounted ? (user?.name || 'Student') : 'Student';
+  const studentEmail = mounted ? (user?.email || 'student@devascent.io') : 'student@devascent.io';
 
   const menuItems = [
     {
@@ -112,7 +116,7 @@ export default function StudentSidebar({
               {studentEmail}
             </p>
             <span className="inline-flex items-center px-2 py-0.5 text-[9px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/90 rounded-md border border-indigo-200/80 dark:border-indigo-800/80 uppercase tracking-wider">
-              {user?.role === 'ADMIN' ? 'ADMINISTRATOR' : 'VERIFIED STUDENT'}
+              {mounted && user?.role === 'ADMIN' ? 'ADMINISTRATOR' : 'VERIFIED STUDENT'}
             </span>
           </div>
         </div>
@@ -279,8 +283,8 @@ export default function StudentSidebar({
         {sidebarContent}
       </aside>
 
-      {/* Mobile Drawer (Controlled by useSidebarStore) */}
-      {isOpen && (
+      {/* Mobile Drawer (Controlled by useSidebarStore) — only rendered on client after mount */}
+      {mounted && isOpen && (
         <div className="fixed inset-0 z-50 lg:hidden bg-slate-950/70 backdrop-blur-sm flex">
           <div className="w-4/5 max-w-xs bg-transparent h-full p-4 overflow-y-auto animate-fadeIn">
             {sidebarContent}

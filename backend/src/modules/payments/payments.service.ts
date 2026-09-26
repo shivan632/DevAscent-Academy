@@ -19,12 +19,18 @@ export class PaymentsService {
     };
   }
 
-  async createOrder(userId: string, courseId: string, couponCode?: string) {
+  async createOrder(userId: string, courseIdOrSlug: string, couponCode?: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    const course = await this.prisma.course.findUnique({ where: { id: courseId } });
+    const course = await this.prisma.course.findFirst({
+      where: {
+        OR: [{ id: courseIdOrSlug }, { slug: courseIdOrSlug }],
+      },
+    });
 
     if (!user) throw new NotFoundException('User not found');
     if (!course) throw new NotFoundException('Course not found');
+
+    const courseId = course.id;
 
     // Check if already enrolled
     const existingEnrollment = await this.prisma.enrollment.findUnique({
@@ -104,7 +110,7 @@ export class PaymentsService {
       });
     }
 
-    // Execute atomic state update
+    // Execute atomic state update with idempotency
     const result = await this.prisma.$transaction(async (tx) => {
       const payment = await tx.payment.findUnique({
         where: { razorpayOrderId },
@@ -112,6 +118,16 @@ export class PaymentsService {
 
       if (!payment) {
         throw new NotFoundException('Payment order record not found.');
+      }
+
+      // Idempotency: If already marked PAID, return existing active enrollment
+      if (payment.status === 'PAID') {
+        const existingEnrollment = await tx.enrollment.findUnique({
+          where: {
+            userId_courseId: { userId: payment.userId, courseId: payment.courseId },
+          },
+        });
+        return { updatedPayment: payment, enrollment: existingEnrollment! };
       }
 
       const updatedPayment = await tx.payment.update({
@@ -151,9 +167,9 @@ export class PaymentsService {
     return {
       success: true,
       enrollment: {
-        id: result.enrollment.id,
-        courseId: result.enrollment.courseId,
-        status: result.enrollment.status,
+        id: result.enrollment?.id || '',
+        courseId: result.enrollment?.courseId || '',
+        status: result.enrollment?.status || 'ACTIVE',
       },
       invoiceUrl: `/settings?tab=billing&order=${razorpayOrderId}`,
     };
@@ -186,6 +202,7 @@ export class PaymentsService {
           where: { razorpayOrderId: orderId },
         });
 
+        // Strict idempotency: only execute once if not yet PAID
         if (payment && payment.status !== 'PAID') {
           await this.prisma.$transaction(async (tx) => {
             await tx.payment.update({
@@ -202,6 +219,13 @@ export class PaymentsService {
                 userId: payment.userId,
                 courseId: payment.courseId,
                 status: 'ACTIVE',
+              },
+            });
+
+            await tx.course.update({
+              where: { id: payment.courseId },
+              data: {
+                seatsRemaining: { decrement: 1 },
               },
             });
           });

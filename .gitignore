@@ -35,3 +35,8 @@ scratch_test_db.js
 # OS files
 .DS_Store
 Thumbs.db
+
+# Agentic skills repository & local tools
+agentic-awesome-skills/
+.agents/
+.planning/

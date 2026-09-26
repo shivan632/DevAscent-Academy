@@ -68,7 +68,7 @@ export default function RefundPolicyPage() {
                 </div>
                 <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                   <h4 className="font-bold text-sm text-slate-900">Option B: Email Billing Desk</h4>
-                  <p className="text-xs text-slate-500">Send an email to <span className="font-semibold text-slate-800">support@devascent.io</span> with your registered email and Razorpay payment ID.</p>
+                  <p className="text-xs text-slate-500">Send an email to <span className="font-semibold text-slate-800">devascentacademy@gmail.com</span> with your registered email and Razorpay payment ID.</p>
                 </div>
               </div>
             </div>

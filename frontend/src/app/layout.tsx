@@ -19,6 +19,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.devascentacademy.me'),
   title: 'DevAscent Academy — Practical Tech Education & Verifiable Certification',
   description: 'Master Full-Stack Web Development, Cloud & Microservices. Build 4 production capstone projects, get weekly live code reviews, and earn an industry-verifiable certificate.',
   keywords: ['DevAscent Academy', 'Full Stack Development', 'Next.js', 'Node.js', 'Prisma', 'PostgreSQL', 'Tech Cohort', 'Coding Bootcamp India', 'Verifiable Certificate'],
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'DevAscent Academy — Become a Full-Stack Developer',
     description: 'Build & Ship 4 Production Apps in 6 Weeks. ₹1,499 Early Bird Pricing with 7-Day Money-Back Guarantee.',
+    url: 'https://www.devascentacademy.me',
     siteName: 'DevAscent Academy',
     type: 'website',
   },

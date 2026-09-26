@@ -32,12 +32,15 @@ async function bootstrap() {
         'http://localhost:3000',
         'http://127.0.0.1:3000',
         'https://dev-ascent-academy.vercel.app',
+        'https://www.devascentacademy.me',
+        'https://devascentacademy.me',
       ];
 
-      // Also allow any preview deployments on vercel.app
+      // Also allow any preview deployments on vercel.app or custom domain subdomains
       if (
         allowedOrigins.includes(origin) ||
-        origin.endsWith('.vercel.app')
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('devascentacademy.me')
       ) {
         return callback(null, true);
       }

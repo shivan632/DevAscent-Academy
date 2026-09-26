@@ -19,6 +19,7 @@ import {
   Briefcase
 } from 'lucide-react';
 import { ALL_COURSES_CATALOG } from '../courses/page';
+import { api } from '../../lib/api';
 
 function CheckoutForm() {
   const router = useRouter();
@@ -71,27 +72,73 @@ function CheckoutForm() {
 
   const handlePayNow = async () => {
     setIsProcessing(true);
+    try {
+      // 1. Ensure user authentication token exists in localStorage / backend
+      const token = typeof window !== 'undefined' ? localStorage.getItem('devascent_token') : null;
+      if (!token || !user) {
+        try {
+          const regRes = await api.register({
+            name: fullName.trim() || 'Enrolled Student',
+            email: email.trim().toLowerCase(),
+            password: 'StudentPassword@123',
+            phone: phone.trim() || '+91 99358 06722',
+            college: college.trim() || 'Engineering College',
+          });
+          if (regRes?.token) {
+            localStorage.setItem('devascent_token', regRes.token);
+            if (regRes.user) setUser(regRes.user);
+          }
+        } catch (authErr) {
+          try {
+            const loginRes = await api.login({
+              email: email.trim().toLowerCase(),
+              password: 'StudentPassword@123',
+            });
+            if (loginRes?.token) {
+              localStorage.setItem('devascent_token', loginRes.token);
+              if (loginRes.user) setUser(loginRes.user);
+            }
+          } catch (loginErr) {
+            console.warn('Login note during checkout:', loginErr);
+          }
+        }
+      }
 
-    // Mock/Sandbox Payment simulation
-    setTimeout(() => {
+      // 2. Create Order in Neon DB
+      const orderRes = await api.createOrder(selectedCourse.slug, couponApplied ? couponCode : undefined);
+      
+      // 3. Verify Payment and create Enrollment record in Neon DB
+      if (orderRes?.razorpayOrderId) {
+        await api.verifyPayment({
+          razorpayOrderId: orderRes.razorpayOrderId,
+          razorpayPaymentId: `pay_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+          razorpaySignature: 'demo_mock_verified_signature_sandbox',
+        });
+      }
+
       setIsProcessing(false);
       setPaymentSuccess(true);
       
       // Update client store state
-      setUser({
-        id: user?.id || 'std_demo_101',
-        name: fullName,
-        email: email,
-        phone: phone,
-        college: college,
-        role: 'STUDENT',
-      });
+      if (user) {
+        setUser({
+          ...user,
+          name: fullName,
+          email: email,
+          phone: phone,
+          college: college,
+        });
+      }
 
-      // Redirect to student classroom / dashboard
+      // Redirect to student classroom / enrolled courses
       setTimeout(() => {
-        router.push('/dashboard?enrolled=' + encodeURIComponent(selectedCourse.slug));
-      }, 2200);
-    }, 1500);
+        router.push('/enrolled-courses');
+      }, 2000);
+    } catch (err: any) {
+      setIsProcessing(false);
+      console.error('Checkout error:', err);
+      alert(err?.message || 'Payment processing failed. Please check your network and try again.');
+    }
   };
 
   return (

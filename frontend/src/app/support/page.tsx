@@ -53,8 +53,8 @@ export default function SupportPage() {
                     </div>
                     <div>
                       <span className="font-bold text-slate-900 block">Email Support</span>
-                      <a href="mailto:support@devascent.io" className="text-indigo-600 hover:underline">
-                        support@devascent.io
+                      <a href="mailto:devascentacademy@gmail.com" className="text-indigo-600 hover:underline">
+                        devascentacademy@gmail.com
                       </a>
                       <p className="text-slate-400 text-[11px]">Response within 4 business hours</p>
                     </div>

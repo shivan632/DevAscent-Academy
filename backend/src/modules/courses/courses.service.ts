@@ -180,9 +180,11 @@ export class CoursesService {
   /**
    * Enroll directly into a free course/internship (instant enrollment).
    */
-  async enrollFree(slug: string, userId: string) {
-    const course = await this.prisma.course.findUnique({
-      where: { slug },
+  async enrollFree(slugOrId: string, userId: string) {
+    const course = await this.prisma.course.findFirst({
+      where: {
+        OR: [{ slug: slugOrId }, { id: slugOrId }],
+      },
     });
 
     if (!course) {
@@ -207,6 +209,14 @@ export class CoursesService {
         courseId: course.id,
         progressPct: 0,
         status: 'ACTIVE',
+      },
+    });
+
+    // Decrement seats remaining in Course table
+    await this.prisma.course.update({
+      where: { id: course.id },
+      data: {
+        seatsRemaining: { decrement: 1 },
       },
     });
 

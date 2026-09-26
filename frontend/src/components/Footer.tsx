@@ -311,9 +311,9 @@ export default function Footer() {
               <Link href="/support" className="hover:text-indigo-400 transition-colors block">
                 Help Desk & FAQ
               </Link>
-              <a href="mailto:support@devascent.io" className="hover:text-indigo-400 transition-colors flex items-center gap-1.5 truncate">
+              <a href="mailto:devascentacademy@gmail.com" className="hover:text-indigo-400 transition-colors flex items-center gap-1.5 truncate">
                 <Mail className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                <span>support@devascent.io</span>
+                <span>devascentacademy@gmail.com</span>
               </a>
               <a href="tel:+919935806722" className="hover:text-indigo-400 transition-colors flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />

@@ -6,42 +6,90 @@ export class ProgressService {
   constructor(private prisma: PrismaService) {}
 
   async getMyEnrollments(userId: string) {
-    const enrollments = await this.prisma.enrollment.findMany({
-      where: { userId },
-      include: {
-        course: {
-          include: {
-            modules: {
-              include: {
-                lessons: {
-                  select: { id: true, title: true, lessonNumber: true },
-                  orderBy: { lessonNumber: 'asc' },
+    const [enrollments, certificates, submissions] = await Promise.all([
+      this.prisma.enrollment.findMany({
+        where: { userId },
+        include: {
+          user: {
+            select: { id: true, name: true, email: true, avatarUrl: true },
+          },
+          course: {
+            include: {
+              modules: {
+                include: {
+                  lessons: {
+                    select: { id: true, title: true, lessonNumber: true, durationMinutes: true },
+                    orderBy: { lessonNumber: 'asc' },
+                  },
                 },
+                orderBy: { moduleNumber: 'asc' },
               },
-              orderBy: { moduleNumber: 'asc' },
             },
           },
         },
-      },
-      orderBy: { enrolledAt: 'desc' },
-    });
+        orderBy: { enrolledAt: 'desc' },
+      }),
+      this.prisma.certificate.findMany({
+        where: { userId },
+      }),
+      this.prisma.completionSubmission.findMany({
+        where: { userId },
+      }),
+    ]);
 
     return {
       enrollments: enrollments.map((enr) => {
-        // Find next unfinished lesson
+        const cert = certificates.find((c) => c.courseId === enr.courseId);
+        const sub = submissions.find((s) => s.courseId === enr.courseId);
         const allLessons = enr.course.modules.flatMap((m) => m.lessons);
         const nextLesson = allLessons.length > 0 ? allLessons[0] : null;
 
         return {
           id: enr.id,
+          userId: enr.userId,
+          studentName: enr.user?.name,
+          studentEmail: enr.user?.email,
           courseId: enr.courseId,
           courseSlug: enr.course.slug,
           courseTitle: enr.course.title,
+          courseType: enr.course.type,
+          description: enr.course.description,
+          domain: enr.course.domain,
+          level: enr.course.level,
+          isFree: enr.course.isFree,
+          durationWeeks: enr.course.durationWeeks,
+          stipendDetails: enr.course.stipendDetails,
           thumbnail: enr.course.thumbnail,
           progressPct: enr.progressPct,
           enrolledAt: enr.enrolledAt,
           status: enr.status,
           nextLesson: nextLesson ? { id: nextLesson.id, title: nextLesson.title } : null,
+          totalLessons: allLessons.length,
+          totalModules: enr.course.modules.length,
+          certificate: cert
+            ? {
+                certId: cert.certId,
+                grade: cert.grade,
+                issuedAt: cert.issuedAt,
+                verifyUrl: `/verify/${cert.certId}`,
+              }
+            : null,
+          submission: sub
+            ? {
+                id: sub.id,
+                status: sub.status,
+                projectName: sub.projectName,
+                gitRepoUrl: sub.gitRepoUrl,
+                submittedAt: sub.submittedAt,
+              }
+            : null,
+          modules: enr.course.modules.map((m) => ({
+            id: m.id,
+            moduleNumber: m.moduleNumber,
+            title: m.title,
+            description: m.description,
+            lessonsCount: m.lessons.length,
+          })),
         };
       }),
     };
@@ -56,18 +104,27 @@ export class ProgressService {
     const completedCount = enrollments.filter((e) => e.progressPct === 100).length;
     const inProgressCount = enrollments.filter((e) => e.progressPct > 0 && e.progressPct < 100).length;
 
-    const progressRecords = await this.prisma.lessonProgress.findMany({
-      where: { userId },
-    });
+    const [progressRecords, passedQuizzesCount, certificatesCount, submissionsCount] = await Promise.all([
+      this.prisma.lessonProgress.findMany({ where: { userId } }),
+      this.prisma.quizSubmission.count({ where: { userId, passed: true } }),
+      this.prisma.certificate.count({ where: { userId } }),
+      this.prisma.completionSubmission.count({ where: { userId } }),
+    ]);
 
-    const totalStudySeconds = progressRecords.reduce((acc, curr) => acc + curr.watchedSeconds, 0);
+    const completedLessonsCount = progressRecords.filter((p) => p.isCompleted).length;
+    const totalStudySeconds = progressRecords.reduce((acc, curr) => acc + (curr.watchedSeconds || 0), 0);
     const totalStudyMinutes = Math.round(totalStudySeconds / 60);
 
     return {
       enrolled: enrolledCount,
       inProgress: inProgressCount,
       completed: completedCount,
-      totalStudyMinutes: totalStudyMinutes || 120, // default placeholder hours
+      completedLessonsCount,
+      passedQuizzesCount,
+      certificatesCount,
+      submissionsCount,
+      totalStudyMinutes: totalStudyMinutes || 120,
+      totalStudyHours: Number((totalStudyMinutes / 60).toFixed(1)) || 2.0,
     };
   }
 
