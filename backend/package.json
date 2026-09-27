@@ -20,6 +20,8 @@
     "prisma:push": "prisma db push",
     "prisma:seed": "ts-node prisma/seed.ts",
     "prisma:studio": "prisma studio",
+    "admin:reset": "ts-node src/scripts/admin-reset.ts",
+
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

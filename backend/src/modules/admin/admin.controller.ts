@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Param,
   Body,
   Query,
@@ -35,6 +36,12 @@ export class AdminController {
   async getBadgeCounts() {
     return this.adminService.getBadgeCounts();
   }
+
+  @Get('health')
+  async getHealth() {
+    return this.adminService.getHealth();
+  }
+
 
   // ─── Students ────────────────────────────────────────────────────────────────
   @Get('students')
@@ -210,5 +217,69 @@ export class AdminController {
     const ip = (req.headers['x-forwarded-for'] as string) || req.socket?.remoteAddress;
     const ua = req.headers['user-agent'];
     return this.adminService.updateUserRole(admin.id, userId, role, ip, ua);
+  }
+
+  // ─── Curriculum Studio & Lesson Management ───────────────────────────────────
+  @Get('courses/:slug/curriculum')
+  async getCourseCurriculum(@Param('slug') slug: string) {
+    return this.adminService.getCourseCurriculum(slug);
+  }
+
+  @Post('courses/:slug/modules')
+  async createModule(
+    @Param('slug') slug: string,
+    @Body() dto: { title: string; description?: string; moduleNumber?: number },
+  ) {
+    return this.adminService.createModule(slug, dto);
+  }
+
+  @Patch('courses/:slug/modules/:moduleId')
+  async updateModule(
+    @Param('moduleId') moduleId: string,
+    @Body() dto: { title?: string; description?: string; moduleNumber?: number },
+  ) {
+    return this.adminService.updateModule(moduleId, dto);
+  }
+
+  @Delete('courses/:slug/modules/:moduleId')
+  async deleteModule(@Param('moduleId') moduleId: string) {
+    return this.adminService.deleteModule(moduleId);
+  }
+
+  @Post('courses/:slug/modules/:moduleId/lessons')
+  async createLesson(
+    @Param('moduleId') moduleId: string,
+    @Body() dto: any,
+  ) {
+    return this.adminService.createLesson(moduleId, dto);
+  }
+
+  @Patch('courses/:slug/lessons/:lessonId')
+  async updateLesson(
+    @Param('lessonId') lessonId: string,
+    @Body() dto: any,
+  ) {
+    return this.adminService.updateLesson(lessonId, dto);
+  }
+
+  @Delete('courses/:slug/lessons/:lessonId')
+  async deleteLesson(@Param('lessonId') lessonId: string) {
+    return this.adminService.deleteLesson(lessonId);
+  }
+
+  @Post('courses/:slug/lessons/:lessonId/quiz')
+  async upsertLessonQuiz(
+    @Param('lessonId') lessonId: string,
+    @Body() dto: any,
+  ) {
+    return this.adminService.upsertLessonQuiz(lessonId, dto);
+  }
+
+  @Patch('courses/:slug/details')
+  async updateCourseDetails(
+    @Param('slug') slug: string,
+    @Body() dto: any,
+  ) {
+    return this.adminService.updateCourseDetails(slug, dto);
   }
 }

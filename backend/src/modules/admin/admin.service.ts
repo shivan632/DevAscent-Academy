@@ -653,4 +653,327 @@ export class AdminService {
 
     return { success: true };
   }
+
+  // ─── Curriculum & Course Content Management ──────────────────────────────────
+  async getCourseCurriculum(slug: string) {
+    const course = await this.prisma.course.findUnique({
+      where: { slug },
+      include: {
+        modules: {
+          include: {
+            lessons: {
+              include: {
+                quiz: {
+                  include: {
+                    questions: true,
+                  },
+                },
+                doubts: {
+                  include: {
+                    user: { select: { id: true, name: true, avatarUrl: true } },
+                  },
+                  orderBy: { createdAt: 'desc' },
+                },
+              },
+              orderBy: { lessonNumber: 'asc' },
+            },
+            quiz: {
+              include: {
+                questions: true,
+              },
+            },
+          },
+          orderBy: { moduleNumber: 'asc' },
+        },
+      },
+    });
+
+    if (!course) {
+      throw new NotFoundException(`Course with slug "${slug}" not found`);
+    }
+
+    // Parse metadata safely
+    const enrichedModules = course.modules.map((m) => ({
+      ...m,
+      lessons: m.lessons.map((l) => {
+        let parsedProjects: any[] = [];
+        try {
+          parsedProjects = JSON.parse(l.exerciseProjects || '[]');
+        } catch (e) {}
+
+        return {
+          ...l,
+          exerciseProjects: parsedProjects,
+          quiz: l.quiz
+            ? {
+                ...l.quiz,
+                questions: l.quiz.questions.map((q) => {
+                  let options: string[] = [];
+                  try {
+                    options = JSON.parse(q.optionsJson || '[]');
+                  } catch (e) {}
+                  return { ...q, options };
+                }),
+              }
+            : null,
+        };
+      }),
+    }));
+
+    return {
+      course: {
+        ...course,
+        modules: enrichedModules,
+      },
+    };
+  }
+
+  async createModule(slug: string, dto: { title: string; description?: string; moduleNumber?: number }) {
+    const course = await this.prisma.course.findUnique({ where: { slug } });
+    if (!course) throw new NotFoundException('Course not found');
+
+    const nextModuleNumber =
+      dto.moduleNumber ||
+      ((await this.prisma.module.count({ where: { courseId: course.id } })) + 1);
+
+    const module = await this.prisma.module.create({
+      data: {
+        courseId: course.id,
+        title: dto.title,
+        description: dto.description || '',
+        moduleNumber: nextModuleNumber,
+      },
+      include: {
+        lessons: true,
+      },
+    });
+
+    return { success: true, module };
+  }
+
+  async updateModule(moduleId: string, dto: { title?: string; description?: string; moduleNumber?: number }) {
+    const module = await this.prisma.module.update({
+      where: { id: moduleId },
+      data: {
+        ...(dto.title !== undefined && { title: dto.title }),
+        ...(dto.description !== undefined && { description: dto.description }),
+        ...(dto.moduleNumber !== undefined && { moduleNumber: dto.moduleNumber }),
+      },
+      include: {
+        lessons: true,
+      },
+    });
+
+    return { success: true, module };
+  }
+
+  async deleteModule(moduleId: string) {
+    await this.prisma.module.delete({ where: { id: moduleId } });
+    return { success: true, message: 'Module deleted successfully' };
+  }
+
+  async createLesson(moduleId: string, dto: {
+    title: string;
+    lessonNumber?: number;
+    durationMinutes?: number;
+    videoUrl?: string;
+    summary?: string;
+    writtenContent?: string;
+    exercisePdfUrl?: string;
+    exercisePdfTitle?: string;
+    exerciseProjects?: any[];
+    isFreePreview?: boolean;
+  }) {
+    const nextLessonNumber =
+      dto.lessonNumber ||
+      ((await this.prisma.lesson.count({ where: { moduleId } })) + 1);
+
+    const lesson = await this.prisma.lesson.create({
+      data: {
+        moduleId,
+        title: dto.title,
+        lessonNumber: nextLessonNumber,
+        durationMinutes: dto.durationMinutes || 15,
+        videoUrl: dto.videoUrl || null,
+        summary: dto.summary || '',
+        writtenContent: dto.writtenContent || '',
+        exercisePdfUrl: dto.exercisePdfUrl || null,
+        exercisePdfTitle: dto.exercisePdfTitle || null,
+        exerciseProjects: dto.exerciseProjects ? JSON.stringify(dto.exerciseProjects) : '[]',
+        isFreePreview: dto.isFreePreview || false,
+      },
+    });
+
+    return { success: true, lesson };
+  }
+
+  async updateLesson(lessonId: string, dto: {
+    title?: string;
+    lessonNumber?: number;
+    durationMinutes?: number;
+    videoUrl?: string;
+    summary?: string;
+    writtenContent?: string;
+    exercisePdfUrl?: string;
+    exercisePdfTitle?: string;
+    exerciseProjects?: any[];
+    isFreePreview?: boolean;
+  }) {
+    const lesson = await this.prisma.lesson.update({
+      where: { id: lessonId },
+      data: {
+        ...(dto.title !== undefined && { title: dto.title }),
+        ...(dto.lessonNumber !== undefined && { lessonNumber: dto.lessonNumber }),
+        ...(dto.durationMinutes !== undefined && { durationMinutes: dto.durationMinutes }),
+        ...(dto.videoUrl !== undefined && { videoUrl: dto.videoUrl || null }),
+        ...(dto.summary !== undefined && { summary: dto.summary }),
+        ...(dto.writtenContent !== undefined && { writtenContent: dto.writtenContent }),
+        ...(dto.exercisePdfUrl !== undefined && { exercisePdfUrl: dto.exercisePdfUrl || null }),
+        ...(dto.exercisePdfTitle !== undefined && { exercisePdfTitle: dto.exercisePdfTitle || null }),
+        ...(dto.exerciseProjects !== undefined && { exerciseProjects: JSON.stringify(dto.exerciseProjects) }),
+        ...(dto.isFreePreview !== undefined && { isFreePreview: dto.isFreePreview }),
+      },
+    });
+
+    return { success: true, lesson };
+  }
+
+  async deleteLesson(lessonId: string) {
+    await this.prisma.lesson.delete({ where: { id: lessonId } });
+    return { success: true, message: 'Lesson deleted successfully' };
+  }
+
+  async upsertLessonQuiz(lessonId: string, dto: {
+    title: string;
+    passingScore?: number;
+    questions: {
+      question: string;
+      options: string[];
+      correctOptionIndex: number;
+      explanation?: string;
+      codeSnippet?: string;
+    }[];
+  }) {
+    // Delete existing quiz questions if quiz exists
+    const existingQuiz = await this.prisma.quiz.findUnique({ where: { lessonId } });
+    if (existingQuiz) {
+      await this.prisma.quizQuestion.deleteMany({ where: { quizId: existingQuiz.id } });
+    }
+
+    const quiz = await this.prisma.quiz.upsert({
+      where: { lessonId },
+      update: {
+        title: dto.title,
+        passingScore: dto.passingScore || 60,
+        questions: {
+          create: dto.questions.map((q) => ({
+            question: q.question,
+            optionsJson: JSON.stringify(q.options),
+            correctOptionIndex: q.correctOptionIndex,
+            explanation: q.explanation || '',
+            codeSnippet: q.codeSnippet || null,
+          })),
+        },
+      },
+      create: {
+        lessonId,
+        title: dto.title,
+        passingScore: dto.passingScore || 60,
+        questions: {
+          create: dto.questions.map((q) => ({
+            question: q.question,
+            optionsJson: JSON.stringify(q.options),
+            correctOptionIndex: q.correctOptionIndex,
+            explanation: q.explanation || '',
+            codeSnippet: q.codeSnippet || null,
+          })),
+        },
+      },
+      include: {
+        questions: true,
+      },
+    });
+
+    return { success: true, quiz };
+  }
+
+  async updateCourseDetails(slug: string, dto: {
+    priceInPaise?: number;
+    earlyBirdPriceInPaise?: number;
+    totalSeats?: number;
+    seatsRemaining?: number;
+    isPublished?: boolean;
+    cohortStartsOn?: Date;
+    durationWeeks?: number;
+    stipendDetails?: string;
+  }) {
+    const course = await this.prisma.course.update({
+      where: { slug },
+      data: {
+        ...(dto.priceInPaise !== undefined && { priceInPaise: dto.priceInPaise }),
+        ...(dto.earlyBirdPriceInPaise !== undefined && { earlyBirdPriceInPaise: dto.earlyBirdPriceInPaise }),
+        ...(dto.totalSeats !== undefined && { totalSeats: dto.totalSeats }),
+        ...(dto.seatsRemaining !== undefined && { seatsRemaining: dto.seatsRemaining }),
+        ...(dto.isPublished !== undefined && { isPublished: dto.isPublished }),
+        ...(dto.cohortStartsOn !== undefined && { cohortStartsOn: new Date(dto.cohortStartsOn) }),
+        ...(dto.durationWeeks !== undefined && { durationWeeks: dto.durationWeeks }),
+        ...(dto.stipendDetails !== undefined && { stipendDetails: dto.stipendDetails }),
+      },
+    });
+
+    return { success: true, course };
+  }
+
+  // ─── Health Check ────────────────────────────────────────────────────────────
+  async getHealth() {
+    const startDb = Date.now();
+    let dbStatus: 'ok' | 'degraded' | 'down' = 'ok';
+    let dbLatency = 0;
+
+    try {
+      await this.prisma.$queryRaw`SELECT 1`;
+      dbLatency = Date.now() - startDb;
+      if (dbLatency > 800) {
+        dbStatus = 'degraded';
+      }
+    } catch {
+      dbStatus = 'down';
+    }
+
+    const razorpayConfigured = !!(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
+    const cloudinaryConfigured = !!(
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET
+    );
+    const smtpConfigured = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+
+    const razorpayStatus: 'ok' | 'down' = razorpayConfigured ? 'ok' : 'down';
+    const cloudinaryStatus: 'ok' | 'down' = cloudinaryConfigured ? 'ok' : 'down';
+    const smtpStatus: 'ok' | 'down' = smtpConfigured ? 'ok' : 'down';
+
+    let overall: 'ok' | 'degraded' | 'down' = 'ok';
+    if (dbStatus === 'down') {
+      overall = 'down';
+    } else if (
+      dbStatus === 'degraded' ||
+      razorpayStatus === 'down' ||
+      cloudinaryStatus === 'down' ||
+      smtpStatus === 'down'
+    ) {
+      overall = 'degraded';
+    }
+
+    return {
+      database: dbStatus,
+      databaseLatencyMs: dbLatency,
+      razorpay: razorpayStatus,
+      cloudinary: cloudinaryStatus,
+      smtp: smtpStatus,
+      overall,
+      timestamp: new Date().toISOString(),
+      uptimeSeconds: Math.round(process.uptime()),
+    };
+  }
 }
+

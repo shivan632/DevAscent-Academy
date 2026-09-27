@@ -106,6 +106,8 @@ export const api = {
   admin: {
     getOverview: () => fetchApi('/admin/overview'),
     getBadgeCounts: () => fetchApi('/admin/badge-counts'),
+    getHealth: () => fetchApi('/admin/health'),
+
 
     getStudents: (params?: { page?: number; limit?: number; search?: string; degree?: string; status?: string }) => {
       const q = new URLSearchParams(params as any).toString();
@@ -148,5 +150,24 @@ export const api = {
 
     updateRole: (userId: string, role: string) =>
       fetchApi(`/admin/settings/role/${userId}`, { method: 'PATCH', body: JSON.stringify({ role }) }),
+
+    // Curriculum & Lesson Studio
+    getCurriculum: (slug: string) => fetchApi(`/admin/courses/${slug}/curriculum`),
+    createModule: (slug: string, data: { title: string; description?: string; moduleNumber?: number }) =>
+      fetchApi(`/admin/courses/${slug}/modules`, { method: 'POST', body: JSON.stringify(data) }),
+    updateModule: (slug: string, moduleId: string, data: { title?: string; description?: string; moduleNumber?: number }) =>
+      fetchApi(`/admin/courses/${slug}/modules/${moduleId}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    deleteModule: (slug: string, moduleId: string) =>
+      fetchApi(`/admin/courses/${slug}/modules/${moduleId}`, { method: 'DELETE' }),
+    createLesson: (slug: string, moduleId: string, data: any) =>
+      fetchApi(`/admin/courses/${slug}/modules/${moduleId}/lessons`, { method: 'POST', body: JSON.stringify(data) }),
+    updateLesson: (slug: string, lessonId: string, data: any) =>
+      fetchApi(`/admin/courses/${slug}/lessons/${lessonId}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    deleteLesson: (slug: string, lessonId: string) =>
+      fetchApi(`/admin/courses/${slug}/lessons/${lessonId}`, { method: 'DELETE' }),
+    upsertLessonQuiz: (slug: string, lessonId: string, data: any) =>
+      fetchApi(`/admin/courses/${slug}/lessons/${lessonId}/quiz`, { method: 'POST', body: JSON.stringify(data) }),
+    updateCourseDetails: (slug: string, data: any) =>
+      fetchApi(`/admin/courses/${slug}/details`, { method: 'PATCH', body: JSON.stringify(data) }),
   },
 };

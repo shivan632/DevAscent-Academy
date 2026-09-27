@@ -167,8 +167,8 @@ export default function StudentSidebar({
         })}
       </div>
 
-      {/* Enrolled Courses Section (if any) */}
-      {enrolledCourses.length > 0 && (
+      {/* Enrolled Courses Section (if any) — deferred until client mount to prevent hydration mismatch */}
+      {mounted && enrolledCourses.length > 0 && (
         <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
           <div className="flex items-center justify-between px-3 mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -193,6 +193,7 @@ export default function StudentSidebar({
           ))}
         </div>
       )}
+
 
       {/* Quick Launch & Actions */}
       <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
