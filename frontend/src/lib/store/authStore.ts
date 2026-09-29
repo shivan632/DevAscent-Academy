@@ -34,27 +34,10 @@ interface AuthState {
   logout: () => Promise<void>;
 }
 
-const getInitialUser = (): User | null => {
-  if (typeof window === 'undefined') return null;
-  try {
-    const saved = localStorage.getItem('devascent_user');
-    return saved ? JSON.parse(saved) : null;
-  } catch {
-    return null;
-  }
-};
-
-const hasToken = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return !!localStorage.getItem('devascent_token');
-};
-
-const initialUser = getInitialUser();
-
 export const useAuthStore = create<AuthState>((set) => ({
-  user: initialUser,
-  isLoading: !initialUser,
-  isAuthenticated: !!initialUser || hasToken(),
+  user: null,
+  isLoading: true,
+  isAuthenticated: false,
   setUser: (user) => {
     if (typeof window !== 'undefined') {
       if (user) {
@@ -74,12 +57,20 @@ export const useAuthStore = create<AuthState>((set) => ({
       return { user: updated };
     }),
   checkAuth: async () => {
-    // If no token exists in localStorage, skip API call to avoid unauthenticated noise
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('devascent_token');
+      const savedUser = localStorage.getItem('devascent_user');
       if (!token) {
         set({ user: null, isAuthenticated: false, isLoading: false });
         return;
+      }
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          set({ user: parsed, isAuthenticated: true, isLoading: false });
+        } catch {
+          // ignore parse error
+        }
       }
       // Keep document cookie in sync for Next.js proxy/middleware
       if (!document.cookie.includes('access_token=')) {
