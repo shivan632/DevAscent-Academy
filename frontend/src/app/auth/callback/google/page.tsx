@@ -26,14 +26,21 @@ export default function GoogleCallbackPage() {
 
         const res = await api.googleAuth(token);
         const rawUser = res?.data?.user || res?.user || res?.data;
+        const accessToken = res?.data?.accessToken || res?.accessToken;
+
+        if (accessToken && typeof window !== 'undefined') {
+          localStorage.setItem('devascent_token', accessToken);
+          document.cookie = `access_token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+        }
 
         if (rawUser) {
           setUser(rawUser);
-          if (rawUser.role === 'ADMIN') {
-            router.push('/admin/submissions');
+          if (rawUser.role === 'ADMIN' || rawUser.email === 'shivrom.2020@gmail.com') {
+            router.push('/admin/dashboard');
           } else {
             router.push('/dashboard');
           }
+          router.refresh();
         } else {
           setError('Failed to authenticate with Google. Redirecting to login...');
           setTimeout(() => router.push('/login'), 2500);

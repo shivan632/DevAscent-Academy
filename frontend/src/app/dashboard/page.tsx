@@ -176,16 +176,25 @@ function DashboardContent() {
     }
   }, [searchParams]);
 
-  // 2. Auth guard: redirect to login if unauthenticated
+  // 2. Auth guard: redirect to login if unauthenticated, or to admin dashboard if admin
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace('/login');
+    if (!authLoading) {
+      if (!user) {
+        router.replace('/login');
+      } else if (user.role === 'ADMIN' || user.email === 'shivrom.2020@gmail.com') {
+        router.replace('/admin/dashboard');
+      }
     }
   }, [user, authLoading, router]);
+
+  // While redirecting admin away from student dashboard
+  if (user && (user.role === 'ADMIN' || user.email === 'shivrom.2020@gmail.com')) {
+    return <DashboardSkeleton />;
+  }
 
   // 3. Populate profile state when user updates
   useEffect(() => {
@@ -646,7 +655,7 @@ function DashboardContent() {
               {/* TAB 1: OVERVIEW & LEARNING */}
               {activeTab === 'overview' && (
                 <div className="space-y-6">
-                  
+
                   {/* Welcome Banner — liquid animated background */}
                   <style>{`
                     @keyframes liquid-blob-1 {

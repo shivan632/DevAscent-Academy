@@ -75,10 +75,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     }),
   checkAuth: async () => {
     // If no token exists in localStorage, skip API call to avoid unauthenticated noise
-    if (typeof window !== 'undefined' && !localStorage.getItem('devascent_token')) {
-      // If we don't have a token, ensure state reflects unauthenticated
-      set({ user: null, isAuthenticated: false, isLoading: false });
-      return;
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('devascent_token');
+      if (!token) {
+        set({ user: null, isAuthenticated: false, isLoading: false });
+        return;
+      }
+      // Keep document cookie in sync for Next.js proxy/middleware
+      if (!document.cookie.includes('access_token=')) {
+        document.cookie = `access_token=${token}; path=/; max-age=604800; SameSite=Lax`;
+      }
     }
     try {
       const response = await api.getProfile();
@@ -98,6 +104,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         if (typeof window !== 'undefined') {
           localStorage.removeItem('devascent_token');
           localStorage.removeItem('devascent_user');
+          document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
         }
         set({ user: null, isAuthenticated: false, isLoading: false });
       } else {
@@ -115,6 +122,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (typeof window !== 'undefined') {
       localStorage.removeItem('devascent_token');
       localStorage.removeItem('devascent_user');
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
     }
     set({ user: null, isAuthenticated: false, isLoading: false });
   },

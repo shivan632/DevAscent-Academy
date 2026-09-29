@@ -49,9 +49,14 @@ export default function SubmissionsPage() {
     onConfirm: async () => {},
   });
 
-  const submissions = data?.submissions || [];
-  const total = data?.meta?.total ?? 0;
-  const totalPages = data?.meta?.totalPages ?? 1;
+  const submissionsPayload = data?.data || data;
+  const submissions = Array.isArray(submissionsPayload?.submissions)
+    ? submissionsPayload.submissions
+    : Array.isArray(submissionsPayload)
+    ? submissionsPayload
+    : [];
+  const total = submissionsPayload?.meta?.total ?? submissions.length;
+  const totalPages = submissionsPayload?.meta?.totalPages ?? 1;
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {

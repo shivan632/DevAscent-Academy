@@ -100,8 +100,16 @@ export default function StudentsPage() {
     window.open(api.admin.exportStudentsUrl(), '_blank');
   };
 
-  const total = data?.meta?.total ?? 0;
-  const totalPages = data?.meta?.totalPages ?? 1;
+  const studentsPayload = data?.data || data;
+  const studentsList: any[] = Array.isArray(studentsPayload)
+    ? studentsPayload
+    : Array.isArray(studentsPayload?.data)
+    ? studentsPayload.data
+    : Array.isArray(studentsPayload?.students)
+    ? studentsPayload.students
+    : [];
+  const total = studentsPayload?.meta?.total ?? data?.meta?.total ?? studentsList.length;
+  const totalPages = studentsPayload?.meta?.totalPages ?? data?.meta?.totalPages ?? 1;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -206,7 +214,7 @@ export default function StudentsPage() {
           <div className="p-6">
             <SkeletonLoader type="table" rows={6} cols={6} />
           </div>
-        ) : !data?.data || data.data.length === 0 ? (
+        ) : studentsList.length === 0 ? (
           <EmptyState
             icon={Users}
             title="No students found"
@@ -246,7 +254,7 @@ export default function StudentsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5 text-white/70">
-                  {data.data.map((student: any) => (
+                  {studentsList.map((student: any) => (
                     <tr
                       key={student.id}
                       className="hover:bg-white/[0.02] transition-colors group cursor-pointer"

@@ -116,7 +116,7 @@ export default function StudentSidebar({
               {studentEmail}
             </p>
             <span className="inline-flex items-center px-2 py-0.5 text-[9px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/90 rounded-md border border-indigo-200/80 dark:border-indigo-800/80 uppercase tracking-wider">
-              {mounted && user?.role === 'ADMIN' ? 'ADMINISTRATOR' : 'VERIFIED STUDENT'}
+              VERIFIED STUDENT
             </span>
           </div>
         </div>

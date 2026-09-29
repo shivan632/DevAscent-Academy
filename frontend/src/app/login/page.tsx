@@ -23,7 +23,7 @@ import {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setUser } = useAuthStore();
+  const { user, isLoading: authLoading, setUser } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,6 +35,36 @@ function LoginForm() {
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Helper to compute target destination honoring ?redirect=
+  const getDestination = (rawUser: any) => {
+    const redirectParam = searchParams.get('redirect');
+    const isAdmin = rawUser?.role === 'ADMIN' || rawUser?.email === 'shivrom.2020@gmail.com';
+    let dest = isAdmin ? '/admin/dashboard' : '/dashboard';
+    if (redirectParam) {
+      if (redirectParam.startsWith('/admin') && !isAdmin) {
+        dest = '/dashboard';
+      } else if (redirectParam.startsWith('/dashboard') && isAdmin) {
+        dest = '/admin/dashboard';
+      } else {
+        dest = redirectParam;
+      }
+    }
+    return dest;
+  };
+
+  // If already authenticated in localStorage/session, sync cookie and auto-redirect
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('devascent_token');
+      if (storedToken && !document.cookie.includes('access_token=')) {
+        document.cookie = `access_token=${storedToken}; path=/; max-age=604800; SameSite=Lax`;
+      }
+    }
+    if (!authLoading && user) {
+      router.replace(getDestination(user));
+    }
+  }, [user, authLoading]);
 
   // Initialize Google Sign-In SDK
   useEffect(() => {
@@ -63,14 +93,13 @@ function LoginForm() {
       const token = res?.data?.accessToken || res?.accessToken;
       if (token && typeof window !== 'undefined') {
         localStorage.setItem('devascent_token', token);
+        document.cookie = `access_token=${token}; path=/; max-age=604800; SameSite=Lax`;
       }
       if (rawUser) {
         setUser(rawUser);
-        if (rawUser.role === 'ADMIN') {
-          router.push('/admin/submissions');
-        } else {
-          router.push('/dashboard');
-        }
+        const destination = getDestination(rawUser);
+        router.push(destination);
+        router.refresh();
       } else {
         throw new Error('Login failed: Invalid server response');
       }
@@ -105,14 +134,13 @@ function LoginForm() {
               const token = res?.data?.accessToken || res?.accessToken;
               if (token && typeof window !== 'undefined') {
                 localStorage.setItem('devascent_token', token);
+                document.cookie = `access_token=${token}; path=/; max-age=604800; SameSite=Lax`;
               }
               if (rawUser) {
                 setUser(rawUser);
-                if (rawUser.role === 'ADMIN') {
-                  router.push('/admin/submissions');
-                } else {
-                  router.push('/dashboard');
-                }
+                const destination = getDestination(rawUser);
+                router.push(destination);
+                router.refresh();
               }
             } catch (err: any) {
               setError(err?.message || 'Google sign-in failed. Please try again.');
@@ -342,7 +370,7 @@ function LoginForm() {
               </span>
             ) : (
               <>
-                <span>Enter Student Portal</span>
+                <span>{email.trim().toLowerCase() === 'shivrom.2020@gmail.com' ? 'Enter Admin Portal' : 'Enter Workspace'}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </>
             )}

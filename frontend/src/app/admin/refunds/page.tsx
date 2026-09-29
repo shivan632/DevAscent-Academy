@@ -43,7 +43,12 @@ export default function RefundsPage() {
     onConfirm: async () => {},
   });
 
-  const refunds = data?.refunds || [];
+  const refundsPayload = data?.data || data;
+  const refunds: any[] = Array.isArray(refundsPayload)
+    ? refundsPayload
+    : Array.isArray(refundsPayload?.refunds)
+    ? refundsPayload.refunds
+    : [];
 
   const handleApprove = (refund: any) => {
     const amountRs = Math.round((refund.amountInPaise || 0) / 100);
