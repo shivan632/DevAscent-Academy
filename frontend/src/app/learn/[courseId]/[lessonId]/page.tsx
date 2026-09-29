@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { fetchApi } from '@/lib/api';
 import ReactMarkdown from 'react-markdown';
 import confetti from 'canvas-confetti';
-import { getEmbedUrl } from '@/lib/utils';
+import { getEmbedUrl, isDirectVideoUrl } from '@/lib/utils';
 import {
   Play,
   Pause,
@@ -545,13 +545,23 @@ export default function CourseLearningRoom() {
           <div className="bg-slate-950 relative aspect-video max-h-[480px] w-full flex items-center justify-center border-b border-slate-800 overflow-hidden">
             {lessonData.videoUrl ? (
               <div className="relative w-full h-full flex items-center justify-center bg-black">
-                <iframe
-                  src={getEmbedUrl(lessonData.videoUrl)}
-                  title={lessonData.title}
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                {isDirectVideoUrl(lessonData.videoUrl) ? (
+                  <video
+                    src={lessonData.videoUrl}
+                    controls
+                    controlsList="nodownload"
+                    className="w-full h-full object-contain bg-black"
+                    playsInline
+                  />
+                ) : (
+                  <iframe
+                    src={getEmbedUrl(lessonData.videoUrl)}
+                    title={lessonData.title}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                )}
               </div>
             ) : (
               // AI Video Coming Soon State

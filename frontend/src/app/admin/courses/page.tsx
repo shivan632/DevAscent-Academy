@@ -35,11 +35,13 @@ export default function CoursesPage() {
     stipendDetails: '',
   });
 
+  const courses: any[] = data?.courses || data?.data?.courses || (Array.isArray(data) ? data : []);
+
   const handleOpenEdit = (course: any) => {
     setEditingCourse(course);
     setEditForm({
-      priceInRupees: Math.round(course.priceInPaise / 100) || 4999,
-      earlyBirdPriceInRupees: Math.round(course.earlyBirdPriceInPaise / 100) || 1499,
+      priceInRupees: Math.round((course.priceInPaise || 499900) / 100),
+      earlyBirdPriceInRupees: Math.round((course.earlyBirdPriceInPaise || 149900) / 100),
       totalSeats: course.totalSeats || 40,
       seatsRemaining: course.seatsRemaining || 10,
       isPublished: course.isPublished ?? true,
@@ -88,11 +90,11 @@ export default function CoursesPage() {
 
       {isLoading ? (
         <KpiSkeleton />
-      ) : !data?.courses?.length ? (
+      ) : !courses.length ? (
         <EmptyState message="No courses found in database." />
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {data.courses.map((course: any) => (
+          {courses.map((course: any) => (
             <div
               key={course.id}
               className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/80 transition-all shadow-sm space-y-4"

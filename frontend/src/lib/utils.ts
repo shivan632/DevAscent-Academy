@@ -13,6 +13,19 @@ export function formatINR(amount: number) {
   }).format(amount);
 }
 
+export function isDirectVideoUrl(url: string): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const clean = url.split('?')[0].toLowerCase();
+  return (
+    clean.endsWith('.mp4') ||
+    clean.endsWith('.webm') ||
+    clean.endsWith('.ogg') ||
+    clean.endsWith('.mov') ||
+    clean.includes('res.cloudinary.com') ||
+    clean.includes('/video/upload/')
+  );
+}
+
 export function getEmbedUrl(url: string): string {
   if (!url || typeof url !== 'string') return '';
   const trimmed = url.trim();

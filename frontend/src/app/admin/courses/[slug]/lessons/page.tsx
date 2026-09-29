@@ -6,7 +6,7 @@ import Link from 'next/link';
 import useSWR from 'swr';
 import { api, fetchApi } from '@/lib/api';
 import ReactMarkdown from 'react-markdown';
-import { getEmbedUrl } from '@/lib/utils';
+import { getEmbedUrl, isDirectVideoUrl } from '@/lib/utils';
 import {
   BookOpen,
   Plus,
@@ -796,12 +796,22 @@ export default function AdminCurriculumStudioPage() {
                   {/* Video Live Preview */}
                   {previewingVideo && lessonForm.videoUrl && (
                     <div className="bg-black rounded-xl overflow-hidden aspect-video max-h-64 w-full border border-slate-800 flex items-center justify-center">
-                      <iframe
-                        src={getEmbedUrl(lessonForm.videoUrl)}
-                        title="Video Preview"
-                        className="w-full h-full border-0"
-                        allowFullScreen
-                      />
+                      {isDirectVideoUrl(lessonForm.videoUrl) ? (
+                        <video
+                          src={lessonForm.videoUrl}
+                          controls
+                          controlsList="nodownload"
+                          className="w-full h-full object-contain bg-black"
+                          playsInline
+                        />
+                      ) : (
+                        <iframe
+                          src={getEmbedUrl(lessonForm.videoUrl)}
+                          title="Video Preview"
+                          className="w-full h-full border-0"
+                          allowFullScreen
+                        />
+                      )}
                     </div>
                   )}
 
