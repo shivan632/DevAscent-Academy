@@ -6,6 +6,7 @@ import Link from 'next/link';
 import useSWR from 'swr';
 import { api, fetchApi } from '@/lib/api';
 import ReactMarkdown from 'react-markdown';
+import { getEmbedUrl } from '@/lib/utils';
 import {
   BookOpen,
   Plus,
@@ -796,7 +797,7 @@ export default function AdminCurriculumStudioPage() {
                   {previewingVideo && lessonForm.videoUrl && (
                     <div className="bg-black rounded-xl overflow-hidden aspect-video max-h-64 w-full border border-slate-800 flex items-center justify-center">
                       <iframe
-                        src={lessonForm.videoUrl}
+                        src={getEmbedUrl(lessonForm.videoUrl)}
                         title="Video Preview"
                         className="w-full h-full border-0"
                         allowFullScreen

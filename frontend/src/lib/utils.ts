@@ -12,3 +12,26 @@ export function formatINR(amount: number) {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+export function getEmbedUrl(url: string): string {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+
+  // Already an embed URL
+  if (trimmed.includes('youtube.com/embed/')) {
+    return trimmed;
+  }
+
+  // Check for YouTube standard, shortened, or shorts URLs
+  const ytMatch = trimmed.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&?#/]+)/);
+  if (ytMatch && ytMatch[1]) {
+    const videoId = ytMatch[1];
+    const timeMatch = trimmed.match(/[?&]t=(\d+)/);
+    const startParam = timeMatch ? `?start=${timeMatch[1]}` : '';
+    return `https://www.youtube.com/embed/${videoId}${startParam}`;
+  }
+
+  // Pass-through for generic video or custom hostings (e.g., Cloudinary, Loom, Vimeo)
+  return trimmed;
+}

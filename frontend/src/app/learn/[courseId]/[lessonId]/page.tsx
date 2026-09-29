@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { fetchApi } from '@/lib/api';
 import ReactMarkdown from 'react-markdown';
 import confetti from 'canvas-confetti';
+import { getEmbedUrl } from '@/lib/utils';
 import {
   Play,
   Pause,
@@ -545,7 +546,7 @@ export default function CourseLearningRoom() {
             {lessonData.videoUrl ? (
               <div className="relative w-full h-full flex items-center justify-center bg-black">
                 <iframe
-                  src={lessonData.videoUrl}
+                  src={getEmbedUrl(lessonData.videoUrl)}
                   title={lessonData.title}
                   className="w-full h-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
