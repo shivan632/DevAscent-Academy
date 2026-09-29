@@ -28,15 +28,16 @@ import Link from 'next/link';
 interface Certificate {
   id: string;
   certId: string;
-  studentName: string;
-  studentEmail: string;
-  userId: string;
-  courseName: string;
-  courseTitle: string;
-  courseId: string;
+  studentName?: string;
+  studentEmail?: string;
+  recipientName?: string;
+  userId?: string;
+  courseName?: string;
+  courseTitle?: string;
+  courseId?: string;
   issuedAt: string;
   grade: string;
-  verifyUrl: string;
+  verifyUrl?: string;
 }
 
 // ─── Manual Issue Modal ───────────────────────────────────────────────────
