@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
@@ -80,8 +81,14 @@ export function AdminNavbar({ onToggleSidebar }: AdminNavbarProps) {
         )}
 
         <div className="flex items-center gap-2.5">
-          <div className="hidden lg:flex w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 items-center justify-center shadow-md shadow-violet-500/20">
-            <ShieldAlert className="w-4 h-4 text-white" />
+          <div className="relative hidden lg:flex w-8 h-8 rounded-lg overflow-hidden bg-white/5 border border-white/10">
+            <Image
+              src="/logo.png"
+              alt="DevAscent"
+              fill
+              className="object-contain p-0.5"
+              priority
+            />
           </div>
           <div className="hidden sm:flex items-center gap-2">
             <span className="text-sm font-black text-white tracking-tight">DevAscent</span>

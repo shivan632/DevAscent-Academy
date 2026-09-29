@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import useSWR from 'swr';
@@ -96,10 +97,16 @@ export function AdminSidebar({ mobileOpen = false, onCloseMobile }: AdminSidebar
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#07090F] border-r border-white/[0.06] select-none">
       {/* Brand Header */}
-      <div className="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between shrink-0">
+      <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-violet-500/25 shrink-0">
-            <ShieldAlert className="w-5 h-5 text-white" />
+          <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-white/5 border border-white/10">
+            <Image
+              src="/logo.png"
+              alt="DevAscent Logo"
+              fill
+              className="object-contain p-1"
+              priority
+            />
           </div>
           <div>
             <div className="flex items-center gap-1.5">

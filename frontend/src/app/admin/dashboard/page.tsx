@@ -115,52 +115,52 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             label="Total Students"
-            value={data?.totalStudents ?? 0}
-            sub={`${data?.activeStudents ?? 0} active · ${data?.suspendedStudents ?? 0} suspended`}
+            value={overview?.totalStudents ?? 0}
+            sub={`${overview?.activeStudents ?? 0} active · ${overview?.suspendedStudents ?? 0} suspended`}
             color="indigo"
             icon={<Users className="w-5 h-5" />}
           />
           <StatsCard
             label="Total Revenue"
-            value={`₹${(data?.totalRevenueInRupees ?? 0).toLocaleString('en-IN')}`}
+            value={`₹${(overview?.totalRevenueInRupees ?? 0).toLocaleString('en-IN')}`}
             sub="From verified paid enrollments"
             color="emerald"
             icon={<IndianRupee className="w-5 h-5" />}
           />
           <StatsCard
             label="Pending Submissions"
-            value={data?.pendingSubmissions ?? 0}
-            sub={`${data?.totalSubmissions ?? 0} total submitted`}
-            color={data?.pendingSubmissions > 0 ? 'amber' : 'emerald'}
+            value={overview?.pendingSubmissions ?? 0}
+            sub={`${overview?.totalSubmissions ?? 0} total submitted`}
+            color={overview?.pendingSubmissions > 0 ? 'amber' : 'emerald'}
             icon={<FileCheck className="w-5 h-5" />}
-            badge={data?.pendingSubmissions > 0 ? `${data.pendingSubmissions} to review` : undefined}
+            badge={overview?.pendingSubmissions > 0 ? `${overview.pendingSubmissions} to review` : undefined}
           />
           <StatsCard
             label="Pending Refunds"
-            value={data?.pendingRefunds ?? 0}
+            value={overview?.pendingRefunds ?? 0}
             sub="7-day policy refund requests"
-            color={data?.pendingRefunds > 0 ? 'rose' : 'emerald'}
+            color={overview?.pendingRefunds > 0 ? 'rose' : 'emerald'}
             icon={<CreditCard className="w-5 h-5" />}
-            badge={data?.pendingRefunds > 0 ? 'Action required' : undefined}
+            badge={overview?.pendingRefunds > 0 ? 'Action required' : undefined}
           />
         </div>
       )}
 
       {/* ── Secondary Metrics ── */}
-      {!isLoading && data && (
+      {!isLoading && overview && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             {
-              label: 'Total Enrollments', value: data.totalEnrollments,
+              label: 'Total Enrollments', value: overview.totalEnrollments,
               sub: 'Across all active batches', icon: TrendingUp, color: 'bg-violet-500/12 border-violet-500/20 text-violet-400',
             },
             {
-              label: 'Avg Revenue / Student', value: `₹${data.totalStudents > 0 ? Math.round(data.totalRevenueInRupees / data.totalStudents).toLocaleString('en-IN') : 0}`,
+              label: 'Avg Revenue / Student', value: `₹${overview.totalStudents > 0 ? Math.round(overview.totalRevenueInRupees / overview.totalStudents).toLocaleString('en-IN') : 0}`,
               sub: 'ARPU metric', icon: IndianRupee, color: 'bg-amber-500/12 border-amber-500/20 text-amber-400',
             },
             {
-              label: 'Suspended Accounts', value: data.suspendedStudents,
-              sub: data.totalStudents > 0 ? `${((data.suspendedStudents / data.totalStudents) * 100).toFixed(1)}% of cohort` : 'Zero suspensions',
+              label: 'Suspended Accounts', value: overview.suspendedStudents,
+              sub: overview.totalStudents > 0 ? `${((overview.suspendedStudents / overview.totalStudents) * 100).toFixed(1)}% of cohort` : 'Zero suspensions',
               icon: UserX, color: 'bg-rose-500/12 border-rose-500/20 text-rose-400',
             },
           ].map((m) => (
