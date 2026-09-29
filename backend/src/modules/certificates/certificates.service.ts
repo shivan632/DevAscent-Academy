@@ -95,9 +95,73 @@ export class CertificatesService {
         recipientName: certificate.recipientName,
         courseTitle: certificate.courseTitle,
         issuedAt: certificate.issuedAt.toISOString(),
-        verifyUrl: `/verify/${certificate.certId}`,
+        verifyUrl: `${frontendUrl}/verify/${certificate.certId}`,
         grade: certificate.grade,
       },
+    };
+  }
+
+  async getAllCertificatesAdmin(page = 1, limit = 50, search = '') {
+    const skip = (page - 1) * limit;
+    const where: any = {};
+    if (search && search.trim()) {
+      const q = search.trim();
+      where.OR = [
+        { certId: { contains: q, mode: 'insensitive' } },
+        { recipientName: { contains: q, mode: 'insensitive' } },
+        { courseTitle: { contains: q, mode: 'insensitive' } },
+        { user: { email: { contains: q, mode: 'insensitive' } } },
+      ];
+    }
+
+    const [total, certificates] = await Promise.all([
+      this.prisma.certificate.count({ where }),
+      this.prisma.certificate.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { issuedAt: 'desc' },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          course: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+    return {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      certificates: certificates.map((c) => ({
+        id: c.id,
+        certId: c.certId,
+        sha256Hash: c.sha256Hash,
+        recipientName: c.recipientName,
+        studentName: c.user?.name || c.recipientName,
+        studentEmail: c.user?.email || '',
+        userId: c.userId,
+        courseTitle: c.courseTitle,
+        courseName: c.course?.title || c.courseTitle,
+        courseId: c.courseId,
+        issuedAt: c.issuedAt.toISOString(),
+        grade: c.grade,
+        verifyUrl: `${frontendUrl}/verify/${c.certId}`,
+      })),
     };
   }
 

@@ -169,5 +169,13 @@ export const api = {
       fetchApi(`/admin/courses/${slug}/lessons/${lessonId}/quiz`, { method: 'POST', body: JSON.stringify(data) }),
     updateCourseDetails: (slug: string, data: any) =>
       fetchApi(`/admin/courses/${slug}/details`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+    // Certificates
+    getCertificates: (params?: { page?: number; limit?: number; search?: string }) => {
+      const q = new URLSearchParams(params as any).toString();
+      return fetchApi(`/admin/certificates${q ? `?${q}` : ''}`);
+    },
+    issueCertificate: (data: { userId: string; courseId: string; grade?: string }) =>
+      fetchApi('/admin/certificates/issue', { method: 'POST', body: JSON.stringify(data) }),
   },
 };
