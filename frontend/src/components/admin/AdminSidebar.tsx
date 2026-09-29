@@ -104,6 +104,7 @@ export function AdminSidebar({ mobileOpen = false, onCloseMobile }: AdminSidebar
               src="/logo.png"
               alt="DevAscent Logo"
               fill
+              sizes="40px"
               className="object-contain p-1"
               priority
             />

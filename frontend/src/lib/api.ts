@@ -1,7 +1,19 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+export function getApiBaseUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host && host !== 'localhost' && host !== '127.0.0.1') {
+      if (envUrl && (envUrl.includes('localhost:3001') || envUrl.includes('127.0.0.1:3001'))) {
+        return `${window.location.protocol}//${host}:3001/api/v1`;
+      }
+    }
+  }
+  return envUrl || 'http://localhost:3001/api/v1';
+}
 
 export async function fetchApi<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
   
   const token = typeof window !== 'undefined' ? localStorage.getItem('devascent_token') : null;
   const headers: Record<string, string> = {
@@ -96,7 +108,7 @@ export const api = {
   getMyCertificates: () => fetchApi('/certificates/my'),
   getCertificate: (courseId: string) => fetchApi(`/certificates/me/${courseId}`),
   verifyCertificatePublic: (certId: string) => fetchApi(`/verify/${certId}`),
-  getDownloadUrl: (certId: string) => `${API_BASE_URL}/certificates/${certId}/download`,
+  getDownloadUrl: (certId: string) => `${getApiBaseUrl()}/certificates/${certId}/download`,
 
   // Refunds
   requestRefund: (refundData: { orderId: string; reason: string; upiId?: string }) => fetchApi('/refunds/apply', { method: 'POST', body: JSON.stringify(refundData) }),
@@ -145,8 +157,8 @@ export const api = {
       return fetchApi(`/admin/audit-log${q ? `?${q}` : ''}`);
     },
 
-    exportStudentsUrl: () => `${API_BASE_URL}/admin/export/students`,
-    exportRevenueUrl: () => `${API_BASE_URL}/admin/export/revenue`,
+    exportStudentsUrl: () => `${getApiBaseUrl()}/admin/export/students`,
+    exportRevenueUrl: () => `${getApiBaseUrl()}/admin/export/revenue`,
 
     updateRole: (userId: string, role: string) =>
       fetchApi(`/admin/settings/role/${userId}`, { method: 'PATCH', body: JSON.stringify({ role }) }),

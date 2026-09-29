@@ -36,11 +36,16 @@ async function bootstrap() {
         'https://devascentacademy.me',
       ];
 
-      // Also allow any preview deployments on vercel.app or custom domain subdomains
+      // Also allow local network IPs, localhost, preview deployments, or custom domain
       if (
         allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app') ||
-        origin.endsWith('devascentacademy.me')
+        origin.endsWith('devascentacademy.me') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin.includes('10.') ||
+        origin.includes('192.168.') ||
+        process.env.NODE_ENV !== 'production'
       ) {
         return callback(null, true);
       }

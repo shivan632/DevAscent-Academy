@@ -86,6 +86,7 @@ export function AdminNavbar({ onToggleSidebar }: AdminNavbarProps) {
               src="/logo.png"
               alt="DevAscent"
               fill
+              sizes="32px"
               className="object-contain p-0.5"
               priority
             />

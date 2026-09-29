@@ -9,14 +9,16 @@ import { AdminNavbar } from '../../components/admin/AdminNavbar';
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated, checkAuth } = useAuthStore();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     checkAuth();
   }, [checkAuth]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (mounted && !isLoading) {
       const isAllowed = user && (user.role === 'ADMIN' || user.email === 'shivrom.2020@gmail.com');
       if (!isAuthenticated || !user) {
         router.replace('/login?redirect=/admin/dashboard');
@@ -24,10 +26,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         router.replace('/dashboard');
       }
     }
-  }, [isLoading, isAuthenticated, user, router]);
+  }, [mounted, isLoading, isAuthenticated, user, router]);
 
-  // While loading auth state
-  if (isLoading) {
+  // While mounting or loading auth state, render loading placeholder consistently on server & client
+  if (!mounted || isLoading) {
     return (
       <div className="min-h-screen bg-[#080C14] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -65,4 +67,3 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
-
