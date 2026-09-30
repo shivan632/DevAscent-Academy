@@ -95,18 +95,22 @@ export class AdminService {
     const skip = (page - 1) * limit;
     const where: any = { role: 'STUDENT' };
 
-    if (filters.status && filters.status !== 'ALL') where.status = filters.status;
-    if (filters.degree && filters.degree !== 'ALL') where.degree = filters.degree;
-    if (filters.emailVerified && filters.emailVerified !== 'ALL') {
+    if (filters.status && filters.status !== 'ALL' && filters.status !== 'undefined' && filters.status !== 'null') {
+      where.status = filters.status;
+    }
+    if (filters.degree && filters.degree !== 'ALL' && filters.degree !== 'undefined' && filters.degree !== 'null') {
+      where.degree = filters.degree;
+    }
+    if (filters.emailVerified && filters.emailVerified !== 'ALL' && filters.emailVerified !== 'undefined' && filters.emailVerified !== 'null') {
       where.isEmailVerified = filters.emailVerified === 'true' || filters.emailVerified === 'VERIFIED';
     }
-    if (filters.courseId && filters.courseId !== 'ALL') {
+    if (filters.courseId && filters.courseId !== 'ALL' && filters.courseId !== 'undefined' && filters.courseId !== 'null') {
       where.enrollments = { some: { courseId: filters.courseId } };
     }
-    if (filters.search) {
+    if (filters.search && filters.search.trim() && filters.search !== 'undefined') {
       where.OR = [
-        { name: { contains: filters.search, mode: 'insensitive' } },
-        { email: { contains: filters.search, mode: 'insensitive' } },
+        { name: { contains: filters.search.trim(), mode: 'insensitive' } },
+        { email: { contains: filters.search.trim(), mode: 'insensitive' } },
       ];
     }
 
@@ -194,25 +198,25 @@ export class AdminService {
     const skip = (page - 1) * limit;
     const where: any = {};
 
-    if (filters.status && filters.status !== 'ALL') {
+    if (filters.status && filters.status !== 'ALL' && filters.status !== 'undefined' && filters.status !== 'null') {
       const dbStatus = filters.status === 'SUCCESS' ? 'PAID' : filters.status;
       where.status = dbStatus;
     }
-    if (filters.courseId && filters.courseId !== 'ALL') {
+    if (filters.courseId && filters.courseId !== 'ALL' && filters.courseId !== 'undefined' && filters.courseId !== 'null') {
       where.courseId = filters.courseId;
     }
-    if (filters.emailVerified && filters.emailVerified !== 'ALL') {
+    if (filters.emailVerified && filters.emailVerified !== 'ALL' && filters.emailVerified !== 'undefined' && filters.emailVerified !== 'null') {
       where.user = {
         ...(where.user || {}),
         isEmailVerified: filters.emailVerified === 'VERIFIED' || filters.emailVerified === 'true',
       };
     }
-    if (filters.search) {
+    if (filters.search && filters.search.trim() && filters.search !== 'undefined') {
       where.OR = [
-        { razorpayOrderId: { contains: filters.search, mode: 'insensitive' } },
-        { razorpayPaymentId: { contains: filters.search, mode: 'insensitive' } },
-        { user: { name: { contains: filters.search, mode: 'insensitive' } } },
-        { user: { email: { contains: filters.search, mode: 'insensitive' } } },
+        { razorpayOrderId: { contains: filters.search.trim(), mode: 'insensitive' } },
+        { razorpayPaymentId: { contains: filters.search.trim(), mode: 'insensitive' } },
+        { user: { name: { contains: filters.search.trim(), mode: 'insensitive' } } },
+        { user: { email: { contains: filters.search.trim(), mode: 'insensitive' } } },
       ];
     }
 

@@ -58,6 +58,18 @@ export async function fetchApi<T = any>(endpoint: string, options: RequestInit =
   }
 }
 
+function buildQuery(params?: Record<string, any>): string {
+  if (!params) return '';
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '' && value !== 'undefined' && value !== 'ALL') {
+      searchParams.append(key, String(value));
+    }
+  }
+  const str = searchParams.toString();
+  return str ? `?${str}` : '';
+}
+
 export const api = {
   // Auth
   register: (userData: any) => fetchApi('/auth/register', { method: 'POST', body: JSON.stringify(userData) }),
@@ -122,8 +134,7 @@ export const api = {
 
 
     getStudents: (params?: { page?: number; limit?: number; search?: string; degree?: string; status?: string; emailVerified?: string; courseId?: string }) => {
-      const q = new URLSearchParams(params as any).toString();
-      return fetchApi(`/admin/students${q ? `?${q}` : ''}`);
+      return fetchApi(`/admin/students${buildQuery(params)}`);
     },
     getStudentDetail: (id: string) => fetchApi(`/admin/students/${id}`),
     suspendStudent: (id: string, reason: string) =>
@@ -139,20 +150,18 @@ export const api = {
 
     // Payments
     getPayments: (params?: { page?: number; limit?: number; search?: string; status?: string; courseId?: string; cohort?: string; emailVerified?: string }) => {
-      const q = new URLSearchParams(params as any).toString();
-      return fetchApi(`/admin/payments${q ? `?${q}` : ''}`);
+      return fetchApi(`/admin/payments${buildQuery(params)}`);
     },
 
     getRefunds: (status?: string) =>
-      fetchApi(`/admin/refunds${status ? `?status=${status}` : ''}`),
+      fetchApi(`/admin/refunds${status && status !== 'ALL' ? `?status=${status}` : ''}`),
     approveRefund: (id: string) =>
       fetchApi(`/admin/refunds/${id}/approve`, { method: 'POST' }),
     rejectRefund: (id: string, reason: string) =>
       fetchApi(`/admin/refunds/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) }),
 
     getSubmissions: (params?: { status?: string; page?: number; limit?: number }) => {
-      const q = new URLSearchParams(params as any).toString();
-      return fetchApi(`/admin/submissions${q ? `?${q}` : ''}`);
+      return fetchApi(`/admin/submissions${buildQuery(params)}`);
     },
     approveSubmission: (id: string, adminNote?: string) =>
       fetchApi(`/admin/submissions/${id}/approve`, { method: 'POST', body: JSON.stringify({ adminNote }) }),
@@ -165,8 +174,7 @@ export const api = {
     getAnalytics: () => fetchApi('/admin/analytics'),
 
     getAuditLog: (params?: { page?: number; limit?: number; action?: string }) => {
-      const q = new URLSearchParams(params as any).toString();
-      return fetchApi(`/admin/audit-log${q ? `?${q}` : ''}`);
+      return fetchApi(`/admin/audit-log${buildQuery(params)}`);
     },
 
     exportStudentsUrl: () => `${getApiBaseUrl()}/admin/export/students`,
@@ -196,8 +204,7 @@ export const api = {
 
     // Certificates
     getCertificates: (params?: { page?: number; limit?: number; search?: string }) => {
-      const q = new URLSearchParams(params as any).toString();
-      return fetchApi(`/admin/certificates${q ? `?${q}` : ''}`);
+      return fetchApi(`/admin/certificates${buildQuery(params)}`);
     },
     issueCertificate: (data: { userId: string; courseId: string; grade?: string }) =>
       fetchApi('/admin/certificates/issue', { method: 'POST', body: JSON.stringify(data) }),
