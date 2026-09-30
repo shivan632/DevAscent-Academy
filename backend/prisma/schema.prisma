@@ -1,46 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id              String    @id @default(cuid())
-  email           String    @unique
-  passwordHash    String
-  name            String
-  phone           String?
-  role            String    @default("STUDENT") // "STUDENT" | "ADMIN" | "INSTRUCTOR"
-  degree          String?   // "BCA" | "MCA" | "BTECH" | "OTHER"
-  college         String?
-  avatarUrl       String?
-  bio             String?
-  city            String?
-  graduationYear  String?
-  githubUrl       String?
-  linkedinUrl     String?
-  portfolioUrl    String?
-  isEmailVerified Boolean   @default(false)
-  status          String    @default("ACTIVE") // "ACTIVE" | "SUSPENDED"
-  suspendedAt     DateTime?
-  lastLoginAt     DateTime?
-  adminNote       String?   // internal notes about this student
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  enrollments            Enrollment[]
-  payments               Payment[]
+  id                     String                  @id @default(cuid())
+  email                  String                  @unique
+  passwordHash           String
+  name                   String
+  phone                  String?
+  role                   String                  @default("STUDENT")
+  degree                 String?
+  college                String?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  isEmailVerified        Boolean                 @default(false)
+  avatarUrl              String?
+  bio                    String?
+  city                   String?
+  githubUrl              String?
+  graduationYear         String?
+  linkedinUrl            String?
+  portfolioUrl           String?
+  adminNote              String?
+  lastLoginAt            DateTime?
+  status                 String                  @default("ACTIVE")
+  suspendedAt            DateTime?
+  auditLogsAsAdmin       AuditLog[]              @relation("AdminAuditLogs")
   certificates           Certificate[]
-  refunds                Refund[]
-  lessonProgress         LessonProgress[]
-  quizSubmissions        QuizSubmission[]
-  internshipApplications InternshipApplication[]
   completionSubmissions  CompletionSubmission[]
-  auditLogsAsAdmin       AuditLog[] @relation("AdminAuditLogs")
   doubts                 Doubt[]
+  enrollments            Enrollment[]
+  internshipApplications InternshipApplication[]
+  lessonProgress         LessonProgress[]
+  payments               Payment[]
+  quizSubmissions        QuizSubmission[]
+  refunds                Refund[]
 }
 
 model OtpVerification {
@@ -53,42 +52,38 @@ model OtpVerification {
 }
 
 model Course {
-  id                    String    @id @default(cuid())
-  slug                  String    @unique
-  title                 String
-  description           String
-  priceInPaise          Int       @default(499900) // ₹4,999
-  earlyBirdPriceInPaise Int       @default(149900) // ₹1,499
-  domain                String    @default("fullstack")
-  level                 String    @default("Intermediate")
-  thumbnail             String
-  cohortNumber          Int       @default(14)
-  seatsRemaining        Int       @default(9)
-  totalSeats            Int       @default(40)
-  cohortStartsOn        DateTime?
-  isPublished           Boolean   @default(true)
-
-  // Enriched course & internship fields
-  type                  String    @default("COURSE") // "COURSE" | "INTERNSHIP"
-  isFree                Boolean   @default(false)
-  objectives            String    @default("[]") // JSON string[]
-  projects              String    @default("[]") // JSON string[]
-  assignments           String    @default("[]") // JSON string[]
-  requirements          String    @default("[]") // JSON string[]
-  durationWeeks         Int?      @default(8)
-  isPaidInternship      Boolean   @default(false)
-  stipendDetails        String?
-  requiresApproval      Boolean   @default(false) // Admin approval required for paid cohort/internship
-
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-
-  modules                Module[]
-  enrollments            Enrollment[]
-  payments               Payment[]
+  id                     String                  @id @default(cuid())
+  slug                   String                  @unique
+  title                  String
+  description            String
+  priceInPaise           Int                     @default(499900)
+  earlyBirdPriceInPaise  Int                     @default(149900)
+  domain                 String                  @default("fullstack")
+  level                  String                  @default("Intermediate")
+  thumbnail              String
+  cohortNumber           Int                     @default(14)
+  seatsRemaining         Int                     @default(9)
+  totalSeats             Int                     @default(40)
+  cohortStartsOn         DateTime?
+  isPublished            Boolean                 @default(true)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  assignments            String                  @default("[]")
+  durationWeeks          Int?                    @default(8)
+  isFree                 Boolean                 @default(false)
+  isPaidInternship       Boolean                 @default(false)
+  objectives             String                  @default("[]")
+  projects               String                  @default("[]")
+  requirements           String                  @default("[]")
+  requiresApproval       Boolean                 @default(false)
+  stipendDetails         String?
+  type                   String                  @default("COURSE")
   certificates           Certificate[]
-  internshipApplications InternshipApplication[]
   completionSubmissions  CompletionSubmission[]
+  enrollments            Enrollment[]
+  internshipApplications InternshipApplication[]
+  modules                Module[]
+  payments               Payment[]
 }
 
 model Module {
@@ -97,39 +92,38 @@ model Module {
   moduleNumber Int
   title        String
   description  String?
-  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons      Lesson[]
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   quiz         Quiz?
 }
 
 model Lesson {
-  id                  String   @id @default(cuid())
-  moduleId            String
-  lessonNumber        Int
-  title               String
-  durationMinutes     Int      @default(15)
-  videoUrl            String?  // Nullable: AI video provided by Admin
-  isFreePreview       Boolean  @default(false)
-  summary             String?
-  writtenContent      String?  @db.Text // GeeksforGeeks style notes/reading content
-  exercisePdfUrl      String?  // PDF link uploaded by Admin
-  exercisePdfTitle    String?  // e.g. "5 Basic Projects with Tech Stacks"
-  exerciseProjects    String?  @default("[]") // JSON list of 5 projects for GitHub/LinkedIn
-  
-  module              Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  quiz                Quiz?
-  progressRecords     LessonProgress[]
-  doubts              Doubt[]
+  id               String           @id @default(cuid())
+  moduleId         String
+  lessonNumber     Int
+  title            String
+  durationMinutes  Int              @default(15)
+  videoUrl         String?
+  isFreePreview    Boolean          @default(false)
+  summary          String?
+  exercisePdfTitle String?
+  exercisePdfUrl   String?
+  exerciseProjects String?          @default("[]")
+  writtenContent   String?
+  doubts           Doubt[]
+  module           Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progressRecords  LessonProgress[]
+  quiz             Quiz?
 }
 
 model Quiz {
-  id           String         @id @default(cuid())
-  moduleId     String?        @unique
-  lessonId     String?        @unique
+  id           String           @id @default(cuid())
+  moduleId     String?          @unique
   title        String
-  passingScore Int            @default(60)
-  module       Module?        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  lesson       Lesson?        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  passingScore Int              @default(60)
+  lessonId     String?          @unique
+  lesson       Lesson?          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  module       Module?          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   questions    QuizQuestion[]
   submissions  QuizSubmission[]
 }
@@ -138,7 +132,7 @@ model QuizQuestion {
   id                 String  @id @default(cuid())
   quizId             String
   question           String
-  optionsJson        String  // Serialized string[]
+  optionsJson        String
   correctOptionIndex Int
   explanation        String?
   codeSnippet        String?
@@ -152,23 +146,21 @@ model QuizSubmission {
   scorePct    Int
   passed      Boolean
   submittedAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Doubt {
   id        String   @id @default(cuid())
   userId    String
   lessonId  String
-  question  String   @db.Text
-  answer    String?  @db.Text
-  status    String   @default("PENDING") // "PENDING" | "ANSWERED"
+  question  String
+  answer    String?
+  status    String   @default("PENDING")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([lessonId])
   @@index([userId])
@@ -179,11 +171,10 @@ model Enrollment {
   userId      String
   courseId    String
   progressPct Int      @default(0)
-  status      String   @default("ACTIVE") // "ACTIVE" | "REFUNDED" | "COMPLETED"
+  status      String   @default("ACTIVE")
   enrolledAt  DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }
@@ -195,9 +186,8 @@ model LessonProgress {
   watchedSeconds Int      @default(0)
   isCompleted    Boolean  @default(false)
   lastWatchedAt  DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson         Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
 }
@@ -211,19 +201,18 @@ model Payment {
   razorpaySignature String?
   amountInPaise     Int
   currency          String   @default("INR")
-  couponCode        String?
-  status            String   @default("PENDING") // "PENDING" | "PAID" | "FAILED" | "REFUNDED"
+  status            String   @default("PENDING")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  refunds Refund[]
+  couponCode        String?
+  course            Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refunds           Refund[]
 }
 
 model Certificate {
   id            String   @id @default(cuid())
-  certId        String   @unique // e.g. "DEV-2025-BC8491"
+  certId        String   @unique
   userId        String
   courseId      String
   recipientName String
@@ -232,9 +221,8 @@ model Certificate {
   grade         String   @default("A+")
   pdfUrl        String?
   issuedAt      DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Refund {
@@ -244,26 +232,24 @@ model Refund {
   amountInPaise   Int
   reason          String
   upiId           String?
-  status          String    @default("SUBMITTED") // "SUBMITTED" | "APPROVED" | "PROCESSED" | "REJECTED"
+  status          String    @default("SUBMITTED")
   rejectionReason String?
   createdAt       DateTime  @default(now())
   processedAt     DateTime?
-
-  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment         Payment   @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model InternshipApplication {
-  id          String   @id @default(cuid())
-  userId      String
-  courseId    String
-  status      String   @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
-  adminNote   String?
-  appliedAt   DateTime @default(now())
-  reviewedAt  DateTime?
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id         String    @id @default(cuid())
+  userId     String
+  courseId   String
+  status     String    @default("PENDING")
+  adminNote  String?
+  appliedAt  DateTime  @default(now())
+  reviewedAt DateTime?
+  course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }
@@ -278,13 +264,12 @@ model CompletionSubmission {
   projectName     String
   gitRepoUrl      String
   linkedinPostUrl String
-  status          String    @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
+  status          String    @default("PENDING")
   adminNote       String?
   submittedAt     DateTime  @default(now())
   reviewedAt      DateTime?
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course          Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }
@@ -292,14 +277,14 @@ model CompletionSubmission {
 model AuditLog {
   id         String   @id @default(cuid())
   adminId    String
-  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id])
-  action     String   // "STUDENT_SUSPENDED" | "REFUND_APPROVED" | "SUBMISSION_APPROVED" | etc.
+  action     String
   targetId   String?
-  targetType String?  // "User" | "Refund" | "Submission" | "Course"
+  targetType String?
   metadata   Json?
   ipAddress  String?
   userAgent  String?
   createdAt  DateTime @default(now())
+  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id])
 
   @@index([adminId, createdAt])
   @@index([action, createdAt])

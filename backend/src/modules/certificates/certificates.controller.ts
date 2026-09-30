@@ -93,13 +93,24 @@ export class CertificatesController {
     @Param('certId') certId: string,
     @Res() res: Response,
   ) {
-    const { buffer, filename } = await this.certificatesService.downloadCertificatePdf(certId);
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Length': buffer.length,
-    });
-    res.end(buffer);
+    try {
+      const { buffer, filename } = await this.certificatesService.downloadCertificatePdf(certId);
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Content-Length': buffer.length,
+      });
+      res.end(buffer);
+    } catch (err: any) {
+      console.error(`[CertificatesController] Download error for ${certId}:`, err);
+      res.status(err?.status || 500).json({
+        success: false,
+        error: {
+          code: 'CERTIFICATE_DOWNLOAD_FAILED',
+          message: err?.message || 'Failed to download certificate PDF',
+        },
+      });
+    }
   }
 
   @Get('verify/:certId')

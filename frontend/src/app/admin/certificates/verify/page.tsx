@@ -36,12 +36,21 @@ export default function AdminCertificateVerifyPage() {
     setErrorMsg('');
     try {
       const res = await api.verifyCertificatePublic(cleaned);
-      const cert = res?.certificate || res?.data?.certificate || res?.data || res;
-      if (cert && (cert.certId || cert.id)) {
-        setResult(cert);
+      if (res && res.verified !== false && (res.verified || res.certId || res.certificate || res.recipient || res.recipientName)) {
+        const cert = res?.certificate || res?.data?.certificate || res?.data || res;
+        setResult({
+          certId: cert.certId || cleaned,
+          recipientName: cert.recipientName || cert.recipient?.name || cert.user?.name || 'Verified Student',
+          courseTitle: cert.courseTitle || cert.course?.title || 'DevAscent Academy',
+          grade: cert.grade || cert.course?.grade || 'Distinction (A+)',
+          issuedAt: cert.issuedAt || cert.course?.completedAt || cert.ledgerTimestamp,
+          sha256Hash: cert.sha256Hash || cert.hash,
+          ...cert,
+        });
         setState('valid');
       } else {
         setResult(null);
+        setErrorMsg(res?.message || 'Certificate not found on public ledger');
         setState('invalid');
       }
     } catch (err: any) {
@@ -97,7 +106,7 @@ export default function AdminCertificateVerifyPage() {
                 setState('idle');
               }}
               onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
-              placeholder="e.g. DEV-2026-BC8491"
+              placeholder="e.g. DEV-BATCH12-A8F3C2"
               className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/[0.10] rounded-xl text-sm font-mono text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.06] transition-all uppercase"
             />
           </div>
@@ -116,7 +125,7 @@ export default function AdminCertificateVerifyPage() {
         </div>
         <p className="text-[10px] text-white/25 mt-2 flex items-center gap-1.5">
           <Shield className="w-3 h-3" />
-          Certificate IDs follow the format: DEV-YYYY-XXXXXX (SHA-256 fingerprint)
+          Certificate IDs follow the format: DEV-BATCH(n)-XXXXXX (SHA-256 fingerprint)
         </p>
       </div>
 

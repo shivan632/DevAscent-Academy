@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import PDFDocument from 'pdfkit';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as QRCode from 'qrcode';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const PDFDocument = require('pdfkit');
 
 /**
  * Service that creates official tamper-proof PDF representations of a certificate.
@@ -10,7 +11,34 @@ import * as QRCode from 'qrcode';
  */
 @Injectable()
 export class PdfService {
-  private logoPath = path.resolve(__dirname, '../../assets/logo.png');
+  private getLogoPath(): string | null {
+    const candidates = [
+      path.resolve(__dirname, '../../assets/logo.png'),
+      path.resolve(__dirname, '../assets/logo.png'),
+      path.resolve(process.cwd(), 'assets/logo.png'),
+      path.resolve(process.cwd(), 'backend/assets/logo.png'),
+    ];
+    for (const p of candidates) {
+      if (fs.existsSync(p)) return p;
+    }
+    return null;
+  }
+
+  private getSignaturePath(): string | null {
+    const candidates = [
+      path.resolve(__dirname, '../../assets/signature.png'),
+      path.resolve(__dirname, '../assets/signature.png'),
+      path.resolve(__dirname, '../../assets/signature.jpg'),
+      path.resolve(process.cwd(), 'assets/signature.png'),
+      path.resolve(process.cwd(), 'backend/assets/signature.png'),
+      path.resolve(process.cwd(), 'assets/signature.jpg'),
+      path.resolve(process.cwd(), 'backend/assets/signature.jpg'),
+    ];
+    for (const p of candidates) {
+      if (fs.existsSync(p)) return p;
+    }
+    return null;
+  }
 
   /**
    * Generates a PDF buffer for the given certificate details.
@@ -63,9 +91,10 @@ export class PdfService {
       doc.restore();
 
       // Organization Logo (if exists)
-      if (fs.existsSync(this.logoPath)) {
+      const logoPath = this.getLogoPath();
+      if (logoPath) {
         try {
-          doc.image(this.logoPath, width / 2 - 35, 42, { width: 70 });
+          doc.image(logoPath, width / 2 - 35, 42, { width: 70 });
         } catch (e) {
           // fallback gracefully
         }
@@ -103,11 +132,19 @@ export class PdfService {
       }
       doc.fontSize(9).font('Helvetica').fillColor('#4f46e5').text(`Verify: ${details.verifyUrl}`, 160, height - 78, { link: details.verifyUrl });
 
-      // Director Signatory
-      const signX = width - 220;
-      doc.moveTo(signX, height - 80).lineTo(signX + 160, height - 80).lineWidth(1).strokeColor('#94a3b8').stroke();
-      doc.fontSize(12).font('Helvetica-Bold').fillColor('#0f172a').text('Shivan Mishra', signX, height - 74, { width: 160, align: 'center' });
-      doc.fontSize(9).font('Helvetica').fillColor('#64748b').text('Founder & Lead Instructor', signX, height - 58, { width: 160, align: 'center' });
+      // Founder Signatory with Founder signature image
+      const signX = width - 230;
+      const signatureImgPath = this.getSignaturePath();
+      if (signatureImgPath) {
+        try {
+          doc.image(signatureImgPath, signX + 20, height - 125, { width: 120 });
+        } catch (e) {
+          console.warn('[PdfService] Signature image render error:', e);
+        }
+      }
+      doc.moveTo(signX, height - 72).lineTo(signX + 160, height - 72).lineWidth(1).strokeColor('#94a3b8').stroke();
+      doc.fontSize(12).font('Helvetica-Bold').fillColor('#0f172a').text('Shivan Mishra', signX, height - 66, { width: 160, align: 'center' });
+      doc.fontSize(9).font('Helvetica').fillColor('#64748b').text('Founder & Lead Instructor', signX, height - 50, { width: 160, align: 'center' });
 
       doc.end();
     });

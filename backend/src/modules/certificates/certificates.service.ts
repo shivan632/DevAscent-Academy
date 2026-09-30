@@ -16,10 +16,15 @@ export class CertificatesService {
     private mailService: MailService,
   ) {}
 
-  generateCertId(): string {
-    const year = new Date().getFullYear();
+  extractBatch(title?: string): number {
+    if (!title) return 12;
+    const match = title.match(/(?:batch|cohort)\s*(\d+)/i);
+    return match ? parseInt(match[1], 10) : 12;
+  }
+
+  generateCertId(batch: number | string = 12): string {
     const randomHex = crypto.randomBytes(3).toString('hex').toUpperCase();
-    return `DEV-${year}-${randomHex}`;
+    return `DEV-BATCH${batch}-${randomHex}`;
   }
 
   computeHash(certId: string, name: string, courseTitle: string, issuedAt: string): string {
@@ -48,7 +53,8 @@ export class CertificatesService {
     const issuedAtStr = issuedAtDate.toISOString().split('T')[0];
 
     if (!certificate) {
-      const certId = this.generateCertId();
+      const batchNumber = this.extractBatch(course.title);
+      const certId = this.generateCertId(batchNumber);
       const sha256Hash = this.computeHash(certId, user.name, course.title, issuedAtStr);
 
       certificate = await this.prisma.certificate.create({
@@ -212,12 +218,18 @@ export class CertificatesService {
   }
 
   async downloadCertificatePdf(certId: string): Promise<{ buffer: Buffer; filename: string }> {
-    const cert = await this.prisma.certificate.findUnique({
-      where: { certId: certId.toUpperCase() },
+    const cleaned = certId.trim();
+    const cert = await this.prisma.certificate.findFirst({
+      where: {
+        certId: {
+          equals: cleaned,
+          mode: 'insensitive',
+        },
+      },
     });
 
     if (!cert) {
-      throw new NotFoundException('Certificate not found');
+      throw new NotFoundException(`Certificate ${certId} not found`);
     }
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -241,8 +253,14 @@ export class CertificatesService {
   }
 
   async verify(certId: string) {
-    const cert = await this.prisma.certificate.findUnique({
-      where: { certId: certId.toUpperCase() },
+    const cleaned = certId.trim();
+    const cert = await this.prisma.certificate.findFirst({
+      where: {
+        certId: {
+          equals: cleaned,
+          mode: 'insensitive',
+        },
+      },
       include: {
         user: {
           select: {
@@ -263,6 +281,13 @@ export class CertificatesService {
 
     return {
       verified: true,
+      certId: cert.certId,
+      id: cert.id,
+      recipientName: cert.recipientName,
+      courseTitle: cert.courseTitle,
+      grade: cert.grade,
+      issuedAt: cert.issuedAt.toISOString(),
+      sha256Hash: cert.sha256Hash,
       recipient: {
         name: cert.recipientName,
         degree: cert.user?.degree || 'BCA / Technical Graduate',
