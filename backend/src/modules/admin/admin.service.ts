@@ -88,13 +88,21 @@ export class AdminService {
       search?: string;
       degree?: string;
       status?: string;
+      emailVerified?: string;
+      courseId?: string;
     } = {},
   ) {
     const skip = (page - 1) * limit;
     const where: any = { role: 'STUDENT' };
 
-    if (filters.status) where.status = filters.status;
-    if (filters.degree) where.degree = filters.degree;
+    if (filters.status && filters.status !== 'ALL') where.status = filters.status;
+    if (filters.degree && filters.degree !== 'ALL') where.degree = filters.degree;
+    if (filters.emailVerified && filters.emailVerified !== 'ALL') {
+      where.isEmailVerified = filters.emailVerified === 'true' || filters.emailVerified === 'VERIFIED';
+    }
+    if (filters.courseId && filters.courseId !== 'ALL') {
+      where.enrollments = { some: { courseId: filters.courseId } };
+    }
     if (filters.search) {
       where.OR = [
         { name: { contains: filters.search, mode: 'insensitive' } },
@@ -110,19 +118,22 @@ export class AdminService {
           id: true,
           name: true,
           email: true,
+          phone: true,
           degree: true,
           college: true,
           city: true,
           status: true,
+          isEmailVerified: true,
           lastLoginAt: true,
           createdAt: true,
           adminNote: true,
           enrollments: {
             select: {
               id: true,
+              courseId: true,
               progressPct: true,
               status: true,
-              course: { select: { title: true, slug: true } },
+              course: { select: { id: true, title: true, slug: true } },
             },
           },
           payments: {
@@ -142,10 +153,13 @@ export class AdminService {
         id: s.id,
         name: s.name,
         email: s.email,
+        phone: s.phone,
         degree: s.degree,
         college: s.college,
+        collegeName: s.college,
         city: s.city,
         status: s.status,
+        isEmailVerified: s.isEmailVerified,
         lastLoginAt: s.lastLoginAt,
         joinedAt: s.createdAt,
         adminNote: s.adminNote,
@@ -161,6 +175,121 @@ export class AdminService {
         limit,
         total,
         totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  // ─── Payments (Paginated & Real DB) ─────────────────────────────────────────
+  async getPayments(
+    page = 1,
+    limit = 20,
+    filters: {
+      search?: string;
+      status?: string;
+      courseId?: string;
+      cohort?: string;
+      emailVerified?: string;
+    } = {},
+  ) {
+    const skip = (page - 1) * limit;
+    const where: any = {};
+
+    if (filters.status && filters.status !== 'ALL') {
+      const dbStatus = filters.status === 'SUCCESS' ? 'PAID' : filters.status;
+      where.status = dbStatus;
+    }
+    if (filters.courseId && filters.courseId !== 'ALL') {
+      where.courseId = filters.courseId;
+    }
+    if (filters.emailVerified && filters.emailVerified !== 'ALL') {
+      where.user = {
+        ...(where.user || {}),
+        isEmailVerified: filters.emailVerified === 'VERIFIED' || filters.emailVerified === 'true',
+      };
+    }
+    if (filters.search) {
+      where.OR = [
+        { razorpayOrderId: { contains: filters.search, mode: 'insensitive' } },
+        { razorpayPaymentId: { contains: filters.search, mode: 'insensitive' } },
+        { user: { name: { contains: filters.search, mode: 'insensitive' } } },
+        { user: { email: { contains: filters.search, mode: 'insensitive' } } },
+      ];
+    }
+
+    const [total, payments, paidPayments, allPaymentsCount, verifiedStudentsCount] = await Promise.all([
+      this.prisma.payment.count({ where }),
+      this.prisma.payment.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              isEmailVerified: true,
+              phone: true,
+            },
+          },
+          course: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              cohortNumber: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.payment.findMany({
+        where: { status: 'PAID' },
+        select: { amountInPaise: true },
+      }),
+      this.prisma.payment.count(),
+      this.prisma.payment.count({
+        where: { user: { isEmailVerified: true } },
+      }),
+    ]);
+
+    const totalRevenueInRupees = Math.round(
+      paidPayments.reduce((acc, p) => acc + p.amountInPaise, 0) / 100,
+    );
+
+    const successCount = await this.prisma.payment.count({ where: { status: 'PAID' } });
+    const pendingCount = await this.prisma.payment.count({ where: { status: 'PENDING' } });
+
+    return {
+      data: payments.map((p) => ({
+        id: p.id,
+        studentId: p.user?.id,
+        studentName: p.user?.name || 'Student',
+        studentEmail: p.user?.email || '',
+        studentPhone: p.user?.phone,
+        emailVerified: p.user?.isEmailVerified ?? false,
+        courseId: p.course?.id,
+        courseName: p.course?.title || 'Course',
+        cohort: `Cohort ${p.course?.cohortNumber || 4}`,
+        amount: Math.round(p.amountInPaise / 100),
+        amountInPaise: p.amountInPaise,
+        status: p.status === 'PAID' ? 'SUCCESS' : p.status,
+        method: p.razorpayPaymentId ? 'Razorpay' : 'Pending Gateway',
+        transactionId: p.razorpayPaymentId || p.razorpayOrderId,
+        paidAt: p.createdAt.toISOString(),
+      })),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+      stats: {
+        totalRevenue: totalRevenueInRupees,
+        successCount,
+        pendingCount,
+        verifiedCount: verifiedStudentsCount,
+        totalCount: allPaymentsCount,
       },
     };
   }
@@ -246,6 +375,113 @@ export class AdminService {
     ]);
 
     return { success: true, message: `Student ${student.name} restored` };
+  }
+
+  async verifyStudentEmail(
+    adminId: string,
+    studentId: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
+    const student = await this.prisma.user.findUnique({ where: { id: studentId } });
+    if (!student) throw new NotFoundException('Student not found');
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: studentId },
+        data: { isEmailVerified: true },
+      }),
+      this.prisma.auditLog.create({
+        data: {
+          adminId,
+          action: 'STUDENT_EMAIL_VERIFIED',
+          targetId: studentId,
+          targetType: 'User',
+          metadata: { studentName: student.name, studentEmail: student.email },
+          ipAddress,
+          userAgent,
+        },
+      }),
+    ]);
+
+    return { success: true, message: `Email for ${student.name} marked as verified.` };
+  }
+
+  async enrollStudentManual(
+    adminId: string,
+    studentId: string,
+    courseId: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
+    const [student, course] = await Promise.all([
+      this.prisma.user.findUnique({ where: { id: studentId } }),
+      this.prisma.course.findUnique({ where: { id: courseId } }),
+    ]);
+    if (!student) throw new NotFoundException('Student not found');
+    if (!course) throw new NotFoundException('Course not found');
+
+    const existing = await this.prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId: studentId, courseId } },
+    });
+    if (existing) {
+      throw new ForbiddenException(`Student is already enrolled in ${course.title}`);
+    }
+
+    const [enrollment] = await this.prisma.$transaction([
+      this.prisma.enrollment.create({
+        data: {
+          userId: studentId,
+          courseId,
+          progressPct: 0,
+          status: 'ACTIVE',
+        },
+      }),
+      this.prisma.auditLog.create({
+        data: {
+          adminId,
+          action: 'STUDENT_MANUALLY_ENROLLED',
+          targetId: studentId,
+          targetType: 'User',
+          metadata: { studentName: student.name, studentEmail: student.email, courseTitle: course.title },
+          ipAddress,
+          userAgent,
+        },
+      }),
+    ]);
+
+    return { success: true, enrollment, message: `Enrolled ${student.name} into ${course.title}` };
+  }
+
+  async updateStudentNote(
+    adminId: string,
+    studentId: string,
+    note: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
+    const student = await this.prisma.user.findUnique({ where: { id: studentId } });
+    if (!student) throw new NotFoundException('Student not found');
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: studentId },
+        data: { adminNote: note },
+      }),
+      this.prisma.auditLog.create({
+        data: {
+          adminId,
+          action: 'STUDENT_NOTE_UPDATED',
+          targetId: studentId,
+          targetType: 'User',
+          metadata: { studentName: student.name, notePreview: note.slice(0, 50) },
+          ipAddress,
+          userAgent,
+        },
+      }),
+    ]);
+
+    return { success: true, message: 'Note updated successfully.' };
   }
 
   // ─── Refunds ────────────────────────────────────────────────────────────────

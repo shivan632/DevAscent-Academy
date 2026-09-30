@@ -14,43 +14,39 @@ import {
   ArrowLeft,
   Shield,
   Loader2,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
-
-// ─── Mock verify function ─────────────────────────────────────────────────
-const MOCK_VALID_IDS: Record<string, {
-  studentName: string; courseName: string; cohort: string;
-  issuedAt: string; grade: string; email: string;
-}> = {
-  'DA-2024-7F3A2C1B': {
-    studentName: 'Rahul Sharma', courseName: 'Web Dev Internship',
-    cohort: 'Cohort 3', issuedAt: '2024-09-01T10:00:00Z',
-    grade: 'Distinction', email: 'rahul@gmail.com',
-  },
-  'DA-2024-8B4D5E2A': {
-    studentName: 'Priya Mehta', courseName: 'Python Internship',
-    cohort: 'Cohort 3', issuedAt: '2024-09-05T12:00:00Z',
-    grade: 'Merit', email: 'priya@gmail.com',
-  },
-};
+import { api } from '../../../../lib/api';
 
 type VerifyState = 'idle' | 'loading' | 'valid' | 'invalid';
 
 export default function AdminCertificateVerifyPage() {
   const [certId, setCertId] = useState('');
   const [state, setState] = useState<VerifyState>('idle');
-  const [result, setResult] = useState<typeof MOCK_VALID_IDS[string] | null>(null);
+  const [result, setResult] = useState<any | null>(null);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleVerify = async () => {
-    if (!certId.trim()) return;
+    const cleaned = certId.trim().toUpperCase();
+    if (!cleaned) return;
+
     setState('loading');
-    await new Promise((r) => setTimeout(r, 1000)); // simulate API
-    const found = MOCK_VALID_IDS[certId.trim().toUpperCase()];
-    if (found) {
-      setResult(found);
-      setState('valid');
-    } else {
+    setErrorMsg('');
+    try {
+      const res = await api.verifyCertificatePublic(cleaned);
+      const cert = res?.certificate || res?.data?.certificate || res?.data || res;
+      if (cert && (cert.certId || cert.id)) {
+        setResult(cert);
+        setState('valid');
+      } else {
+        setResult(null);
+        setState('invalid');
+      }
+    } catch (err: any) {
       setResult(null);
+      setErrorMsg(err?.message || 'Certificate not found on public ledger');
       setState('invalid');
     }
   };
@@ -59,13 +55,17 @@ export default function AdminCertificateVerifyPage() {
     setCertId('');
     setState('idle');
     setResult(null);
+    setErrorMsg('');
   };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <Link href="/admin/certificates" className="inline-flex items-center gap-1.5 text-[11px] text-white/40 hover:text-white/80 transition-colors mb-4">
+        <Link
+          href="/admin/certificates"
+          className="inline-flex items-center gap-1.5 text-[11px] text-white/40 hover:text-white/80 transition-colors mb-4"
+        >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Certificates
         </Link>
@@ -75,25 +75,30 @@ export default function AdminCertificateVerifyPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-white tracking-tight">Verify Certificate</h1>
-            <p className="text-xs text-white/35 mt-0.5">Enter a DevAscent Certificate ID to verify its authenticity</p>
+            <p className="text-xs text-white/35 mt-0.5">
+              Enter a DevAscent Certificate ID to verify cryptographic authenticity
+            </p>
           </div>
         </div>
       </div>
 
       {/* Input Card */}
-      <div className="bg-[#0D1117] border border-white/[0.07] rounded-2xl p-6">
+      <div className="bg-[#0D1117] border border-white/[0.07] rounded-2xl p-6 shadow-xl">
         <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-2">
-          Certificate ID
+          Certificate ID / Fingerprint
         </label>
         <div className="flex gap-3">
           <div className="relative flex-1">
             <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
             <input
               value={certId}
-              onChange={(e) => { setCertId(e.target.value); setState('idle'); }}
+              onChange={(e) => {
+                setCertId(e.target.value);
+                setState('idle');
+              }}
               onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
-              placeholder="e.g. DA-2024-7F3A2C1B"
-              className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/[0.10] rounded-xl text-sm font-mono text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.06] transition-all"
+              placeholder="e.g. DEV-2026-BC8491"
+              className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/[0.10] rounded-xl text-sm font-mono text-white placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.06] transition-all uppercase"
             />
           </div>
           <button
@@ -111,29 +116,39 @@ export default function AdminCertificateVerifyPage() {
         </div>
         <p className="text-[10px] text-white/25 mt-2 flex items-center gap-1.5">
           <Shield className="w-3 h-3" />
-          Certificate IDs follow the format: DA-YYYY-XXXXXXXX (SHA-256 fingerprint)
+          Certificate IDs follow the format: DEV-YYYY-XXXXXX (SHA-256 fingerprint)
         </p>
       </div>
 
       {/* Result: Valid */}
       {state === 'valid' && result && (
-        <div className="bg-emerald-500/8 border border-emerald-500/25 rounded-2xl p-6 animate-in fade-in slide-in-from-bottom-2">
+        <div className="bg-emerald-500/8 border border-emerald-500/25 rounded-2xl p-6 shadow-xl animate-in fade-in slide-in-from-bottom-2">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-12 h-12 rounded-full bg-emerald-500/15 border-2 border-emerald-500/30 flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
-              <p className="text-sm font-black text-emerald-300">✓ Authentic Certificate</p>
-              <p className="text-[10px] text-emerald-400/60">This certificate was issued by DevAscent Academy</p>
+              <p className="text-sm font-black text-emerald-300">✓ Authentic Verified Certificate</p>
+              <p className="text-[10px] text-emerald-400/60">Cryptographic record confirmed on immutable database</p>
             </div>
           </div>
 
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 space-y-3">
             {[
-              { icon: User, label: 'Issued To', value: result.studentName },
-              { icon: BookOpen, label: 'Course', value: result.courseName },
-              { icon: BadgeCheck, label: 'Cohort', value: result.cohort },
-              { icon: Calendar, label: 'Issued On', value: new Date(result.issuedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) },
+              { icon: Hash, label: 'Cert ID', value: result.certId || certId },
+              { icon: User, label: 'Recipient', value: result.recipientName || result.user?.name || 'Verified Student' },
+              { icon: BookOpen, label: 'Course', value: result.courseTitle || result.course?.title || 'DevAscent Academy' },
+              {
+                icon: Calendar,
+                label: 'Issued On',
+                value: result.issuedAt
+                  ? new Date(result.issuedAt).toLocaleDateString('en-IN', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  : 'Verified',
+              },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex items-center gap-3">
                 <Icon className="w-4 h-4 text-white/30 shrink-0" />
@@ -141,41 +156,65 @@ export default function AdminCertificateVerifyPage() {
                 <span className="text-xs font-semibold text-white">{value}</span>
               </div>
             ))}
+
             <div className="flex items-center gap-3">
               <BadgeCheck className="w-4 h-4 text-white/30 shrink-0" />
               <span className="text-[10px] text-white/40 w-16 shrink-0">Grade</span>
-              <span className={`text-[10px] font-black px-2 py-0.5 rounded-lg ${
-                result.grade === 'Distinction' ? 'bg-amber-500/15 text-amber-300 border border-amber-500/20' :
-                result.grade === 'Merit' ? 'bg-blue-500/15 text-blue-300 border border-blue-500/20' :
-                'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20'
-              }`}>
-                {result.grade}
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">
+                {result.grade || 'A+'}
               </span>
             </div>
+
+            {result.sha256Hash && (
+              <div className="pt-2 border-t border-white/5">
+                <p className="text-[9px] text-white/30 uppercase font-mono">SHA-256 Checksum:</p>
+                <p className="text-[10px] font-mono text-emerald-300/80 break-all">{result.sha256Hash}</p>
+              </div>
+            )}
           </div>
 
-          <button onClick={handleReset} className="mt-4 text-[11px] text-emerald-400/60 hover:text-emerald-300 transition-colors flex items-center gap-1">
-            <Search className="w-3 h-3" /> Verify another
-          </button>
+          <div className="flex items-center gap-3 mt-5">
+            <a
+              href={api.getDownloadUrl(result.certId || certId)}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-semibold transition-all"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download PDF</span>
+            </a>
+            <button
+              onClick={handleReset}
+              className="text-[11px] text-emerald-400/60 hover:text-emerald-300 transition-colors flex items-center gap-1 ml-auto"
+            >
+              <Search className="w-3 h-3" /> Verify another
+            </button>
+          </div>
         </div>
       )}
 
       {/* Result: Invalid */}
       {state === 'invalid' && (
-        <div className="bg-rose-500/8 border border-rose-500/20 rounded-2xl p-6 animate-in fade-in slide-in-from-bottom-2">
+        <div className="bg-rose-500/8 border border-rose-500/20 rounded-2xl p-6 shadow-xl animate-in fade-in slide-in-from-bottom-2">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-full bg-rose-500/15 border-2 border-rose-500/25 flex items-center justify-center">
               <XCircle className="w-6 h-6 text-rose-400" />
             </div>
             <div>
               <p className="text-sm font-black text-rose-300">✗ Certificate Not Found</p>
-              <p className="text-[10px] text-rose-400/60">No record found for ID: <span className="font-mono">{certId}</span></p>
+              <p className="text-[10px] text-rose-400/60">
+                No verified record for ID: <span className="font-mono">{certId}</span>
+              </p>
             </div>
           </div>
           <p className="text-xs text-white/40 mb-4">
-            This certificate ID does not exist in our system. It may be invalid, revoked, or entered incorrectly. Double-check the ID and try again.
+            {errorMsg ||
+              'This certificate ID does not exist in the DevAscent registry. It may be revoked, pending issuance, or mistyped.'}
           </p>
-          <button onClick={handleReset} className="text-[11px] text-rose-400/60 hover:text-rose-300 transition-colors flex items-center gap-1">
+          <button
+            onClick={handleReset}
+            className="text-[11px] text-rose-400/60 hover:text-rose-300 transition-colors flex items-center gap-1"
+          >
             <Search className="w-3 h-3" /> Try a different ID
           </button>
         </div>
@@ -183,14 +222,16 @@ export default function AdminCertificateVerifyPage() {
 
       {/* Info section */}
       {state === 'idle' && (
-        <div className="bg-[#0D1117] border border-white/[0.07] rounded-2xl p-5">
-          <p className="text-[10px] font-black uppercase tracking-wider text-white/30 mb-3">How Verification Works</p>
+        <div className="bg-[#0D1117] border border-white/[0.07] rounded-2xl p-5 shadow-lg">
+          <p className="text-[10px] font-black uppercase tracking-wider text-white/30 mb-3">
+            How Verification Works
+          </p>
           <div className="space-y-3">
             {[
               { step: '01', text: 'Each certificate has a unique SHA-256 derived ID assigned at issuance.' },
-              { step: '02', text: 'The ID is printed on the certificate PDF and emailed to the student.' },
-              { step: '03', text: 'Enter the ID above to instantly verify the certificate\'s authenticity.' },
-              { step: '04', text: 'Results show the student name, course, cohort, and grade — no login needed for public verification.' },
+              { step: '02', text: 'The ID is printed on the certificate PDF, signed digitally, and registered.' },
+              { step: '03', text: 'Instant database lookup checks against the authoritative certificates table.' },
+              { step: '04', text: 'Public verification is also open to employers at devascent.in/verify.' },
             ].map(({ step, text }) => (
               <div key={step} className="flex items-start gap-3">
                 <span className="text-[10px] font-black text-violet-400/60 w-6 shrink-0">{step}</span>

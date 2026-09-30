@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import useSWR from 'swr';
 import { api } from '../../lib/api';
 import {
@@ -16,6 +16,11 @@ import {
   UserCheck,
   Phone,
   ShieldAlert,
+  BadgeCheck,
+  PlusCircle,
+  Save,
+  Check,
+  Loader2,
 } from 'lucide-react';
 
 interface StudentDetailDrawerProps {
@@ -31,16 +36,73 @@ export function StudentDetailDrawer({
   onSuspend,
   onRestore,
 }: StudentDetailDrawerProps) {
-  const { data: student, isLoading, error } = useSWR(
+  const { data: resData, isLoading, error, mutate } = useSWR(
     studentId ? `/admin/students/${studentId}` : null,
     () => api.admin.getStudentDetail(studentId!),
     { revalidateOnFocus: false }
   );
 
+  const student = resData?.data || resData;
+
+  const { data: coursesData } = useSWR('/admin/courses', () => api.admin.getCourseStats());
+  const allCourses: any[] = coursesData?.courses || coursesData?.data?.courses || [];
+
+  const [noteText, setNoteText] = useState<string | null>(null);
+  const [savingNote, setSavingNote] = useState(false);
+  const [noteSaved, setNoteSaved] = useState(false);
+
+  const [selectedCourseToEnroll, setSelectedCourseToEnroll] = useState('');
+  const [enrolling, setEnrolling] = useState(false);
+  const [verifyingEmail, setVerifyingEmail] = useState(false);
+
+  const currentNote = noteText !== null ? noteText : student?.adminNote || '';
+
+  const handleSaveNote = async () => {
+    if (!studentId) return;
+    setSavingNote(true);
+    try {
+      await api.admin.updateStudentNote(studentId, currentNote);
+      setNoteSaved(true);
+      setTimeout(() => setNoteSaved(false), 2500);
+      await mutate();
+    } catch (e: any) {
+      alert(e.message || 'Failed to save note');
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    if (!studentId) return;
+    setVerifyingEmail(true);
+    try {
+      await api.admin.verifyStudentEmail(studentId);
+      await mutate();
+    } catch (e: any) {
+      alert(e.message || 'Failed to verify email');
+    } finally {
+      setVerifyingEmail(false);
+    }
+  };
+
+  const handleEnrollCourse = async () => {
+    if (!studentId || !selectedCourseToEnroll) return;
+    setEnrolling(true);
+    try {
+      await api.admin.enrollStudentManual(studentId, selectedCourseToEnroll);
+      setSelectedCourseToEnroll('');
+      await mutate();
+    } catch (e: any) {
+      alert(e.message || 'Failed to enroll student');
+    } finally {
+      setEnrolling(false);
+    }
+  };
+
   if (!studentId) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
       <div
         className="w-full sm:max-w-md md:max-w-lg bg-[#0F1420] border-l border-white/10 h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-200"
         onClick={(e) => e.stopPropagation()}
@@ -58,7 +120,7 @@ export function StudentDetailDrawer({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-white/40 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+            className="p-1.5 text-white/40 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -93,15 +155,30 @@ export function StudentDetailDrawer({
                       </p>
                     )}
                   </div>
-                  <span
-                    className={`px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-full border ${
-                      student.status === 'ACTIVE'
-                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                        : 'bg-rose-500/15 text-rose-400 border-rose-500/30'
-                    }`}
-                  >
-                    {student.status}
-                  </span>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <span
+                      className={`px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-full border ${
+                        student.status === 'ACTIVE'
+                          ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                          : 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+                      }`}
+                    >
+                      {student.status || 'ACTIVE'}
+                    </span>
+                    {student.isEmailVerified ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
+                        <BadgeCheck className="w-3 h-3" /> Email Verified
+                      </span>
+                    ) : (
+                      <button
+                        onClick={handleVerifyEmail}
+                        disabled={verifyingEmail}
+                        className="text-[10px] font-bold text-amber-400 hover:text-amber-300 underline"
+                      >
+                        {verifyingEmail ? 'Verifying…' : '⚠ Verify Email Now'}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 text-[11px] text-white/60">
@@ -115,8 +192,67 @@ export function StudentDetailDrawer({
                   </div>
                   <div className="col-span-2 flex items-center gap-1.5">
                     <Building className="w-3.5 h-3.5 text-purple-400" />
-                    <span className="truncate">College: {student.collegeName || '—'}</span>
+                    <span className="truncate">College: {student.collegeName || student.college || '—'}</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Admin Note Section */}
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-white uppercase tracking-wider text-[11px] text-white/50">
+                    Internal Admin Notes
+                  </h4>
+                  <button
+                    onClick={handleSaveNote}
+                    disabled={savingNote}
+                    className="flex items-center gap-1 px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-[10px] font-bold transition-all"
+                  >
+                    {savingNote ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : noteSaved ? (
+                      <Check className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <Save className="w-3 h-3" />
+                    )}
+                    <span>{savingNote ? 'Saving…' : noteSaved ? 'Saved' : 'Save Note'}</span>
+                  </button>
+                </div>
+                <textarea
+                  value={currentNote}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  placeholder="Add internal notes about this student's progress, phone calls, or cohort changes…"
+                  rows={3}
+                  className="w-full p-2.5 bg-black/20 border border-white/10 rounded-xl text-xs text-white placeholder-white/20 focus:outline-none focus:border-indigo-500/50 resize-none"
+                />
+              </div>
+
+              {/* Manual Course Enrollment */}
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2.5">
+                <h4 className="font-bold text-white uppercase tracking-wider text-[11px] text-white/50">
+                  Manual Course Enrollment
+                </h4>
+                <div className="flex gap-2">
+                  <select
+                    value={selectedCourseToEnroll}
+                    onChange={(e) => setSelectedCourseToEnroll(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-[#0B0F1A] border border-white/10 rounded-xl text-xs text-white/80 focus:outline-none focus:border-indigo-500/50"
+                  >
+                    <option value="">Select a course to enroll…</option>
+                    {allCourses.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleEnrollCourse}
+                    disabled={!selectedCourseToEnroll || enrolling}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold transition-all disabled:opacity-40"
+                  >
+                    {enrolling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <PlusCircle className="w-3.5 h-3.5" />}
+                    <span>Enroll</span>
+                  </button>
                 </div>
               </div>
 
@@ -127,7 +263,7 @@ export function StudentDetailDrawer({
                     Enrolled Courses ({student.enrollments?.length || 0})
                   </h4>
                   <span className="text-[11px] text-indigo-400 font-semibold">
-                    ₹{(student.totalSpentRupees || 0).toLocaleString('en-IN')} Spent
+                    ₹{((student.payments || []).filter((p: any) => p.status === 'PAID').reduce((s: number, p: any) => s + p.amountInPaise, 0) / 100).toLocaleString('en-IN')} Spent
                   </span>
                 </div>
 
@@ -144,16 +280,16 @@ export function StudentDetailDrawer({
                           <p className="font-semibold text-white">{enr.course?.title || 'Course'}</p>
                           <p className="text-[10px] text-white/40">
                             Enrolled on{' '}
-                            {new Date(enr.enrolledAt).toLocaleDateString('en-IN', {
+                            {new Date(enr.enrolledAt || enr.createdAt || Date.now()).toLocaleDateString('en-IN', {
                               day: 'numeric',
                               month: 'short',
                               year: 'numeric',
                             })}
                           </p>
                         </div>
-                        {enr.certificateIssued ? (
+                        {enr.progressPct === 100 ? (
                           <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
-                            <Award className="w-3 h-3" /> Certified
+                            <Award className="w-3 h-3" /> Completed
                           </span>
                         ) : (
                           <span className="text-[10px] text-white/40 font-medium">In Progress</span>
@@ -164,12 +300,12 @@ export function StudentDetailDrawer({
                       <div className="space-y-1">
                         <div className="flex justify-between text-[10px] text-white/40">
                           <span>Completion</span>
-                          <span className="font-bold text-white/70">{enr.progressPercent || 0}%</span>
+                          <span className="font-bold text-white/70">{enr.progressPct || 0}%</span>
                         </div>
                         <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full"
-                            style={{ width: `${enr.progressPercent || 0}%` }}
+                            style={{ width: `${enr.progressPct || 0}%` }}
                           />
                         </div>
                       </div>
@@ -199,9 +335,11 @@ export function StudentDetailDrawer({
                           </div>
                           <div>
                             <p className="font-bold text-white">
-                              ₹{(pay.amountInPaise / 100).toLocaleString('en-IN')}
+                              ₹{((pay.amountInPaise || 0) / 100).toLocaleString('en-IN')}
                             </p>
-                            <p className="text-[10px] text-white/40">{pay.orderId || pay.id.slice(-8)}</p>
+                            <p className="text-[10px] text-white/40 font-mono">
+                              {pay.razorpayPaymentId || pay.razorpayOrderId || pay.id.slice(-8)}
+                            </p>
                           </div>
                         </div>
                         <div className="text-right">
@@ -209,7 +347,7 @@ export function StudentDetailDrawer({
                             className={`px-2 py-0.5 text-[9px] font-bold rounded-md uppercase ${
                               pay.status === 'PAID'
                                 ? 'bg-emerald-500/15 text-emerald-400'
-                                : 'bg-rose-500/15 text-rose-400'
+                                : 'bg-amber-500/15 text-amber-400'
                             }`}
                           >
                             {pay.status}

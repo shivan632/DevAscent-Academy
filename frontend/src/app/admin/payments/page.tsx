@@ -18,46 +18,28 @@ import {
   Calendar,
   ChevronDown,
   BadgeCheck,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  CreditCard,
 } from 'lucide-react';
 import { SkeletonLoader } from '../../../components/admin/SkeletonLoader';
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-interface Payment {
-  id: string;
-  studentName: string;
-  studentEmail: string;
-  emailVerified: boolean;
-  courseName: string;
-  cohort: string;
-  amount: number;
-  status: 'SUCCESS' | 'PENDING' | 'FAILED' | 'REFUNDED';
-  method: string;
-  transactionId: string;
-  paidAt: string;
-}
+import { EmptyState } from '../../../components/admin/EmptyState';
+import { useDebounce } from '../../../lib/hooks/useDebounce';
 
 // ─── Status config ─────────────────────────────────────────────────────────
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; bg: string }> = {
   SUCCESS:  { label: 'Success',  icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/12 border-emerald-500/20' },
+  PAID:     { label: 'Success',  icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/12 border-emerald-500/20' },
   PENDING:  { label: 'Pending',  icon: Clock,        color: 'text-amber-400',   bg: 'bg-amber-500/12 border-amber-500/20' },
   FAILED:   { label: 'Failed',   icon: XCircle,      color: 'text-rose-400',    bg: 'bg-rose-500/12 border-rose-500/20' },
   REFUNDED: { label: 'Refunded', icon: RefreshCw,    color: 'text-slate-400',   bg: 'bg-slate-500/12 border-slate-500/20' },
 };
 
-// ─── Mock data (replace with real API) ────────────────────────────────────
-const MOCK_PAYMENTS: Payment[] = [
-  { id: 'p1', studentName: 'Rahul Sharma', studentEmail: 'rahul@gmail.com', emailVerified: true,  courseName: 'Web Dev Internship', cohort: 'Cohort 4', amount: 4999, status: 'SUCCESS',  method: 'UPI',       transactionId: 'UPI2024092801', paidAt: '2024-09-28T10:24:00Z' },
-  { id: 'p2', studentName: 'Priya Mehta',  studentEmail: 'priya@gmail.com',  emailVerified: true,  courseName: 'Python Internship',  cohort: 'Cohort 4', amount: 3999, status: 'SUCCESS',  method: 'Razorpay',  transactionId: 'RZP2024092802', paidAt: '2024-09-28T11:15:00Z' },
-  { id: 'p3', studentName: 'Amit Singh',   studentEmail: 'amit@yahoo.com',   emailVerified: false, courseName: 'Web Dev Internship', cohort: 'Cohort 3', amount: 4999, status: 'PENDING',  method: 'NetBanking',transactionId: 'NB2024092803',  paidAt: '2024-09-27T09:00:00Z' },
-  { id: 'p4', studentName: 'Sneha Patel',  studentEmail: 'sneha@gmail.com',  emailVerified: true,  courseName: 'Python Internship',  cohort: 'Cohort 3', amount: 3999, status: 'REFUNDED', method: 'UPI',       transactionId: 'UPI2024092604', paidAt: '2024-09-26T14:30:00Z' },
-  { id: 'p5', studentName: 'Karan Joshi',  studentEmail: 'karan@gmail.com',  emailVerified: true,  courseName: 'Web Dev Internship', cohort: 'Cohort 4', amount: 4999, status: 'SUCCESS',  method: 'Card',      transactionId: 'CARD2024092505',paidAt: '2024-09-25T16:45:00Z' },
-  { id: 'p6', studentName: 'Divya Rao',    studentEmail: 'divya@outlook.com',emailVerified: false, courseName: 'Python Internship',  cohort: 'Cohort 4', amount: 3999, status: 'FAILED',   method: 'UPI',       transactionId: 'UPI2024092406', paidAt: '2024-09-24T08:20:00Z' },
-];
-
 // ─── KPI Card ──────────────────────────────────────────────────────────────
 function KpiCard({ label, value, sub, icon: Icon, color }: { label: string; value: string; sub: string; icon: React.ElementType; color: string }) {
   return (
-    <div className="bg-[#0D1117] border border-white/[0.07] rounded-2xl p-4 flex items-start gap-3">
+    <div className="bg-[#0D1117] border border-white/[0.07] rounded-2xl p-4 flex items-start gap-3 shadow-lg">
       <div className={`p-2.5 rounded-xl ${color} shrink-0`}>
         <Icon className="w-4 h-4" />
       </div>
@@ -72,38 +54,50 @@ function KpiCard({ label, value, sub, icon: Icon, color }: { label: string; valu
 
 // ─── Main Page ────────────────────────────────────────────────────────────
 export default function AdminPaymentsPage() {
-  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [searchInput, setSearchInput] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
-  const [cohortFilter, setCohortFilter] = useState<string>('ALL');
   const [verifiedFilter, setVerifiedFilter] = useState<string>('ALL');
 
-  // TODO: replace with real API call
-  const payments = MOCK_PAYMENTS;
-  const isLoading = false;
+  const search = useDebounce(searchInput, 300);
 
-  const cohorts = useMemo(() => ['ALL', ...Array.from(new Set(payments.map((p) => p.cohort)))], [payments]);
+  const { data: resData, isLoading, isValidating, mutate } = useSWR(
+    ['/admin/payments', page, limit, search, statusFilter, verifiedFilter],
+    () =>
+      api.admin.getPayments({
+        page,
+        limit,
+        search: search || undefined,
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
+        emailVerified: verifiedFilter === 'ALL' ? undefined : verifiedFilter,
+      }),
+    { refreshInterval: 60000, revalidateOnFocus: true }
+  );
 
-  const filtered = useMemo(() => {
-    return payments.filter((p) => {
-      const matchSearch =
-        !search ||
-        p.studentName.toLowerCase().includes(search.toLowerCase()) ||
-        p.studentEmail.toLowerCase().includes(search.toLowerCase()) ||
-        p.transactionId.toLowerCase().includes(search.toLowerCase());
-      const matchStatus = statusFilter === 'ALL' || p.status === statusFilter;
-      const matchCohort = cohortFilter === 'ALL' || p.cohort === cohortFilter;
-      const matchVerified =
-        verifiedFilter === 'ALL' ||
-        (verifiedFilter === 'VERIFIED' && p.emailVerified) ||
-        (verifiedFilter === 'UNVERIFIED' && !p.emailVerified);
-      return matchSearch && matchStatus && matchCohort && matchVerified;
-    });
-  }, [payments, search, statusFilter, cohortFilter, verifiedFilter]);
+  const payload = resData?.data || resData || {};
+  const paymentsList: any[] = Array.isArray(payload?.data)
+    ? payload.data
+    : Array.isArray(payload?.payments)
+    ? payload.payments
+    : Array.isArray(payload)
+    ? payload
+    : [];
 
-  const totalRevenue = payments.filter((p) => p.status === 'SUCCESS').reduce((s, p) => s + p.amount, 0);
-  const successCount = payments.filter((p) => p.status === 'SUCCESS').length;
-  const pendingCount = payments.filter((p) => p.status === 'PENDING').length;
-  const verifiedCount = payments.filter((p) => p.emailVerified).length;
+  const meta = payload?.meta || {};
+  const stats = payload?.stats || {};
+  const total = meta?.total ?? paymentsList.length;
+  const totalPages = meta?.totalPages ?? 1;
+
+  const totalRevenue = stats?.totalRevenue ?? 0;
+  const successCount = stats?.successCount ?? 0;
+  const pendingCount = stats?.pendingCount ?? 0;
+  const verifiedCount = stats?.verifiedCount ?? 0;
+  const totalCount = stats?.totalCount ?? total;
+
+  const handleExport = () => {
+    window.open(api.admin.exportRevenueUrl(), '_blank');
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -116,12 +110,27 @@ export default function AdminPaymentsPage() {
             </div>
             <h1 className="text-2xl font-black text-white tracking-tight">Payment Ledger</h1>
           </div>
-          <p className="text-xs text-white/35 mt-1 ml-11">All student payments · batch & email verification tracking</p>
+          <p className="text-xs text-white/35 mt-1 ml-11">
+            Real-time student transactions from PostgreSQL database · batch & verification tracking
+          </p>
         </div>
-        <button className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 border border-emerald-500/25 text-emerald-300 text-xs font-bold transition-all self-start sm:self-auto">
-          <Download className="w-3.5 h-3.5" />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => mutate()}
+            disabled={isValidating}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/60 hover:text-white text-xs font-semibold transition-all"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isValidating ? 'animate-spin text-emerald-400' : ''}`} />
+            <span>Refresh</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 border border-emerald-500/25 text-emerald-300 text-xs font-bold transition-all shadow-md shadow-emerald-500/5"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Grid */}
@@ -129,28 +138,28 @@ export default function AdminPaymentsPage() {
         <KpiCard
           label="Total Revenue"
           value={`₹${totalRevenue.toLocaleString('en-IN')}`}
-          sub="From successful payments"
+          sub="From paid enrollments"
           icon={IndianRupee}
           color="bg-emerald-500/12 border border-emerald-500/20 text-emerald-400"
         />
         <KpiCard
           label="Successful"
           value={String(successCount)}
-          sub="Payments cleared"
+          sub="Payments completed"
           icon={CheckCircle2}
           color="bg-blue-500/12 border border-blue-500/20 text-blue-400"
         />
         <KpiCard
           label="Pending"
           value={String(pendingCount)}
-          sub="Awaiting confirmation"
+          sub="Awaiting completion"
           icon={Clock}
           color="bg-amber-500/12 border border-amber-500/20 text-amber-400"
         />
         <KpiCard
           label="Email Verified"
           value={String(verifiedCount)}
-          sub={`of ${payments.length} students`}
+          sub={`of ${totalCount} transactions`}
           icon={MailCheck}
           color="bg-violet-500/12 border border-violet-500/20 text-violet-400"
         />
@@ -163,41 +172,50 @@ export default function AdminPaymentsPage() {
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30" />
             <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search name, email, txn ID…"
-              className="w-full pl-9 pr-4 py-2.5 bg-white/[0.03] border border-white/[0.08] rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.05] transition-all"
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Search name, email, order ID, txn ID…"
+              className="w-full pl-9 pr-8 py-2.5 bg-white/[0.03] border border-white/[0.08] rounded-xl text-xs text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.05] transition-all"
             />
+            {searchInput && (
+              <button
+                onClick={() => {
+                  setSearchInput('');
+                  setPage(1);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Status Filter */}
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2.5 bg-white/[0.03] border border-white/[0.08] rounded-xl text-xs text-white/70 focus:outline-none focus:border-violet-500/50 transition-all cursor-pointer"
           >
             <option value="ALL">All Status</option>
-            <option value="SUCCESS">Success</option>
+            <option value="SUCCESS">Success / Paid</option>
             <option value="PENDING">Pending</option>
             <option value="FAILED">Failed</option>
             <option value="REFUNDED">Refunded</option>
           </select>
 
-          {/* Cohort Filter */}
-          <select
-            value={cohortFilter}
-            onChange={(e) => setCohortFilter(e.target.value)}
-            className="px-3 py-2.5 bg-white/[0.03] border border-white/[0.08] rounded-xl text-xs text-white/70 focus:outline-none focus:border-violet-500/50 transition-all cursor-pointer"
-          >
-            {cohorts.map((c) => (
-              <option key={c} value={c}>{c === 'ALL' ? 'All Batches' : c}</option>
-            ))}
-          </select>
-
           {/* Email Verified Filter */}
           <select
             value={verifiedFilter}
-            onChange={(e) => setVerifiedFilter(e.target.value)}
+            onChange={(e) => {
+              setVerifiedFilter(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2.5 bg-white/[0.03] border border-white/[0.08] rounded-xl text-xs text-white/70 focus:outline-none focus:border-violet-500/50 transition-all cursor-pointer"
           >
             <option value="ALL">All Emails</option>
@@ -206,103 +224,159 @@ export default function AdminPaymentsPage() {
           </select>
 
           <span className="text-[10px] text-white/30 font-medium ml-auto">
-            {filtered.length} of {payments.length} records
+            {paymentsList.length} of {total} records
           </span>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-[#0D1117] border border-white/[0.07] rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/[0.06]">
-                {['Student', 'Course / Batch', 'Amount', 'Method', 'Status', 'Paid At', 'Txn ID'].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-wider text-white/30">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-xs text-white/30">
-                    No payments match your filters.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((p) => {
-                  const cfg = STATUS_CONFIG[p.status];
-                  const StatusIcon = cfg.icon;
-                  return (
-                    <tr key={p.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
-                      {/* Student */}
-                      <td className="px-4 py-3.5">
-                        <div>
-                          <p className="text-xs font-bold text-white">{p.studentName}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <p className="text-[10px] text-white/40">{p.studentEmail}</p>
-                            {p.emailVerified ? (
-                              <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-400">
-                                <BadgeCheck className="w-2.5 h-2.5" /> Verified
-                              </span>
-                            ) : (
-                              <span className="text-[9px] font-bold text-amber-400">⚠ Unverified</span>
-                            )}
+      <div className="bg-[#0D1117] border border-white/[0.07] rounded-2xl overflow-hidden shadow-xl">
+        {isLoading ? (
+          <div className="p-6">
+            <SkeletonLoader type="table" rows={5} cols={7} />
+          </div>
+        ) : paymentsList.length === 0 ? (
+          <EmptyState
+            icon={CreditCard}
+            title="No payment records found"
+            description={
+              searchInput || statusFilter !== 'ALL' || verifiedFilter !== 'ALL'
+                ? 'No transactions matched the applied filters.'
+                : 'No student payments have been initiated yet.'
+            }
+            action={
+              searchInput || statusFilter !== 'ALL' || verifiedFilter !== 'ALL'
+                ? {
+                    label: 'Reset Filters',
+                    onClick: () => {
+                      setSearchInput('');
+                      setStatusFilter('ALL');
+                      setVerifiedFilter('ALL');
+                      setPage(1);
+                    },
+                  }
+                : undefined
+            }
+          />
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-white/[0.06] bg-white/[0.015]">
+                    {['Student', 'Course / Batch', 'Amount', 'Method', 'Status', 'Date & Time', 'Transaction / Order ID'].map((h) => (
+                      <th key={h} className="px-4 py-3.5 text-left text-[10px] font-black uppercase tracking-wider text-white/35">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.04]">
+                  {paymentsList.map((p: any) => {
+                    const statusKey = p.status?.toUpperCase() || 'PENDING';
+                    const cfg = STATUS_CONFIG[statusKey] || STATUS_CONFIG.PENDING;
+                    const StatusIcon = cfg.icon;
+
+                    return (
+                      <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
+                        {/* Student */}
+                        <td className="px-4 py-3.5">
+                          <div>
+                            <p className="text-xs font-bold text-white">{p.studentName}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <p className="text-[10px] text-white/40">{p.studentEmail}</p>
+                              {p.emailVerified ? (
+                                <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-400">
+                                  <BadgeCheck className="w-2.5 h-2.5" /> Verified
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-bold text-amber-400">⚠ Unverified</span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Course / Batch */}
-                      <td className="px-4 py-3.5">
-                        <p className="text-xs font-semibold text-white/80">{p.courseName}</p>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-violet-500/15 text-violet-300 border border-violet-500/20">
-                          {p.cohort}
-                        </span>
-                      </td>
+                        {/* Course / Batch */}
+                        <td className="px-4 py-3.5">
+                          <p className="text-xs font-semibold text-white/80 max-w-[160px] truncate">{p.courseName}</p>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-violet-500/15 text-violet-300 border border-violet-500/20">
+                            {p.cohort}
+                          </span>
+                        </td>
 
-                      {/* Amount */}
-                      <td className="px-4 py-3.5">
-                        <p className="text-sm font-black text-emerald-400">₹{p.amount.toLocaleString('en-IN')}</p>
-                      </td>
+                        {/* Amount */}
+                        <td className="px-4 py-3.5">
+                          <p className="text-sm font-black text-emerald-400">₹{(p.amount || 0).toLocaleString('en-IN')}</p>
+                        </td>
 
-                      {/* Method */}
-                      <td className="px-4 py-3.5">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white/[0.05] text-white/60 border border-white/[0.08]">
-                          {p.method}
-                        </span>
-                      </td>
+                        {/* Method */}
+                        <td className="px-4 py-3.5">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white/[0.05] text-white/60 border border-white/[0.08]">
+                            {p.method}
+                          </span>
+                        </td>
 
-                      {/* Status */}
-                      <td className="px-4 py-3.5">
-                        <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full border ${cfg.bg} ${cfg.color}`}>
-                          <StatusIcon className="w-3 h-3" />
-                          {cfg.label}
-                        </span>
-                      </td>
+                        {/* Status */}
+                        <td className="px-4 py-3.5">
+                          <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full border ${cfg.bg} ${cfg.color}`}>
+                            <StatusIcon className="w-3 h-3" />
+                            {cfg.label}
+                          </span>
+                        </td>
 
-                      {/* Paid At */}
-                      <td className="px-4 py-3.5">
-                        <p className="text-[10px] text-white/50">
-                          {new Date(p.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </p>
-                        <p className="text-[9px] text-white/30">
-                          {new Date(p.paidAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </td>
+                        {/* Paid At */}
+                        <td className="px-4 py-3.5">
+                          <p className="text-[10px] text-white/60 font-medium">
+                            {new Date(p.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </p>
+                          <p className="text-[9px] text-white/30">
+                            {new Date(p.paidAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </td>
 
-                      {/* Txn ID */}
-                      <td className="px-4 py-3.5">
-                        <p className="text-[10px] font-mono text-white/40 truncate max-w-[120px]">{p.transactionId}</p>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                        {/* Txn ID */}
+                        <td className="px-4 py-3.5">
+                          <p className="text-[10px] font-mono text-white/50 truncate max-w-[150px]" title={p.transactionId}>
+                            {p.transactionId}
+                          </p>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="px-6 py-4 border-t border-white/5 bg-white/[0.01] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/50">
+              <div>
+                Showing <span className="font-bold text-white">{Math.min((page - 1) * limit + 1, total)}</span> to{' '}
+                <span className="font-bold text-white">{Math.min(page * limit, total)}</span> of{' '}
+                <span className="font-bold text-white">{total}</span> payments
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 disabled:opacity-30 disabled:pointer-events-none text-white"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="px-3 py-1 font-semibold text-white/70">
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 disabled:opacity-30 disabled:pointer-events-none text-white"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

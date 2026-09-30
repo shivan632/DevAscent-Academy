@@ -51,8 +51,10 @@ export class AdminController {
     @Query('search') search?: string,
     @Query('degree') degree?: string,
     @Query('status') status?: string,
+    @Query('emailVerified') emailVerified?: string,
+    @Query('courseId') courseId?: string,
   ) {
-    return this.adminService.getStudents(page, limit, { search, degree, status });
+    return this.adminService.getStudents(page, limit, { search, degree, status, emailVerified, courseId });
   }
 
   @Get('students/:id')
@@ -81,6 +83,61 @@ export class AdminController {
     const ip = (req.headers['x-forwarded-for'] as string) || req.socket?.remoteAddress;
     const ua = req.headers['user-agent'];
     return this.adminService.restoreStudent(admin.id, id, ip, ua);
+  }
+
+  @Patch('students/:id/verify-email')
+  async verifyStudentEmail(
+    @Param('id') id: string,
+    @CurrentUser() admin: any,
+    @Req() req: Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.socket?.remoteAddress;
+    const ua = req.headers['user-agent'];
+    return this.adminService.verifyStudentEmail(admin.id, id, ip, ua);
+  }
+
+  @Post('students/:id/enroll')
+  async enrollStudentManual(
+    @Param('id') id: string,
+    @Body('courseId') courseId: string,
+    @CurrentUser() admin: any,
+    @Req() req: Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.socket?.remoteAddress;
+    const ua = req.headers['user-agent'];
+    return this.adminService.enrollStudentManual(admin.id, id, courseId, ip, ua);
+  }
+
+  @Patch('students/:id/note')
+  async updateStudentNote(
+    @Param('id') id: string,
+    @Body('note') note: string,
+    @CurrentUser() admin: any,
+    @Req() req: Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.socket?.remoteAddress;
+    const ua = req.headers['user-agent'];
+    return this.adminService.updateStudentNote(admin.id, id, note, ip, ua);
+  }
+
+  // ─── Payments ────────────────────────────────────────────────────────────────
+  @Get('payments')
+  async getPayments(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+    @Query('courseId') courseId?: string,
+    @Query('cohort') cohort?: string,
+    @Query('emailVerified') emailVerified?: string,
+  ) {
+    return this.adminService.getPayments(page, limit, {
+      search,
+      status,
+      courseId,
+      cohort,
+      emailVerified,
+    });
   }
 
   // ─── Refunds ─────────────────────────────────────────────────────────────────

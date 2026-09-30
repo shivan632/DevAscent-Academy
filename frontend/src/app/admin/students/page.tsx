@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import useSWR from 'swr';
 import { api } from '../../../lib/api';
 import { SkeletonLoader } from '../../../components/admin/SkeletonLoader';
@@ -20,6 +20,10 @@ import {
   X,
   Users,
   Calendar,
+  MailCheck,
+  BadgeCheck,
+  PlusCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { useDebounce } from '../../../lib/hooks/useDebounce';
 
@@ -36,17 +40,24 @@ export default function StudentsPage() {
   const [limit, setLimit] = useState(25);
   const [searchInput, setSearchInput] = useState('');
   const [degree, setDegree] = useState('');
-  const [status, setStatus] = useState<string>('ACTIVE');
+  const [status, setStatus] = useState<string>('ALL');
+  const [verifiedFilter, setVerifiedFilter] = useState<string>('ALL');
+  const [courseFilter, setCourseFilter] = useState<string>('ALL');
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
   const search = useDebounce(searchInput, 300);
 
-  const { data, isLoading, mutate } = useStudents({
+  const { data: coursesData } = useSWR('/admin/courses', () => api.admin.getCourseStats());
+  const coursesList: any[] = coursesData?.courses || coursesData?.data?.courses || [];
+
+  const { data, isLoading, isValidating, mutate } = useStudents({
     page,
     limit,
     search: search && search.length >= 2 ? search : undefined,
-    degree: degree || undefined,
+    degree: degree && degree !== 'ALL' ? degree : undefined,
     status: status === 'ALL' ? undefined : status,
+    emailVerified: verifiedFilter === 'ALL' ? undefined : verifiedFilter,
+    courseId: courseFilter === 'ALL' ? undefined : courseFilter,
   });
 
   const [confirmModal, setConfirmModal] = useState<{
@@ -96,17 +107,26 @@ export default function StudentsPage() {
     });
   };
 
+  const handleVerifyEmail = async (student: any) => {
+    try {
+      await api.admin.verifyStudentEmail(student.id);
+      await mutate();
+    } catch (e: any) {
+      alert(e.message || 'Failed to verify email');
+    }
+  };
+
   const handleExport = () => {
     window.open(api.admin.exportStudentsUrl(), '_blank');
   };
 
   const studentsPayload = data?.data || data;
-  const studentsList: any[] = Array.isArray(studentsPayload)
-    ? studentsPayload
-    : Array.isArray(studentsPayload?.data)
+  const studentsList: any[] = Array.isArray(studentsPayload?.data)
     ? studentsPayload.data
     : Array.isArray(studentsPayload?.students)
     ? studentsPayload.students
+    : Array.isArray(studentsPayload)
+    ? studentsPayload
     : [];
   const total = studentsPayload?.meta?.total ?? data?.meta?.total ?? studentsList.length;
   const totalPages = studentsPayload?.meta?.totalPages ?? data?.meta?.totalPages ?? 1;
@@ -118,22 +138,32 @@ export default function StudentsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-extrabold text-white tracking-tight">Student Management</h1>
-            <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              {total} enrolled
+            <span className="px-2.5 py-0.5 text-xs font-bold rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              {total} registered
             </span>
           </div>
           <p className="text-xs text-white/40 mt-1">
-            Search, inspect enrollments, and manage student account statuses with full audit logging.
+            Search students from PostgreSQL database, inspect enrollments, verify emails, and manage access.
           </p>
         </div>
 
-        <button
-          onClick={handleExport}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-semibold rounded-xl transition-all self-start sm:self-auto shadow-md shadow-indigo-500/5"
-        >
-          <Download className="w-3.5 h-3.5" />
-          <span>Export CSV</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => mutate()}
+            disabled={isValidating}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/60 hover:text-white text-xs font-semibold transition-all"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isValidating ? 'animate-spin text-indigo-400' : ''}`} />
+            <span>Refresh</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-semibold rounded-xl transition-all shadow-md shadow-indigo-500/5"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -143,7 +173,7 @@ export default function StudentsPage() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input
             type="text"
-            placeholder="Search by student name or email (min 2 chars)…"
+            placeholder="Search by student name or email…"
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value);
@@ -164,6 +194,23 @@ export default function StudentsPage() {
           )}
         </div>
 
+        {/* Course Filter */}
+        <select
+          value={courseFilter}
+          onChange={(e) => {
+            setCourseFilter(e.target.value);
+            setPage(1);
+          }}
+          className="px-3.5 py-2.5 bg-[#0F1420] border border-white/10 rounded-xl text-xs text-white/70 focus:outline-none focus:border-indigo-500/50 transition-colors cursor-pointer"
+        >
+          <option value="ALL">All Courses</option>
+          {coursesList.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.title}
+            </option>
+          ))}
+        </select>
+
         {/* Degree Filter */}
         <select
           value={degree}
@@ -171,7 +218,7 @@ export default function StudentsPage() {
             setDegree(e.target.value);
             setPage(1);
           }}
-          className="px-3.5 py-2.5 bg-[#0F1420] border border-white/10 rounded-xl text-xs text-white/70 focus:outline-none focus:border-indigo-500/50 transition-colors"
+          className="px-3.5 py-2.5 bg-[#0F1420] border border-white/10 rounded-xl text-xs text-white/70 focus:outline-none focus:border-indigo-500/50 transition-colors cursor-pointer"
         >
           <option value="">All Degrees</option>
           <option value="BCA">BCA</option>
@@ -179,6 +226,20 @@ export default function StudentsPage() {
           <option value="BTECH">B.Tech / B.E.</option>
           <option value="BSC">B.Sc Computer Science</option>
           <option value="OTHER">Other Degrees</option>
+        </select>
+
+        {/* Email Verification Filter */}
+        <select
+          value={verifiedFilter}
+          onChange={(e) => {
+            setVerifiedFilter(e.target.value);
+            setPage(1);
+          }}
+          className="px-3.5 py-2.5 bg-[#0F1420] border border-white/10 rounded-xl text-xs text-white/70 focus:outline-none focus:border-indigo-500/50 transition-colors cursor-pointer"
+        >
+          <option value="ALL">All Email Status</option>
+          <option value="VERIFIED">Verified ✓</option>
+          <option value="UNVERIFIED">Unverified ⚠</option>
         </select>
 
         {/* Status Filter Chips */}
@@ -219,18 +280,20 @@ export default function StudentsPage() {
             icon={Users}
             title="No students found"
             description={
-              searchInput || degree || status !== 'ACTIVE'
+              searchInput || degree || status !== 'ALL' || verifiedFilter !== 'ALL' || courseFilter !== 'ALL'
                 ? 'Try adjusting your search criteria or resetting the applied filters.'
-                : 'No students are enrolled yet.'
+                : 'No student accounts exist in the database yet.'
             }
             action={
-              searchInput || degree || status !== 'ACTIVE'
+              searchInput || degree || status !== 'ALL' || verifiedFilter !== 'ALL' || courseFilter !== 'ALL'
                 ? {
                     label: 'Reset Filters',
                     onClick: () => {
                       setSearchInput('');
                       setDegree('');
-                      setStatus('ACTIVE');
+                      setStatus('ALL');
+                      setVerifiedFilter('ALL');
+                      setCourseFilter('ALL');
                       setPage(1);
                     },
                   }
@@ -246,7 +309,7 @@ export default function StudentsPage() {
                   <tr className="border-b border-white/5 bg-white/[0.015] text-[10px] font-extrabold text-white/40 uppercase tracking-wider">
                     <th className="px-6 py-3.5">Student</th>
                     <th className="px-4 py-3.5">Degree & College</th>
-                    <th className="px-4 py-3.5">Status</th>
+                    <th className="px-4 py-3.5">Status & Email</th>
                     <th className="px-4 py-3.5">Enrollments</th>
                     <th className="px-4 py-3.5">Total Paid</th>
                     <th className="px-4 py-3.5">Joined Date</th>
@@ -270,6 +333,9 @@ export default function StudentsPage() {
                               {student.name}
                             </p>
                             <p className="text-[11px] text-white/40">{student.email}</p>
+                            {student.phone && (
+                              <p className="text-[10px] text-white/30">{student.phone}</p>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -278,30 +344,49 @@ export default function StudentsPage() {
                         <div>
                           <p className="font-semibold text-white/90">{student.degree || '—'}</p>
                           <p className="text-[10px] text-white/40 truncate max-w-[140px]">
-                            {student.collegeName || 'Not specified'}
+                            {student.collegeName || student.college || 'Not specified'}
                           </p>
                         </div>
                       </td>
 
                       <td className="px-4 py-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${
-                            student.status === 'ACTIVE'
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                              : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                          }`}
-                        >
+                        <div className="space-y-1">
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              student.status === 'ACTIVE' ? 'bg-emerald-400' : 'bg-rose-400'
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                              student.status === 'ACTIVE'
+                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                             }`}
-                          />
-                          {student.status}
-                        </span>
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                student.status === 'ACTIVE' ? 'bg-emerald-400' : 'bg-rose-400'
+                              }`}
+                            />
+                            {student.status || 'ACTIVE'}
+                          </span>
+                          <div>
+                            {student.isEmailVerified ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
+                                <BadgeCheck className="w-3 h-3" /> Verified
+                              </span>
+                            ) : (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleVerifyEmail(student);
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 hover:text-amber-300 underline"
+                              >
+                                ⚠ Verify Email
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </td>
 
                       <td className="px-4 py-4 font-semibold text-white/80">
-                        {student.enrollmentCount} course{student.enrollmentCount !== 1 ? 's' : ''}
+                        {student.enrollmentCount || (student.enrollments?.length ?? 0)} course{student.enrollmentCount !== 1 ? 's' : ''}
                       </td>
 
                       <td className="px-4 py-4 font-bold text-emerald-400">
@@ -309,7 +394,7 @@ export default function StudentsPage() {
                       </td>
 
                       <td className="px-4 py-4 text-white/40 text-[11px]">
-                        {new Date(student.joinedAt).toLocaleDateString('en-IN', {
+                        {new Date(student.joinedAt || student.createdAt).toLocaleDateString('en-IN', {
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric',
@@ -353,7 +438,7 @@ export default function StudentsPage() {
 
             {/* Mobile Card Layout */}
             <div className="block md:hidden divide-y divide-white/5 p-2">
-              {data.data.map((student: any) => (
+              {studentsList.map((student: any) => (
                 <div
                   key={student.id}
                   className="p-4 space-y-3 cursor-pointer hover:bg-white/[0.02] rounded-xl transition-colors"
@@ -371,7 +456,7 @@ export default function StudentsPage() {
                           : 'bg-rose-500/15 text-rose-400'
                       }`}
                     >
-                      {student.status}
+                      {student.status || 'ACTIVE'}
                     </span>
                   </div>
 

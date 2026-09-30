@@ -121,7 +121,7 @@ export const api = {
     getHealth: () => fetchApi('/admin/health'),
 
 
-    getStudents: (params?: { page?: number; limit?: number; search?: string; degree?: string; status?: string }) => {
+    getStudents: (params?: { page?: number; limit?: number; search?: string; degree?: string; status?: string; emailVerified?: string; courseId?: string }) => {
       const q = new URLSearchParams(params as any).toString();
       return fetchApi(`/admin/students${q ? `?${q}` : ''}`);
     },
@@ -130,6 +130,18 @@ export const api = {
       fetchApi(`/admin/students/${id}/suspend`, { method: 'PATCH', body: JSON.stringify({ reason }) }),
     restoreStudent: (id: string) =>
       fetchApi(`/admin/students/${id}/restore`, { method: 'PATCH' }),
+    verifyStudentEmail: (id: string) =>
+      fetchApi(`/admin/students/${id}/verify-email`, { method: 'PATCH' }),
+    enrollStudentManual: (id: string, courseId: string) =>
+      fetchApi(`/admin/students/${id}/enroll`, { method: 'POST', body: JSON.stringify({ courseId }) }),
+    updateStudentNote: (id: string, note: string) =>
+      fetchApi(`/admin/students/${id}/note`, { method: 'PATCH', body: JSON.stringify({ note }) }),
+
+    // Payments
+    getPayments: (params?: { page?: number; limit?: number; search?: string; status?: string; courseId?: string; cohort?: string; emailVerified?: string }) => {
+      const q = new URLSearchParams(params as any).toString();
+      return fetchApi(`/admin/payments${q ? `?${q}` : ''}`);
+    },
 
     getRefunds: (status?: string) =>
       fetchApi(`/admin/refunds${status ? `?status=${status}` : ''}`),
