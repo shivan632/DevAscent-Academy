@@ -118,7 +118,17 @@ function DashboardContent() {
   const [activeTab, setActiveTab] = useState<'overview' | 'certificates' | 'submissions' | 'profile' | 'settings' | 'support'>('overview');
   
   // Data state
-  const [certificates, setCertificates] = useState<any[]>([]);
+  const [certificates, setCertificates] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('devascent_certificates_cache');
+        return cached ? JSON.parse(cached) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
   const [enrollments, setEnrollments] = useState<any[]>(() => {
@@ -240,14 +250,17 @@ function DashboardContent() {
         if (certsRes.status === 'fulfilled' && certsRes.value) {
           const val = certsRes.value;
           const payload = val?.data !== undefined ? val.data : val;
+          let list: any[] = [];
           if (Array.isArray(payload)) {
-            setCertificates(payload);
+            list = payload;
           } else if (Array.isArray(payload?.certificates)) {
-            setCertificates(payload.certificates);
+            list = payload.certificates;
           } else if (Array.isArray(val?.certificates)) {
-            setCertificates(val.certificates);
-          } else {
-            setCertificates([]);
+            list = val.certificates;
+          }
+          setCertificates(list);
+          if (typeof window !== 'undefined' && list.length > 0) {
+            localStorage.setItem('devascent_certificates_cache', JSON.stringify(list));
           }
         }
 
@@ -301,7 +314,27 @@ function DashboardContent() {
       }
     }
     loadDashboardData();
-  }, []);
+  }, [user?.id]);
+
+  // Re-fetch certificates on tab switch to certificates
+  useEffect(() => {
+    if (activeTab === 'certificates') {
+      api.getMyCertificates().then((res) => {
+        const payload = res?.data !== undefined ? res.data : res;
+        const list = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.certificates)
+          ? payload.certificates
+          : Array.isArray(res?.certificates)
+          ? res.certificates
+          : [];
+        setCertificates(list);
+        if (typeof window !== 'undefined' && list.length > 0) {
+          localStorage.setItem('devascent_certificates_cache', JSON.stringify(list));
+        }
+      }).catch((err) => console.warn('Failed to refresh certificates:', err));
+    }
+  }, [activeTab]);
 
   const safeCertificates = Array.isArray(certificates) ? certificates : [];
   const safeSubmissions = Array.isArray(submissions) ? submissions : [];
