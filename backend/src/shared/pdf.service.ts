@@ -10,7 +10,7 @@ import * as QRCode from 'qrcode';
  */
 @Injectable()
 export class PdfService {
-  private logoPath = path.resolve(__dirname, '../../../assets/logo.png');
+  private logoPath = path.resolve(__dirname, '../../assets/logo.png');
 
   /**
    * Generates a PDF buffer for the given certificate details.

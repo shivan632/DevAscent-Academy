@@ -68,28 +68,31 @@ export class CertificatesService {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const verifyUrl = `${frontendUrl}/verify/${certificate.certId}`;
 
-    // Generate tamper-proof PDF with QR code
-    const pdfBuffer = await this.pdfService.generatePdfBuffer({
-      certId: certificate.certId,
-      recipientName: certificate.recipientName,
-      courseTitle: certificate.courseTitle,
-      grade: certificate.grade,
-      issuedAt: issuedAtStr,
-      verifyUrl,
-      sha256Hash: certificate.sha256Hash,
-    });
-
-    // Send official certificate email with PDF attachment
+    // Generate PDF + send email — wrapped in try/catch so a failure here never returns 500
     try {
-      await this.mailService.sendCertificateEmail(
-        user.email,
-        user.name,
-        course.title,
-        certificate.certId,
-        pdfBuffer,
-      );
-    } catch (mailErr: any) {
-      console.warn(`[CertificatesService] Certificate issued, but email delivery skipped/failed: ${mailErr?.message}`);
+      const pdfBuffer = await this.pdfService.generatePdfBuffer({
+        certId: certificate.certId,
+        recipientName: certificate.recipientName,
+        courseTitle: certificate.courseTitle,
+        grade: certificate.grade,
+        issuedAt: issuedAtStr,
+        verifyUrl,
+        sha256Hash: certificate.sha256Hash,
+      });
+
+      try {
+        await this.mailService.sendCertificateEmail(
+          user.email,
+          user.name,
+          course.title,
+          certificate.certId,
+          pdfBuffer,
+        );
+      } catch (mailErr: any) {
+        console.warn(`[CertificatesService] Certificate issued, but email delivery failed: ${mailErr?.message}`);
+      }
+    } catch (pdfErr: any) {
+      console.warn(`[CertificatesService] PDF generation skipped/failed: ${pdfErr?.message}`);
     }
 
     return {

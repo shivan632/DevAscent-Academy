@@ -90,6 +90,8 @@ export default function AdminPaymentsPage() {
   const totalPages = meta?.totalPages ?? 1;
 
   const totalRevenue = stats?.totalRevenue ?? 0;
+  const paidRevenue = stats?.paidRevenue ?? 0;
+  const pendingRevenue = stats?.pendingRevenue ?? 0;
   const successCount = stats?.successCount ?? 0;
   const pendingCount = stats?.pendingCount ?? 0;
   const verifiedCount = stats?.verifiedCount ?? 0;
@@ -138,7 +140,7 @@ export default function AdminPaymentsPage() {
         <KpiCard
           label="Total Revenue"
           value={`₹${totalRevenue.toLocaleString('en-IN')}`}
-          sub="From paid enrollments"
+          sub={pendingRevenue > 0 ? `₹${paidRevenue.toLocaleString('en-IN')} paid · ₹${pendingRevenue.toLocaleString('en-IN')} pending` : 'From paid enrollments'}
           icon={IndianRupee}
           color="bg-emerald-500/12 border border-emerald-500/20 text-emerald-400"
         />

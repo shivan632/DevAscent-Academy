@@ -248,8 +248,8 @@ export class AdminService {
         take: limit,
       }),
       this.prisma.payment.findMany({
-        where: { status: 'PAID' },
-        select: { amountInPaise: true },
+        where: { status: { in: ['PAID', 'PENDING'] } },
+        select: { amountInPaise: true, status: true },
       }),
       this.prisma.payment.count(),
       this.prisma.payment.count({
@@ -257,9 +257,17 @@ export class AdminService {
       }),
     ]);
 
-    const totalRevenueInRupees = Math.round(
-      paidPayments.reduce((acc, p) => acc + p.amountInPaise, 0) / 100,
+    const paidRevenue = Math.round(
+      paidPayments
+        .filter(p => p.status === 'PAID')
+        .reduce((acc, p) => acc + p.amountInPaise, 0) / 100,
     );
+    const pendingRevenue = Math.round(
+      paidPayments
+        .filter(p => p.status === 'PENDING')
+        .reduce((acc, p) => acc + p.amountInPaise, 0) / 100,
+    );
+    const totalRevenueInRupees = paidRevenue + pendingRevenue;
 
     const successCount = await this.prisma.payment.count({ where: { status: 'PAID' } });
     const pendingCount = await this.prisma.payment.count({ where: { status: 'PENDING' } });
@@ -290,6 +298,8 @@ export class AdminService {
       },
       stats: {
         totalRevenue: totalRevenueInRupees,
+        paidRevenue,
+        pendingRevenue,
         successCount,
         pendingCount,
         verifiedCount: verifiedStudentsCount,
