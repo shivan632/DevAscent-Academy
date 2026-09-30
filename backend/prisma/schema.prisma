@@ -39,6 +39,8 @@ model User {
   lessonProgress         LessonProgress[]
   payments               Payment[]
   quizSubmissions        QuizSubmission[]
+  quizAttempts           QuizAttempt[]
+  aiVideoProgress        AiVideoProgress[]
   refunds                Refund[]
 }
 
@@ -84,6 +86,39 @@ model Course {
   internshipApplications InternshipApplication[]
   modules                Module[]
   payments               Payment[]
+  aiVideos               AiVideo[]
+}
+
+model AiVideo {
+  id                String            @id @default(cuid())
+  courseId          String
+  order             Int               // 1, 2, or 3
+  title             String
+  description       String?
+  videoUrl          String
+  durationSec       Int               @default(15) // 15, 20, etc.
+  unlocksFromLesson Int               @default(1)
+  unlocksToLesson   Int               @default(5)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  course            Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress          AiVideoProgress[]
+
+  @@unique([courseId, order])
+}
+
+model AiVideoProgress {
+  id        String    @id @default(cuid())
+  userId    String
+  aiVideoId String
+  watched   Boolean   @default(false)
+  watchedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  aiVideo   AiVideo   @relation(fields: [aiVideoId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, aiVideoId])
 }
 
 model Module {
@@ -103,13 +138,14 @@ model Lesson {
   lessonNumber     Int
   title            String
   durationMinutes  Int              @default(15)
-  videoUrl         String?
   isFreePreview    Boolean          @default(false)
   summary          String?
   exercisePdfTitle String?
   exercisePdfUrl   String?
   exerciseProjects String?          @default("[]")
   writtenContent   String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @default(now()) @updatedAt
   doubts           Doubt[]
   module           Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   progressRecords  LessonProgress[]
@@ -119,21 +155,27 @@ model Lesson {
 model Quiz {
   id           String           @id @default(cuid())
   moduleId     String?          @unique
-  title        String
-  passingScore Int              @default(60)
   lessonId     String?          @unique
+  title        String
+  passingScore Int              @default(70)
+  maxAttempts  Int              @default(3)
+  createdAt    DateTime         @default(now())
   lesson       Lesson?          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   module       Module?          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   questions    QuizQuestion[]
   submissions  QuizSubmission[]
+  attempts     QuizAttempt[]
 }
 
 model QuizQuestion {
   id                 String  @id @default(cuid())
   quizId             String
+  order              Int     @default(1)
   question           String
-  optionsJson        String
-  correctOptionIndex Int
+  questionText       String?
+  optionsJson        String? @default("[]")
+  options            String[] @default([])
+  correctOptionIndex Int     @default(0)
   explanation        String?
   codeSnippet        String?
   quiz               Quiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
@@ -148,6 +190,22 @@ model QuizSubmission {
   submittedAt DateTime @default(now())
   quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model QuizAttempt {
+  id         String   @id @default(cuid())
+  userId     String
+  quizId     String
+  score      Int      // 0-100
+  passed     Boolean  @default(false)
+  answers    Json     // { questionId: selectedIndex }
+  attemptNum Int      @default(1) // 1, 2, or 3
+  createdAt  DateTime @default(now())
+  quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, quizId])
+  @@index([userId, quizId, passed])
 }
 
 model Doubt {
@@ -180,14 +238,18 @@ model Enrollment {
 }
 
 model LessonProgress {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   userId         String
   lessonId       String
-  watchedSeconds Int      @default(0)
-  isCompleted    Boolean  @default(false)
-  lastWatchedAt  DateTime @default(now())
-  lesson         Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  watchedSeconds Int       @default(0)
+  isCompleted    Boolean   @default(false)
+  completed      Boolean   @default(false)
+  lastWatchedAt  DateTime  @default(now())
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+  lesson         Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
 }

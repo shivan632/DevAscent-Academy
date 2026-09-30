@@ -88,6 +88,7 @@ export const api = {
     return fetchApi(`/courses${query ? `?${query}` : ''}`);
   },
   getCourseBySlug: (slug: string) => fetchApi(`/courses/${slug}`),
+  getCurriculum: (slug: string) => fetchApi(`/courses/${slug}/curriculum`),
   enrollFree: (slug: string) => fetchApi(`/courses/${slug}/enroll-free`, { method: 'POST' }),
   applyCohort: (slug: string, note?: string) => fetchApi(`/courses/${slug}/apply`, { method: 'POST', body: JSON.stringify({ note }) }),
 
@@ -148,6 +149,11 @@ export const api = {
     updateStudentNote: (id: string, note: string) =>
       fetchApi(`/admin/students/${id}/note`, { method: 'PATCH', body: JSON.stringify({ note }) }),
 
+    // Enrollments
+    getEnrollments: (params?: { page?: number; limit?: number; search?: string; courseId?: string; status?: string }) => {
+      return fetchApi(`/admin/enrollments${buildQuery(params)}`);
+    },
+
     // Payments
     getPayments: (params?: { page?: number; limit?: number; search?: string; status?: string; courseId?: string; cohort?: string; emailVerified?: string }) => {
       return fetchApi(`/admin/payments${buildQuery(params)}`);
@@ -202,11 +208,37 @@ export const api = {
     updateCourseDetails: (slug: string, data: any) =>
       fetchApi(`/admin/courses/${slug}/details`, { method: 'PATCH', body: JSON.stringify(data) }),
 
+    // AI Overview Videos (Studio A)
+    getAiVideos: (slug: string) => fetchApi(`/admin/courses/${slug}/videos`),
+    createAiVideo: (slug: string, data: any) =>
+      fetchApi(`/admin/courses/${slug}/videos`, { method: 'POST', body: JSON.stringify(data) }),
+    updateAiVideo: (id: string, data: any) =>
+      fetchApi(`/admin/videos/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    deleteAiVideo: (id: string) =>
+      fetchApi(`/admin/videos/${id}`, { method: 'DELETE' }),
+
     // Certificates
     getCertificates: (params?: { page?: number; limit?: number; search?: string }) => {
       return fetchApi(`/admin/certificates${buildQuery(params)}`);
     },
     issueCertificate: (data: { userId: string; courseId: string; grade?: string }) =>
       fetchApi('/admin/certificates/issue', { method: 'POST', body: JSON.stringify(data) }),
+
+    // Quiz Reset
+    resetStudentQuiz: (quizId: string, userId: string) =>
+      fetchApi(`/admin/quizzes/${quizId}/reset/${userId}`, { method: 'POST' }),
   },
+
+  // Student AI Video endpoints
+  markAiVideoWatched: (id: string) =>
+    fetchApi(`/ai-videos/${id}/mark-watched`, { method: 'POST' }),
+
+  // Generic REST helpers for convenience
+  get: (endpoint: string, options?: RequestInit) => fetchApi(endpoint, { ...options, method: 'GET' }),
+  post: (endpoint: string, body?: any, options?: RequestInit) =>
+    fetchApi(endpoint, { ...options, method: 'POST', body: body ? JSON.stringify(body) : undefined }),
+  patch: (endpoint: string, body?: any, options?: RequestInit) =>
+    fetchApi(endpoint, { ...options, method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
+  delete: (endpoint: string, options?: RequestInit) =>
+    fetchApi(endpoint, { ...options, method: 'DELETE' }),
 };

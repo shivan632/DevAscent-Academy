@@ -44,6 +44,17 @@ export class CoursesController {
     return this.coursesService.findBySlug(slug, userId);
   }
 
+  @Get(':slug/curriculum')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getCurriculum(
+    @Param('slug') slug: string,
+    @Req() req: Request,
+  ) {
+    const user = (req as any).user;
+    const userId = user?.id || user?.sub;
+    return this.coursesService.getCurriculum(slug, userId);
+  }
+
   @Post(':slug/enroll-free')
   @UseGuards(JwtAuthGuard)
   async enrollFree(

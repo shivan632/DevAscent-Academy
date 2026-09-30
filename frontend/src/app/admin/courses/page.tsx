@@ -19,7 +19,8 @@ import {
   X,
   Loader2,
   Sparkles,
-  Settings2
+  Settings2,
+  Video
 } from 'lucide-react';
 
 export default function CoursesPage() {
@@ -168,7 +169,7 @@ export default function CoursesPage() {
 
               {/* Action Buttons */}
               <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Link
                     href={`/courses/${course.slug}`}
                     target="_blank"
@@ -185,6 +186,14 @@ export default function CoursesPage() {
                     <Settings2 className="w-3.5 h-3.5 text-indigo-400" />
                     <span>Quick Settings</span>
                   </button>
+
+                  <Link
+                    href={`/admin/courses/${course.slug}/videos`}
+                    className="inline-flex items-center gap-1.5 text-xs text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-1.5 rounded-lg transition-colors border border-indigo-500/30"
+                  >
+                    <Video className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>AI Videos</span>
+                  </Link>
                 </div>
 
                 <Link
@@ -192,7 +201,7 @@ export default function CoursesPage() {
                   className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-md shadow-indigo-600/20 transition-all"
                 >
                   <Layers className="w-4 h-4" />
-                  <span>Manage Curriculum & Lessons Studio →</span>
+                  <span>Curriculum Studio →</span>
                 </Link>
               </div>
             </div>

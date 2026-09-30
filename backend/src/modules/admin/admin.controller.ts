@@ -57,6 +57,17 @@ export class AdminController {
     return this.adminService.getStudents(page, limit, { search, degree, status, emailVerified, courseId });
   }
 
+  @Get('enrollments')
+  async getEnrollments(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(25), ParseIntPipe) limit: number,
+    @Query('search') search?: string,
+    @Query('courseId') courseId?: string,
+    @Query('status') status?: string,
+  ) {
+    return this.adminService.getEnrollments(page, limit, { search, courseId, status });
+  }
+
   @Get('students/:id')
   async getStudentDetail(@Param('id') id: string) {
     return this.adminService.getStudentDetail(id);
@@ -215,6 +226,16 @@ export class AdminController {
     @CurrentUser() admin: any,
   ) {
     return this.adminService.bulkApproveSubmissions(admin.id, ids);
+  }
+
+  // ─── Quiz Reset ──────────────────────────────────────────────────────────────
+  @Post('quizzes/:id/reset/:userId')
+  async resetUserQuiz(
+    @Param('id') quizId: string,
+    @Param('userId') userId: string,
+    @CurrentUser() admin: any,
+  ) {
+    return this.adminService.resetUserQuiz(quizId, userId, admin?.id);
   }
 
   // ─── Courses ─────────────────────────────────────────────────────────────────

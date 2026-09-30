@@ -263,10 +263,281 @@ export class CoursesService {
     };
   }
 
+  /**
+   * Compute interleaved curriculum with AI Overview milestone video gates and sequential lesson unlocking.
+   */
+  async getCurriculum(slugOrId: string, userId?: string) {
+    const course = await this.prisma.course.findFirst({
+      where: {
+        OR: [{ id: slugOrId }, { slug: slugOrId }],
+      },
+      include: {
+        aiVideos: {
+          orderBy: { order: 'asc' },
+        },
+        modules: {
+          include: {
+            lessons: {
+              include: {
+                quiz: {
+                  select: { id: true, title: true, passingScore: true, maxAttempts: true },
+                },
+              },
+              orderBy: { lessonNumber: 'asc' },
+            },
+          },
+          orderBy: { moduleNumber: 'asc' },
+        },
+      },
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    let enrollment: any = null;
+    let isEnrolled = false;
+    const watchedAiVideoIds = new Set<string>();
+    const completedLessonIds = new Set<string>();
+    const passedQuizIds = new Set<string>();
+
+    if (userId) {
+      enrollment = await this.prisma.enrollment.findUnique({
+        where: { userId_courseId: { userId, courseId: course.id } },
+      });
+      isEnrolled = !!enrollment && enrollment.status === 'ACTIVE';
+
+      const [aiVideoProgress, lessonProgress, quizSubmissions] = await Promise.all([
+        this.prisma.aiVideoProgress.findMany({
+          where: { userId, aiVideo: { courseId: course.id }, watched: true },
+        }),
+        this.prisma.lessonProgress.findMany({
+          where: { userId, isCompleted: true },
+        }),
+        this.prisma.quizSubmission.findMany({
+          where: { userId, passed: true },
+        }),
+      ]);
+
+      aiVideoProgress.forEach((p) => watchedAiVideoIds.add(p.aiVideoId));
+      lessonProgress.forEach((p) => completedLessonIds.add(p.lessonId));
+      quizSubmissions.forEach((q) => passedQuizIds.add(q.quizId));
+    }
+
+    // Flatten all lessons into global sequence
+    const allLessons: any[] = [];
+    course.modules.forEach((m) => {
+      m.lessons.forEach((l) => {
+        allLessons.push({
+          ...l,
+          moduleId: m.id,
+          moduleTitle: m.title,
+          moduleNumber: m.moduleNumber,
+        });
+      });
+    });
+
+    // Calculate progression state for each AI Video
+    const aiVideosWithStatus = course.aiVideos.map((v) => {
+      const isWatched = watchedAiVideoIds.has(v.id);
+      let isUnlocked = false;
+      let lockReason = '';
+
+      if (!isEnrolled) {
+        isUnlocked = v.order === 1; // Preview or locked
+        if (!isUnlocked) lockReason = 'Enroll in the course to unlock';
+      } else {
+        if (v.order === 1) {
+          isUnlocked = true;
+        } else if (v.order === 2) {
+          const requiredLessonCount = Math.min(5, allLessons.length);
+          const prevLessons = allLessons.slice(0, requiredLessonCount);
+          const allPrevCompleted = prevLessons.length > 0 && prevLessons.every((l) => {
+            const completed = completedLessonIds.has(l.id);
+            const quizOk = !l.quiz || passedQuizIds.has(l.quiz.id);
+            return completed && quizOk;
+          });
+          isUnlocked = allPrevCompleted;
+          if (!isUnlocked) lockReason = `Complete Lessons 1-${requiredLessonCount} and pass their skill quizzes to unlock Video 2`;
+        } else if (v.order === 3) {
+          const requiredLessonCount = Math.min(10, allLessons.length);
+          const prevLessons = allLessons.slice(0, requiredLessonCount);
+          const allPrevCompleted = prevLessons.length > 0 && prevLessons.every((l) => {
+            const completed = completedLessonIds.has(l.id);
+            const quizOk = !l.quiz || passedQuizIds.has(l.quiz.id);
+            return completed && quizOk;
+          });
+          isUnlocked = allPrevCompleted;
+          if (!isUnlocked) lockReason = `Complete Lessons 1-${requiredLessonCount} and pass their skill quizzes to unlock Video 3`;
+        }
+      }
+
+      return {
+        id: v.id,
+        courseId: v.courseId,
+        order: v.order,
+        title: v.title,
+        description: v.description,
+        videoUrl: isUnlocked ? v.videoUrl : null,
+        durationSec: v.durationSec,
+        unlocksFromLesson: v.unlocksFromLesson,
+        unlocksToLesson: v.unlocksToLesson,
+        isUnlocked,
+        isWatched,
+        lockReason,
+      };
+    });
+
+    // Calculate progression state for lessons
+    const lessonsWithStatus = allLessons.map((l, index) => {
+      const globalSeq = index + 1; // 1-indexed
+      const isCompleted = completedLessonIds.has(l.id);
+      const quizPassed = l.quiz ? passedQuizIds.has(l.quiz.id) : true;
+      let isUnlocked = false;
+      let lockReason = '';
+
+      if (!isEnrolled) {
+        isUnlocked = l.isFreePreview;
+        if (!isUnlocked) lockReason = 'Enroll to access this lesson';
+      } else {
+        // Milestone gating check:
+        // L1-L5 governed by Video 1
+        // L6-L10 governed by Video 2
+        // L11-L15 governed by Video 3
+        let governingVideo: any = null;
+        if (globalSeq >= 1 && globalSeq <= 5) {
+          governingVideo = aiVideosWithStatus.find((v) => v.order === 1);
+        } else if (globalSeq >= 6 && globalSeq <= 10) {
+          governingVideo = aiVideosWithStatus.find((v) => v.order === 2);
+        } else if (globalSeq >= 11) {
+          governingVideo = aiVideosWithStatus.find((v) => v.order === 3);
+        }
+
+        const videoSatisfied = !governingVideo || governingVideo.isWatched;
+
+        if (!videoSatisfied) {
+          isUnlocked = false;
+          lockReason = `Watch AI Overview Video ${governingVideo.order} first to unlock this milestone batch`;
+        } else {
+          if (index === 0) {
+            isUnlocked = true;
+          } else {
+            const prevLesson = allLessons[index - 1];
+            const prevCompleted = completedLessonIds.has(prevLesson.id);
+            const prevQuizOk = !prevLesson.quiz || passedQuizIds.has(prevLesson.quiz.id);
+
+            if (prevCompleted && prevQuizOk) {
+              isUnlocked = true;
+            } else {
+              isUnlocked = false;
+              lockReason = `Complete Lesson ${prevLesson.lessonNumber} (${prevLesson.title}) and pass its quiz (70%+) to proceed`;
+            }
+          }
+        }
+      }
+
+      return {
+        id: l.id,
+        moduleId: l.moduleId,
+        moduleNumber: l.moduleNumber,
+        moduleTitle: l.moduleTitle,
+        lessonNumber: l.lessonNumber,
+        globalSeq,
+        title: l.title,
+        durationMinutes: l.durationMinutes,
+        summary: l.summary,
+        isFreePreview: l.isFreePreview,
+        isUnlocked,
+        isCompleted,
+        lockReason,
+        hasQuiz: !!l.quiz,
+        quizPassed,
+        quiz: l.quiz
+          ? {
+              id: l.quiz.id,
+              title: l.quiz.title,
+              passingScore: l.quiz.passingScore,
+              maxAttempts: l.quiz.maxAttempts,
+            }
+          : null,
+        exercisePdfTitle: l.exercisePdfTitle,
+        hasExercisePdf: !!l.exercisePdfUrl,
+      };
+    });
+
+    // Assemble Interleaved Curriculum List:
+    // [ Video 1, L1..L5, Video 2, L6..L10, Video 3, L11..L15 ]
+    const interleavedList: any[] = [];
+    const v1 = aiVideosWithStatus.find((v) => v.order === 1);
+    if (v1) interleavedList.push({ type: 'ai-video', item: v1 });
+
+    const batch1 = lessonsWithStatus.filter((l) => l.globalSeq >= 1 && l.globalSeq <= 5);
+    batch1.forEach((l) => interleavedList.push({ type: 'lesson', item: l }));
+
+    const v2 = aiVideosWithStatus.find((v) => v.order === 2);
+    if (v2) interleavedList.push({ type: 'ai-video', item: v2 });
+
+    const batch2 = lessonsWithStatus.filter((l) => l.globalSeq >= 6 && l.globalSeq <= 10);
+    batch2.forEach((l) => interleavedList.push({ type: 'lesson', item: l }));
+
+    const v3 = aiVideosWithStatus.find((v) => v.order === 3);
+    if (v3) interleavedList.push({ type: 'ai-video', item: v3 });
+
+    const batch3 = lessonsWithStatus.filter((l) => l.globalSeq >= 11);
+    batch3.forEach((l) => interleavedList.push({ type: 'lesson', item: l }));
+
+    const allLessonsCompleted = lessonsWithStatus.length > 0 && lessonsWithStatus.every((l) => l.isCompleted && l.quizPassed);
+    const allVideosWatched = aiVideosWithStatus.length === 0 || aiVideosWithStatus.every((v) => v.isWatched);
+    const isEligibleForCertificate = allLessonsCompleted && allVideosWatched;
+
+    const totalItems = aiVideosWithStatus.length + lessonsWithStatus.length;
+    const completedVideos = aiVideosWithStatus.filter((v) => v.isWatched).length;
+    const completedLessons = lessonsWithStatus.filter((l) => l.isCompleted && l.quizPassed).length;
+    const progressPct = totalItems > 0 ? Math.round(((completedVideos + completedLessons) / totalItems) * 100) : 0;
+
+    return {
+      success: true,
+      course: {
+        id: course.id,
+        slug: course.slug,
+        title: course.title,
+        description: course.description,
+        isFree: course.isFree,
+        type: course.type,
+        domain: course.domain,
+        level: course.level,
+      },
+      isEnrolled,
+      progressPct,
+      isEligibleForCertificate,
+      stats: {
+        totalVideos: aiVideosWithStatus.length,
+        watchedVideos: completedVideos,
+        totalLessons: lessonsWithStatus.length,
+        completedLessons,
+        totalItems,
+        completedItems: completedVideos + completedLessons,
+      },
+      aiVideos: aiVideosWithStatus,
+      lessons: lessonsWithStatus,
+      modules: course.modules.map((m) => ({
+        id: m.id,
+        moduleNumber: m.moduleNumber,
+        title: m.title,
+        description: m.description,
+        lessons: lessonsWithStatus.filter((l) => l.moduleId === m.id),
+      })),
+      interleavedCurriculum: interleavedList,
+    };
+  }
+
   async getLesson(courseSlug: string, lessonId: string, user?: any) {
     const course = await this.prisma.course.findUnique({
       where: { slug: courseSlug },
       include: {
+        aiVideos: {
+          orderBy: { order: 'asc' },
+        },
         modules: {
           include: {
             lessons: {
@@ -277,13 +548,13 @@ export class CoursesService {
                 durationMinutes: true,
                 isFreePreview: true,
                 quiz: {
-                  select: { id: true, title: true, passingScore: true },
+                  select: { id: true, title: true, passingScore: true, maxAttempts: true },
                 },
               },
               orderBy: { lessonNumber: 'asc' },
             },
             quiz: {
-              select: { id: true, title: true, passingScore: true },
+              select: { id: true, title: true, passingScore: true, maxAttempts: true },
             },
           },
           orderBy: { moduleNumber: 'asc' },
@@ -333,55 +604,12 @@ export class CoursesService {
       throw new NotFoundException('Lesson not found');
     }
 
-    // Check enrollment if lesson is not a free preview
-    let isEnrolled = false;
-    let userProgressMap = new Map<string, boolean>();
-    let passedQuizzesMap = new Map<string, boolean>();
-    let currentLessonProgress: any = null;
+    const userId = user?.id || user?.sub;
+    const curriculumData = await this.getCurriculum(course.id, userId);
 
-    if (user) {
-      const enrollment = await this.prisma.enrollment.findUnique({
-        where: {
-          userId_courseId: {
-            userId: user.id,
-            courseId: course.id,
-          },
-        },
-      });
-      isEnrolled = !!enrollment && enrollment.status === 'ACTIVE';
-
-      // Get all progress for this user in this course
-      const allLessons = course.modules.flatMap((m) => m.lessons);
-      const allLessonIds = allLessons.map((l) => l.id);
-
-      const [progressRecords, quizSubmissions] = await Promise.all([
-        this.prisma.lessonProgress.findMany({
-          where: {
-            userId: user.id,
-            lessonId: { in: allLessonIds },
-          },
-        }),
-        this.prisma.quizSubmission.findMany({
-          where: {
-            userId: user.id,
-            passed: true,
-          },
-        }),
-      ]);
-
-      progressRecords.forEach((pr) => {
-        userProgressMap.set(pr.lessonId, pr.isCompleted);
-      });
-
-      quizSubmissions.forEach((qs) => {
-        passedQuizzesMap.set(qs.quizId, true);
-      });
-
-      currentLessonProgress = progressRecords.find((pr) => pr.lessonId === lesson.id) || null;
-    }
-
-    // If lesson is locked (not free preview and not enrolled and not admin)
-    const isLocked = !lesson.isFreePreview && !isEnrolled && user?.role !== 'ADMIN';
+    const targetLessonInCurriculum = curriculumData.lessons.find((l) => l.id === lesson.id);
+    const isLocked = targetLessonInCurriculum ? !targetLessonInCurriculum.isUnlocked : (!lesson.isFreePreview && !curriculumData.isEnrolled && user?.role !== 'ADMIN');
+    const lockReason = targetLessonInCurriculum?.lockReason || (isLocked ? 'Enroll to access this lesson' : '');
 
     // Parse exercise projects safely
     let parsedProjects: any[] = [];
@@ -392,63 +620,57 @@ export class CoursesService {
     }
 
     // Flat list of all lessons in sequence for prev / next
-    const allSequenceLessons = course.modules.flatMap((m) => m.lessons);
+    const allSequenceLessons = curriculumData.lessons;
     const currentIndex = allSequenceLessons.findIndex((l) => l.id === lesson.id);
     const prevLesson = currentIndex > 0 ? allSequenceLessons[currentIndex - 1] : null;
     const nextLesson = currentIndex < allSequenceLessons.length - 1 ? allSequenceLessons[currentIndex + 1] : null;
 
-    // Build enriched module tree for sidebar
-    const enrichedModules = course.modules.map((m) => ({
-      id: m.id,
-      moduleNumber: m.moduleNumber,
-      title: m.title,
-      description: m.description,
-      lessons: m.lessons.map((l) => ({
-        id: l.id,
-        lessonNumber: l.lessonNumber,
-        title: l.title,
-        durationMinutes: l.durationMinutes,
-        isFreePreview: l.isFreePreview,
-        isCompleted: userProgressMap.get(l.id) || false,
-        isActive: l.id === lesson.id,
-        hasQuiz: !!l.quiz,
-        quizPassed: l.quiz ? (passedQuizzesMap.get(l.quiz.id) || false) : false,
-      })),
-    }));
-
-    const totalLessons = allSequenceLessons.length;
-    const completedCount = allSequenceLessons.filter((l) => userProgressMap.get(l.id)).length;
-    const overallProgressPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+    const currentLessonProgress = targetLessonInCurriculum?.isCompleted || false;
 
     return {
       lesson: {
         id: lesson.id,
         lessonNumber: lesson.lessonNumber,
+        globalSeq: targetLessonInCurriculum?.globalSeq || lesson.lessonNumber,
         title: lesson.title,
         durationMinutes: lesson.durationMinutes,
         summary: lesson.summary,
         isFreePreview: lesson.isFreePreview,
         isLocked,
-        videoUrl: isLocked ? null : lesson.videoUrl,
+        lockReason,
         writtenContent: isLocked ? null : lesson.writtenContent,
         exercisePdfUrl: isLocked ? null : lesson.exercisePdfUrl,
         exercisePdfTitle: lesson.exercisePdfTitle || `${lesson.title} - Capstone Exercise Guide`,
         exerciseProjects: parsedProjects,
-        isCompleted: currentLessonProgress?.isCompleted || false,
+        isCompleted: currentLessonProgress,
         quiz: lesson.quiz
           ? {
               id: lesson.quiz.id,
               title: lesson.quiz.title,
               passingScore: lesson.quiz.passingScore,
-              isPassed: passedQuizzesMap.get(lesson.quiz.id) || false,
-              questions: lesson.quiz.questions.map((q) => ({
-                id: q.id,
-                question: q.question,
-                options: JSON.parse(q.optionsJson || '[]'),
-                codeSnippet: q.codeSnippet,
-                explanation: q.explanation,
-                correctOptionIndex: q.correctOptionIndex,
-              })),
+              maxAttempts: lesson.quiz.maxAttempts || 3,
+              isPassed: targetLessonInCurriculum?.quizPassed || false,
+              attemptsCount: userId
+                ? await this.prisma.quizAttempt.count({
+                    where: { userId, quizId: lesson.quiz.id },
+                  })
+                : 0,
+              attemptsExhausted: userId
+                ? (await this.prisma.quizAttempt.count({
+                    where: { userId, quizId: lesson.quiz.id },
+                  })) >= (lesson.quiz.maxAttempts || 3) && !(targetLessonInCurriculum?.quizPassed || false)
+                : false,
+              supportEmail: 'support@devascentacademy.me',
+              questions: isLocked
+                ? []
+                : lesson.quiz.questions.map((q) => ({
+                    id: q.id,
+                    question: q.question,
+                    options: JSON.parse(q.optionsJson || '[]'),
+                    codeSnippet: q.codeSnippet,
+                    explanation: q.explanation,
+                    correctOptionIndex: q.correctOptionIndex,
+                  })),
             }
           : null,
         doubts: (lesson.doubts || []).map((d) => ({
@@ -474,15 +696,18 @@ export class CoursesService {
         level: course.level,
         type: course.type,
       },
-      modules: enrichedModules,
+      modules: curriculumData.modules,
+      aiVideos: curriculumData.aiVideos,
+      interleavedCurriculum: curriculumData.interleavedCurriculum,
       navigation: {
-        prevLesson: prevLesson ? { id: prevLesson.id, title: prevLesson.title } : null,
-        nextLesson: nextLesson ? { id: nextLesson.id, title: nextLesson.title } : null,
+        prevLesson: prevLesson ? { id: prevLesson.id, title: prevLesson.title, isUnlocked: prevLesson.isUnlocked } : null,
+        nextLesson: nextLesson ? { id: nextLesson.id, title: nextLesson.title, isUnlocked: nextLesson.isUnlocked } : null,
         currentIndex: currentIndex + 1,
-        totalLessons,
-        overallProgressPct,
+        totalLessons: allSequenceLessons.length,
+        overallProgressPct: curriculumData.progressPct,
       },
-      isEnrolled,
+      isEnrolled: curriculumData.isEnrolled,
+      stats: curriculumData.stats,
     };
   }
 
@@ -567,6 +792,7 @@ export class CoursesService {
       },
       update: {
         isCompleted: newCompleted,
+        completed: newCompleted,
         lastWatchedAt: new Date(),
       },
       create: {
@@ -574,22 +800,34 @@ export class CoursesService {
         lessonId,
         watchedSeconds: 60,
         isCompleted: newCompleted,
+        completed: newCompleted,
       },
     });
 
-    // Calculate total course completion percentage
+    // Calculate total course completion percentage (Lessons + AI Videos)
     const allCourseLessons = course.modules.flatMap((m) => m.lessons);
     const totalLessons = allCourseLessons.length;
+    const totalVideos = await this.prisma.aiVideo.count({ where: { courseId: course.id } });
+    const totalItems = totalLessons + totalVideos;
 
-    const completedLessons = await this.prisma.lessonProgress.count({
-      where: {
-        userId,
-        lessonId: { in: allCourseLessons.map((l) => l.id) },
-        isCompleted: true,
-      },
-    });
+    const [completedLessons, watchedVideos] = await Promise.all([
+      this.prisma.lessonProgress.count({
+        where: {
+          userId,
+          lessonId: { in: allCourseLessons.map((l) => l.id) },
+          isCompleted: true,
+        },
+      }),
+      this.prisma.aiVideoProgress.count({
+        where: {
+          userId,
+          aiVideo: { courseId: course.id },
+          watched: true,
+        },
+      }),
+    ]);
 
-    const progressPct = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+    const progressPct = totalItems > 0 ? Math.round(((completedLessons + watchedVideos) / totalItems) * 100) : 0;
     const courseCompleted = progressPct === 100;
 
     await this.prisma.enrollment.updateMany({
@@ -637,6 +875,19 @@ export class CoursesService {
       throw new NotFoundException('Quiz not found');
     }
 
+    // Check prior attempts count
+    const priorAttemptsCount = await this.prisma.quizAttempt.count({
+      where: { userId, quizId },
+    });
+
+    const maxAttempts = quiz.maxAttempts || 3;
+
+    if (priorAttemptsCount >= maxAttempts) {
+      throw new BadRequestException(
+        `You have used all ${maxAttempts} attempts for this quiz. Please contact support@devascentacademy.me to request an attempt reset.`
+      );
+    }
+
     let correctCount = 0;
     const feedback = quiz.questions.map((q) => {
       const submittedAnswer = answers.find((a) => a.questionId === q.id);
@@ -653,20 +904,41 @@ export class CoursesService {
 
     const scorePct = quiz.questions.length > 0 ? Math.round((correctCount / quiz.questions.length) * 100) : 100;
     const passed = scorePct >= quiz.passingScore;
+    const currentAttemptNum = priorAttemptsCount + 1;
 
-    await this.prisma.quizSubmission.create({
-      data: {
-        userId,
-        quizId,
-        scorePct,
-        passed,
-      },
+    // Convert answers to object for json storage
+    const answersMap: Record<string, number> = {};
+    answers.forEach((a) => {
+      answersMap[a.questionId] = a.selectedIndex;
     });
+
+    await Promise.all([
+      this.prisma.quizSubmission.create({
+        data: {
+          userId,
+          quizId,
+          scorePct,
+          passed,
+        },
+      }),
+      this.prisma.quizAttempt.create({
+        data: {
+          userId,
+          quizId,
+          score: scorePct,
+          passed,
+          answers: answersMap,
+          attemptNum: currentAttemptNum,
+        },
+      }),
+    ]);
 
     // If passed, auto-mark this lesson as completed!
     if (passed && quiz.lessonId) {
       await this.toggleLessonComplete(userId, quiz.lessonId, true);
     }
+
+    const remainingAttempts = Math.max(0, maxAttempts - currentAttemptNum);
 
     return {
       scorePct,
@@ -675,6 +947,11 @@ export class CoursesService {
       feedback,
       correctCount,
       totalQuestions: quiz.questions.length,
+      attemptNum: currentAttemptNum,
+      maxAttempts,
+      remainingAttempts,
+      attemptsExhausted: !passed && remainingAttempts === 0,
+      supportEmail: 'support@devascentacademy.me',
     };
   }
 }

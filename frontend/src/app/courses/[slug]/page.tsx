@@ -39,6 +39,8 @@ export default function CourseDetailsPage() {
 
   const [course, setCourse] = useState<any>(null);
   const [modules, setModules] = useState<any[]>([]);
+  const [curriculum, setCurriculum] = useState<any[]>([]);
+  const [aiVideos, setAiVideos] = useState<any[]>([]);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [enrollment, setEnrollment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -50,12 +52,19 @@ export default function CourseDetailsPage() {
     async function loadCourse() {
       setLoading(true);
       try {
-        const res = await api.getCourseBySlug(slug);
+        const [res, currRes] = await Promise.all([
+          api.getCourseBySlug(slug),
+          api.getCurriculum(slug).catch(() => null),
+        ]);
         if (res?.course) {
           setCourse(res.course);
           setModules(res.modules || []);
           setIsEnrolled(res.isEnrolled || false);
           setEnrollment(res.enrollment || null);
+        }
+        if (currRes?.interleavedCurriculum) {
+          setCurriculum(currRes.interleavedCurriculum);
+          setAiVideos(currRes.aiVideos || []);
         }
       } catch (err: any) {
         setError(err?.message || 'Failed to load course details.');
@@ -203,64 +212,97 @@ export default function CourseDetailsPage() {
                 </div>
               )}
 
-              {/* Curriculum Breakdown */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
+              {/* Curriculum Breakdown with Milestone Gates */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                       <BookOpen className="w-5 h-5 text-indigo-600" />
-                      <span>Curriculum & Topics for Study</span>
+                      <span>Curriculum & Milestone Progression</span>
                     </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">Practical, code-first engineering modules</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Sequential milestones gated by AI Overview Videos and 70% Skill Quizzes</p>
                   </div>
                   <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
-                    {modules.length} Modules
+                    {modules.length} Modules • {aiVideos.length} AI Overviews
                   </span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {modules.map((mod: any, mIdx: number) => {
                     const isOpen = openModuleIndex === mIdx;
-                    return (
-                      <div key={mod.id || mIdx} className="border border-slate-200 rounded-xl overflow-hidden">
-                        <button
-                          onClick={() => setOpenModuleIndex(isOpen ? -1 : mIdx)}
-                          className="w-full px-5 py-4 bg-slate-50/70 hover:bg-slate-50 flex items-center justify-between text-left transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">
-                              {mod.moduleNumber || mIdx + 1}
-                            </span>
-                            <span className="font-semibold text-sm text-slate-900">{mod.title}</span>
-                          </div>
-                          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-indigo-600' : ''}`} />
-                        </button>
+                    // Find AI Video that corresponds to this module
+                    const matchedVideo = aiVideos.find((v: any) => v.order === mIdx + 1);
 
-                        {isOpen && (
-                          <div className="p-4 bg-white border-t border-slate-100 space-y-2">
-                            {mod.description && (
-                              <p className="text-xs text-slate-500 mb-3 italic">{mod.description}</p>
-                            )}
-                            {mod.lessons?.map((lesson: any) => (
-                              <div key={lesson.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0 text-xs sm:text-sm text-slate-700">
-                                <div className="flex items-center gap-2.5">
-                                  <Play className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                                  <span>{lesson.title}</span>
+                    return (
+                      <div key={mod.id || mIdx} className="space-y-2">
+                        {/* Standalone Milestone AI Overview Banner (if video exists for this slot) */}
+                        {matchedVideo && (
+                          <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 text-white rounded-xl p-3.5 px-4 flex items-center justify-between gap-3 shadow-sm border border-indigo-800/40">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="w-7 h-7 rounded-lg bg-indigo-500/30 text-indigo-300 font-bold text-xs flex items-center justify-center shrink-0 border border-indigo-400/30">
+                                🎬
+                              </span>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-300">
+                                    Milestone {matchedVideo.order} AI Overview
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-mono">
+                                    ({matchedVideo.durationSec ? `${matchedVideo.durationSec}s` : 'Intro'})
+                                  </span>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs text-slate-400">
-                                  <span>{lesson.durationMinutes} mins</span>
-                                  {lesson.isFreePreview ? (
-                                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
-                                      PREVIEW
-                                    </span>
-                                  ) : !isEnrolled && (
-                                    <Lock className="w-3.5 h-3.5 text-slate-400" />
-                                  )}
-                                </div>
+                                <p className="text-xs font-semibold text-white truncate">
+                                  {matchedVideo.title}
+                                </p>
                               </div>
-                            ))}
+                            </div>
+                            <span className="text-[10px] font-semibold text-indigo-200 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-400/30 shrink-0">
+                              Gates Lessons {matchedVideo.unlocksFromLesson}–{matchedVideo.unlocksToLesson}
+                            </span>
                           </div>
                         )}
+
+                        {/* Module Lessons Accordion */}
+                        <div className="border border-slate-200 rounded-xl overflow-hidden">
+                          <button
+                            onClick={() => setOpenModuleIndex(isOpen ? -1 : mIdx)}
+                            className="w-full px-5 py-4 bg-slate-50/70 hover:bg-slate-50 flex items-center justify-between text-left transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">
+                                {mod.moduleNumber || mIdx + 1}
+                              </span>
+                              <span className="font-semibold text-sm text-slate-900">{mod.title}</span>
+                            </div>
+                            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-indigo-600' : ''}`} />
+                          </button>
+
+                          {isOpen && (
+                            <div className="p-4 bg-white border-t border-slate-100 space-y-2">
+                              {mod.description && (
+                                <p className="text-xs text-slate-500 mb-3 italic">{mod.description}</p>
+                              )}
+                              {mod.lessons?.map((lesson: any) => (
+                                <div key={lesson.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0 text-xs sm:text-sm text-slate-700">
+                                  <div className="flex items-center gap-2.5">
+                                    <BookOpen className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                    <span>{lesson.title}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                                    <span>{lesson.durationMinutes} mins study</span>
+                                    {lesson.isFreePreview ? (
+                                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                                        PREVIEW
+                                      </span>
+                                    ) : !isEnrolled && (
+                                      <Lock className="w-3.5 h-3.5 text-slate-400" />
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     );
                   })}

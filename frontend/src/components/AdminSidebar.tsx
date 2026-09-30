@@ -21,6 +21,7 @@ import {
   Bell,
   X,
   Menu,
+  ClipboardList,
 } from 'lucide-react';
 
 interface BadgeCounts {
@@ -31,6 +32,7 @@ interface BadgeCounts {
 const navItems = [
   { href: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/admin/students', label: 'Students', icon: Users },
+  { href: '/admin/enrollments', label: 'Enrollments', icon: ClipboardList },
   { href: '/admin/submissions', label: 'Submissions', icon: FileCheck, badgeKey: 'pendingSubmissions' as const },
   { href: '/admin/refunds', label: 'Refunds', icon: CreditCard, badgeKey: 'pendingRefunds' as const },
   { href: '/admin/courses', label: 'Courses', icon: BookOpen },

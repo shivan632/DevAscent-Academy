@@ -13,9 +13,13 @@ async function main() {
   await prisma.refund.deleteMany();
   await prisma.payment.deleteMany();
   await prisma.certificate.deleteMany();
+  await prisma.doubt.deleteMany();
+  await prisma.quizAttempt.deleteMany();
   await prisma.quizSubmission.deleteMany();
   await prisma.quizQuestion.deleteMany();
   await prisma.quiz.deleteMany();
+  await prisma.aiVideoProgress.deleteMany();
+  await prisma.aiVideo.deleteMany();
   await prisma.lessonProgress.deleteMany();
   await prisma.lesson.deleteMany();
   await prisma.module.deleteMany();
@@ -373,7 +377,6 @@ async function main() {
               lessonNumber: 1,
               title: '1. Semantic HTML5 & Modern Layout Architecture',
               durationMinutes: 35,
-              videoUrl: null, // Admin video upload pending
               isFreePreview: true,
               summary: 'Structured semantic layout rules, accessibility, and clean DOM trees.',
               writtenContent: `# 1. Semantic HTML5 & Modern Layout Architecture\n\n### 📖 Core Engineering Principles\nSemantic HTML provides meaning to web pages rather than just presentation. Screen readers, search engine crawlers, and browsers rely on semantic tags to structure and rank content effectively.\n\n### 💡 Key Semantic Tags\n- \`<header>\`: Container for introductory content or navigational links.\n- \`<nav>\`: Section of navigation links.\n- \`<main>\`: The dominant content of the \`<body>\`.\n- \`<article>\`: Independent, self-contained piece of content (blog post, product card).\n- \`<section>\`: Thematic grouping of content, typically with a heading.\n- \`<footer>\`: Footer containing authorship, copyright, and secondary links.\n\n\`\`\`html\n<!-- Example Semantic Page Layout -->\n<header class="site-header">\n  <nav aria-label="Main Navigation">\n    <a href="/">DevAscent</a>\n  </nav>\n</header>\n\n<main id="content">\n  <article class="post">\n    <h1>Production Web Development</h1>\n    <p>Semantic markup enhances SEO and web accessibility.</p>\n  </article>\n</main>\n\`\`\`\n\n### 🎯 Key Production Standards\n1. Always use only one \`<h1>\` tag per page.\n2. Add descriptive \`alt\` text to all content images.\n3. Wrap primary actions in semantic \`<button>\` instead of \`<div onclick="...">\`.`,
@@ -383,7 +386,6 @@ async function main() {
               lessonNumber: 2,
               title: '2. Flexbox vs. CSS Grid & 375px Mobile Breakpoints',
               durationMinutes: 45,
-              videoUrl: null,
               isFreePreview: false,
               summary: 'Building fluid 1D and 2D layouts using CSS Flexbox and Grid with clamp() responsive typography.',
               writtenContent: `# 2. Flexbox vs. CSS Grid & 375px Mobile Breakpoints\n\n### 📐 When to use Flexbox vs. CSS Grid\n- **CSS Flexbox (1D):** Perfect for arranging items in a single direction (row or column), like navbars, buttons groups, and card content alignment.\n- **CSS Grid (2D):** Best for multi-dimensional layouts with rows and columns, like full-page grids, dashboard widgets, and media galleries.\n\n\`\`\`css\n/* Responsive Auto-Fit Grid */\n.card-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));\n  gap: 1.5rem;\n}\n\n/* Fluid clamp typography */\nh1 {\n  font-size: clamp(1.75rem, 4vw + 1rem, 3.25rem);\n}\n\`\`\`\n\n### 📱 Mobile Breakpoint Checklist\n- Ensure touch targets are at least **44px × 44px**.\n- Test all cards at **375px viewport** to prevent horizontal scrollbars.`,
@@ -406,7 +408,6 @@ async function main() {
               lessonNumber: 1,
               title: '3. ES6+ Modern JavaScript, Closures & Event Loop',
               durationMinutes: 40,
-              videoUrl: null,
               isFreePreview: false,
               summary: 'Understanding async/await, call stack microtasks, destructuring, and immutable array operations.',
               writtenContent: `# 3. ES6+ Modern JavaScript, Closures & Event Loop\n\n### ⚡ Microtasks & Macrotasks in JavaScript\nJavaScript is single-threaded and executes non-blocking asynchronous operations using an **Event Loop**.\n\n\`\`\`javascript\n// Promise Microtask Execution Order\nconsole.log('1. Synchronous');\n\nsetTimeout(() => console.log('4. Macrotask (Timeout)'), 0);\n\nPromise.resolve().then(() => console.log('3. Microtask (Promise)'));\n\nconsole.log('2. Synchronous');\n// Output order: 1 -> 2 -> 3 -> 4\n\`\`\`\n\n### 🛠️ Array Methods for State Updates\nAlways use non-mutating array methods like \`.map()\`, \`.filter()\`, and \`.reduce()\` when managing state in modern applications.`,
@@ -416,7 +417,6 @@ async function main() {
               lessonNumber: 2,
               title: '4. REST API Integration & Error Handling Patterns',
               durationMinutes: 50,
-              videoUrl: null,
               isFreePreview: false,
               summary: 'Consuming remote APIs with fetch, handling 4xx/5xx status codes, and building clean loading skeletons.',
               writtenContent: `# 4. REST API Integration & Error Handling Patterns\n\n### 🌐 Resilient API Client Pattern\nHandling network errors gracefully is critical for user retention.\n\n\`\`\`typescript\nasync function fetchUserData(userId: string) {\n  try {\n    const res = await fetch(\`/api/users/\${userId}\`);\n    if (!res.ok) {\n      throw new Error(\`HTTP error! status: \${res.status}\`);\n    }\n    const data = await res.json();\n    return { success: true, data };\n  } catch (error) {\n    console.error('Fetch failed:', error);\n    return { success: false, error: (error as Error).message };\n  }\n}\n\`\`\``,
@@ -439,7 +439,6 @@ async function main() {
               lessonNumber: 1,
               title: '5. React Component State, Props & Lifecycle',
               durationMinutes: 45,
-              videoUrl: null,
               isFreePreview: false,
               summary: 'Declarative component rendering, props drilling avoidance, and useEffect dependencies.',
               writtenContent: `# 5. React Component State & Lifecycle\n\n### ⚛️ Declarative UI\nIn React, your UI is a direct mathematical function of your state: \`UI = f(state)\`.\n\n\`\`\`tsx\nexport function Counter() {\n  const [count, setCount] = useState(0);\n  return (\n    <button onClick={() => setCount(prev => prev + 1)}>\n      Clicked {count} times\n    </button>\n  );\n}\n\`\`\``,
@@ -449,7 +448,6 @@ async function main() {
               lessonNumber: 2,
               title: '6. Capstone Submission & GitHub Portfolio Guidelines',
               durationMinutes: 60,
-              videoUrl: null,
               isFreePreview: false,
               summary: 'Step-by-step instructions to push your repository to GitHub, deploy live on Vercel, and earn your verified certificate.',
               writtenContent: `# 6. Capstone Submission & GitHub Portfolio Guidelines\n\n### 🏆 Certification Requirements\nTo claim your tamper-proof **SHA-256 Verifiable Certificate**, complete the following:\n1. Choose 1 of the 5 Capstone Projects in the Exercise tab.\n2. Create a public repository on GitHub named appropriately (e.g. \`devascent-web-capstone\`).\n3. Include a comprehensive \`README.md\` with demo screenshots and live deployment URL.\n4. Submit your repository link on the **Submit Capstone** page to receive admin review and certificate issuance!`,
@@ -498,6 +496,20 @@ async function main() {
   }
 
   if (freeReactCourse) {
+    // Seed test standalone AI Overview Video for Course
+    await prisma.aiVideo.create({
+      data: {
+        courseId: freeReactCourse.id,
+        order: 1,
+        title: 'Module 1: React 19 Foundations & Architecture Overview',
+        description: 'High-level intro video on React 19 primitives, Server Components, and mental models before starting lessons 1-5.',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        durationSec: 20,
+        unlocksFromLesson: 1,
+        unlocksToLesson: 5,
+      },
+    });
+
     const freeMod1 = await prisma.module.create({
       data: {
         courseId: freeReactCourse.id,
@@ -510,7 +522,6 @@ async function main() {
               lessonNumber: 1,
               title: 'Modern React Architecture & Component Lifecycle',
               durationMinutes: 30,
-              videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
               isFreePreview: true,
               summary: 'Understanding Virtual DOM reconciliation and declarative UI rendering.',
             },
@@ -518,7 +529,6 @@ async function main() {
               lessonNumber: 2,
               title: 'Mastering Hooks: useState, useEffect, and Custom Hooks',
               durationMinutes: 45,
-              videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
               isFreePreview: true,
               summary: 'Deep dive into hook rules, dependency arrays, and cleanup functions.',
             },
@@ -539,7 +549,6 @@ async function main() {
               lessonNumber: 1,
               title: 'Type-Safe React: Props, Generics, and Event Handlers',
               durationMinutes: 40,
-              videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
               isFreePreview: true,
               summary: 'Typing forms, HTML button props, and union dispatch states.',
             },
@@ -547,7 +556,6 @@ async function main() {
               lessonNumber: 2,
               title: 'Capstone Project Walkthrough & Git Submission Guidelines',
               durationMinutes: 50,
-              videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
               isFreePreview: true,
               summary: 'Guidelines for preparing your public GitHub repo and LinkedIn post for certification review.',
             },
@@ -555,6 +563,83 @@ async function main() {
         },
       },
     });
+
+    // Seed test Quiz for Lesson 1 with 3 questions
+    const firstLesson = await prisma.lesson.findFirst({
+      where: { moduleId: freeMod1.id, lessonNumber: 1 },
+    });
+
+    if (firstLesson) {
+      await prisma.quiz.create({
+        data: {
+          lessonId: firstLesson.id,
+          title: 'React 19 Foundations Assessment',
+          passingScore: 70,
+          maxAttempts: 3,
+          questions: {
+            create: [
+              {
+                order: 1,
+                question: 'What is the primary benefit of React Server Components (RSC)?',
+                questionText: 'What is the primary benefit of React Server Components (RSC)?',
+                options: [
+                  'Reduces client JavaScript bundle size and executes on the server',
+                  'Replaces CSS stylesheets completely',
+                  'Runs synchronous database operations in the browser window',
+                  'Forces all components to use useState',
+                ],
+                optionsJson: JSON.stringify([
+                  'Reduces client JavaScript bundle size and executes on the server',
+                  'Replaces CSS stylesheets completely',
+                  'Runs synchronous database operations in the browser window',
+                  'Forces all components to use useState',
+                ]),
+                correctOptionIndex: 0,
+                explanation: 'Server components execute only on the server, emitting zero client-side JavaScript for pure presentational logic.',
+              },
+              {
+                order: 2,
+                question: 'When does useEffect cleanup function execute?',
+                questionText: 'When does useEffect cleanup function execute?',
+                options: [
+                  'Only when the browser window closes',
+                  'Before the component unmounts and before re-running the effect on dependency change',
+                  'Immediately on initial mount before rendering JSX',
+                  'After the user clicks any button on the page',
+                ],
+                optionsJson: JSON.stringify([
+                  'Only when the browser window closes',
+                  'Before the component unmounts and before re-running the effect on dependency change',
+                  'Immediately on initial mount before rendering JSX',
+                  'After the user clicks any button on the page',
+                ]),
+                correctOptionIndex: 1,
+                explanation: 'React executes cleanup functions before running the new effect on dependency changes and on component unmount.',
+              },
+              {
+                order: 3,
+                question: 'Why should state in React never be mutated directly?',
+                questionText: 'Why should state in React never be mutated directly?',
+                options: [
+                  'Direct mutation triggers immediate browser memory leaks',
+                  'React relies on shallow reference comparison to detect state changes and schedule re-renders',
+                  'Direct mutation converts numbers to strings automatically',
+                  'JavaScript forbids changing object properties in strict mode',
+                ],
+                optionsJson: JSON.stringify([
+                  'Direct mutation triggers immediate browser memory leaks',
+                  'React relies on shallow reference comparison to detect state changes and schedule re-renders',
+                  'Direct mutation converts numbers to strings automatically',
+                  'JavaScript forbids changing object properties in strict mode',
+                ]),
+                correctOptionIndex: 1,
+                explanation: 'React checks Object.is reference equality to know whether a component needs re-rendering; mutating existing references avoids re-renders.',
+              },
+            ],
+          },
+        },
+      });
+    }
 
     // 5. Enroll Test Student
     await prisma.enrollment.create({
@@ -577,6 +662,7 @@ async function main() {
           lessonId: l.id,
           watchedSeconds: l.durationMinutes * 60,
           isCompleted: true,
+          completed: true,
         },
       });
     }

@@ -183,6 +183,109 @@ export class AdminService {
     };
   }
 
+  // ─── Enrollments (Paginated Admin View) ─────────────────────────────────────
+  async getEnrollments(
+    page = 1,
+    limit = 25,
+    filters: {
+      search?: string;
+      courseId?: string;
+      status?: string;
+    } = {},
+  ) {
+    const skip = (page - 1) * limit;
+    const where: any = {};
+
+    if (filters.courseId && filters.courseId !== 'ALL' && filters.courseId !== 'undefined') {
+      where.courseId = filters.courseId;
+    }
+    if (filters.status && filters.status !== 'ALL' && filters.status !== 'undefined') {
+      where.status = filters.status;
+    }
+    if (filters.search && filters.search.trim() && filters.search !== 'undefined') {
+      where.user = {
+        OR: [
+          { name: { contains: filters.search.trim(), mode: 'insensitive' } },
+          { email: { contains: filters.search.trim(), mode: 'insensitive' } },
+        ],
+      };
+    }
+
+    const [total, enrollments] = await Promise.all([
+      this.prisma.enrollment.count({ where }),
+      this.prisma.enrollment.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              degree: true,
+              status: true,
+              isEmailVerified: true,
+              avatarUrl: true,
+            },
+          },
+          course: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              cohortNumber: true,
+              type: true,
+            },
+          },
+        },
+        orderBy: { enrolledAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    // Attach payment info for each enrollment
+    const enrollmentIds = enrollments.map((e) => e.userId + '_' + e.courseId);
+    const payments = await this.prisma.payment.findMany({
+      where: {
+        OR: enrollments.map((e) => ({ userId: e.userId, courseId: e.courseId, status: 'PAID' })),
+      },
+      select: { userId: true, courseId: true, amountInPaise: true, createdAt: true, razorpayPaymentId: true },
+    });
+
+    const paymentMap = new Map<string, any>();
+    for (const p of payments) {
+      paymentMap.set(`${p.userId}_${p.courseId}`, p);
+    }
+
+    return {
+      data: enrollments.map((e) => {
+        const payment = paymentMap.get(`${e.userId}_${e.courseId}`);
+        return {
+          id: e.id,
+          enrolledAt: e.enrolledAt,
+          status: e.status,
+          progressPct: e.progressPct,
+          student: e.user,
+          course: e.course,
+          payment: payment
+            ? {
+                amountRupees: Math.round(payment.amountInPaise / 100),
+                paidAt: payment.createdAt,
+                razorpayPaymentId: payment.razorpayPaymentId,
+              }
+            : null,
+        };
+      }),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   // ─── Payments (Paginated & Real DB) ─────────────────────────────────────────
   async getPayments(
     page = 1,
@@ -314,18 +417,49 @@ export class AdminService {
       where: { id: studentId },
       include: {
         enrollments: {
+          include: {
+            course: { select: { id: true, title: true, slug: true, cohortNumber: true } },
+          },
+          orderBy: { enrolledAt: 'desc' },
+        },
+        certificates: {
           include: { course: { select: { title: true, slug: true } } },
         },
-        certificates: true,
-        payments: true,
-        refunds: true,
+        payments: {
+          include: { course: { select: { title: true } } },
+          orderBy: { createdAt: 'desc' },
+        },
+        refunds: {
+          orderBy: { createdAt: 'desc' },
+        },
         completionSubmissions: {
           include: { course: { select: { title: true } } },
+        },
+        quizSubmissions: {
+          include: {
+            quiz: { select: { id: true, title: true, lessonId: true, moduleId: true } },
+          },
+          orderBy: { submittedAt: 'desc' },
+        },
+        aiVideoProgress: {
+          include: { aiVideo: { select: { id: true, title: true, order: true } } },
         },
       },
     });
     if (!student) throw new NotFoundException('Student not found');
-    return student;
+
+    // Cast to any so we can spread and add computed fields without TS complaints
+    const s = student as any;
+    const { passwordHash, ...safeStudent } = s;
+    return {
+      ...safeStudent,
+      enrollmentCount: s.enrollments?.length ?? 0,
+      certificateCount: s.certificates?.length ?? 0,
+      totalSpentRupees: Math.round(
+        (s.payments ?? []).filter((p: any) => p.status === 'PAID').reduce((acc: number, p: any) => acc + p.amountInPaise, 0) / 100,
+      ),
+      watchedVideosCount: (s.aiVideoProgress ?? []).filter((p: any) => p.watched).length,
+    };
   }
 
   // ─── Suspend / Restore Student ───────────────────────────────────────────────
@@ -1026,7 +1160,6 @@ export class AdminService {
     title: string;
     lessonNumber?: number;
     durationMinutes?: number;
-    videoUrl?: string;
     summary?: string;
     writtenContent?: string;
     exercisePdfUrl?: string;
@@ -1044,7 +1177,6 @@ export class AdminService {
         title: dto.title,
         lessonNumber: nextLessonNumber,
         durationMinutes: dto.durationMinutes || 15,
-        videoUrl: dto.videoUrl || null,
         summary: dto.summary || '',
         writtenContent: dto.writtenContent || '',
         exercisePdfUrl: dto.exercisePdfUrl || null,
@@ -1061,7 +1193,6 @@ export class AdminService {
     title?: string;
     lessonNumber?: number;
     durationMinutes?: number;
-    videoUrl?: string;
     summary?: string;
     writtenContent?: string;
     exercisePdfUrl?: string;
@@ -1075,7 +1206,6 @@ export class AdminService {
         ...(dto.title !== undefined && { title: dto.title }),
         ...(dto.lessonNumber !== undefined && { lessonNumber: dto.lessonNumber }),
         ...(dto.durationMinutes !== undefined && { durationMinutes: dto.durationMinutes }),
-        ...(dto.videoUrl !== undefined && { videoUrl: dto.videoUrl || null }),
         ...(dto.summary !== undefined && { summary: dto.summary }),
         ...(dto.writtenContent !== undefined && { writtenContent: dto.writtenContent }),
         ...(dto.exercisePdfUrl !== undefined && { exercisePdfUrl: dto.exercisePdfUrl || null }),
@@ -1096,7 +1226,9 @@ export class AdminService {
   async upsertLessonQuiz(lessonId: string, dto: {
     title: string;
     passingScore?: number;
+    maxAttempts?: number;
     questions: {
+      order?: number;
       question: string;
       options: string[];
       correctOptionIndex: number;
@@ -1114,10 +1246,14 @@ export class AdminService {
       where: { lessonId },
       update: {
         title: dto.title,
-        passingScore: dto.passingScore || 60,
+        passingScore: dto.passingScore || 70,
+        maxAttempts: dto.maxAttempts || 3,
         questions: {
-          create: dto.questions.map((q) => ({
+          create: dto.questions.map((q, idx) => ({
+            order: q.order || idx + 1,
             question: q.question,
+            questionText: q.question,
+            options: q.options,
             optionsJson: JSON.stringify(q.options),
             correctOptionIndex: q.correctOptionIndex,
             explanation: q.explanation || '',
@@ -1128,10 +1264,14 @@ export class AdminService {
       create: {
         lessonId,
         title: dto.title,
-        passingScore: dto.passingScore || 60,
+        passingScore: dto.passingScore || 70,
+        maxAttempts: dto.maxAttempts || 3,
         questions: {
-          create: dto.questions.map((q) => ({
+          create: dto.questions.map((q, idx) => ({
+            order: q.order || idx + 1,
             question: q.question,
+            questionText: q.question,
+            options: q.options,
             optionsJson: JSON.stringify(q.options),
             correctOptionIndex: q.correctOptionIndex,
             explanation: q.explanation || '',
@@ -1223,6 +1363,61 @@ export class AdminService {
       overall,
       timestamp: new Date().toISOString(),
       uptimeSeconds: Math.round(process.uptime()),
+    };
+  }
+
+  /**
+   * Reset quiz attempts and submissions for a student so they get 3 fresh attempts.
+   */
+  async resetUserQuiz(quizId: string, userId: string, adminId?: string) {
+    const quiz = await this.prisma.quiz.findUnique({
+      where: { id: quizId },
+      include: { lesson: true },
+    });
+
+    if (!quiz) {
+      throw new NotFoundException(`Quiz with ID ${quizId} not found`);
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.quizAttempt.deleteMany({
+        where: { quizId, userId },
+      }),
+      this.prisma.quizSubmission.deleteMany({
+        where: { quizId, userId },
+      }),
+      ...(adminId
+        ? [
+            this.prisma.auditLog.create({
+              data: {
+                adminId,
+                action: 'QUIZ_ATTEMPTS_RESET',
+                targetId: quizId,
+                targetType: 'Quiz',
+                metadata: {
+                  studentId: userId,
+                  studentEmail: user.email,
+                  quizTitle: quiz.title,
+                },
+              },
+            }),
+          ]
+        : []),
+    ]);
+
+    return {
+      success: true,
+      message: `Quiz attempts for ${user.name} (${user.email}) have been reset. 3 fresh attempts granted.`,
+      quizId,
+      userId,
     };
   }
 }

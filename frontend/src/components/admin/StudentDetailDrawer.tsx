@@ -54,6 +54,22 @@ export function StudentDetailDrawer({
   const [selectedCourseToEnroll, setSelectedCourseToEnroll] = useState('');
   const [enrolling, setEnrolling] = useState(false);
   const [verifyingEmail, setVerifyingEmail] = useState(false);
+  const [resettingQuizId, setResettingQuizId] = useState<string | null>(null);
+
+  const handleResetQuiz = async (quizId: string) => {
+    if (!studentId || !quizId) return;
+    if (!confirm('Are you sure you want to reset this quiz for the student? They will receive 3 fresh attempts.')) return;
+    try {
+      setResettingQuizId(quizId);
+      await api.admin.resetStudentQuiz(quizId, studentId);
+      alert('Quiz attempts have been reset successfully. 3 fresh attempts granted.');
+      await mutate();
+    } catch (err: any) {
+      alert(err.message || 'Failed to reset quiz attempts.');
+    } finally {
+      setResettingQuizId(null);
+    }
+  };
 
   const currentNote = noteText !== null ? noteText : student?.adminNote || '';
 
@@ -364,6 +380,44 @@ export function StudentDetailDrawer({
                   </div>
                 )}
               </div>
+
+              {/* Quiz Submissions & Attempt Reset */}
+              {student.quizSubmissions && student.quizSubmissions.length > 0 && (
+                <div className="space-y-2.5">
+                  <h4 className="font-bold text-white uppercase tracking-wider text-[11px] text-white/50">
+                    Quiz Submissions ({student.quizSubmissions.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {student.quizSubmissions.map((qs: any) => (
+                      <div
+                        key={qs.id}
+                        className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between gap-3"
+                      >
+                        <div className="space-y-0.5 min-w-0">
+                          <p className="font-semibold text-white truncate">{qs.quiz?.title || 'Skill Assessment'}</p>
+                          <div className="flex items-center gap-2 text-[10px]">
+                            <span className={qs.passed ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                              {qs.scorePct}% {qs.passed ? '(Passed)' : '(Failed)'}
+                            </span>
+                            <span className="text-white/30">•</span>
+                            <span className="text-white/40">
+                              {new Date(qs.submittedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleResetQuiz(qs.quizId)}
+                          disabled={resettingQuizId === qs.quizId}
+                          className="px-2.5 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold transition-all shrink-0 disabled:opacity-50"
+                        >
+                          {resettingQuizId === qs.quizId ? 'Resetting...' : 'Reset 3 Attempts'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

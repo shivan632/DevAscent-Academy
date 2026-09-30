@@ -10,6 +10,7 @@ import { CertificatesModule } from './modules/certificates/certificates.module';
 import { SubmissionsModule } from './modules/submissions/submissions.module';
 import { RefundsModule } from './modules/refunds/refunds.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { AiVideosModule } from './modules/ai-videos/ai-videos.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AdminModule } from './modules/admin/admin.module';
     SubmissionsModule,
     RefundsModule,
     AdminModule,
+    AiVideosModule,
   ],
 })
 export class AppModule {}

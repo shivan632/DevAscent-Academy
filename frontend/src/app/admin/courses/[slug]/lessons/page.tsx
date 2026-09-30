@@ -6,6 +6,9 @@ import Link from 'next/link';
 import useSWR from 'swr';
 import { api, fetchApi } from '@/lib/api';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 import { getEmbedUrl, isDirectVideoUrl } from '@/lib/utils';
 import {
   BookOpen,
@@ -51,7 +54,6 @@ interface LessonForm {
   title: string;
   lessonNumber: number;
   durationMinutes: number;
-  videoUrl: string;
   summary: string;
   writtenContent: string;
   exercisePdfUrl: string;
@@ -79,16 +81,15 @@ export default function AdminCurriculumStudioPage() {
   const [moduleDescription, setModuleDescription] = useState('');
   const [savingModule, setSavingModule] = useState(false);
 
-  // Lesson studio modal state
+  // Lesson studio modal state (Studio B: 3 Tabs only)
   const [lessonModalOpen, setLessonModalOpen] = useState(false);
-  const [activeStudioTab, setActiveStudioTab] = useState<'video' | 'notes' | 'quiz' | 'exercise'>('video');
+  const [activeStudioTab, setActiveStudioTab] = useState<'notes' | 'quiz' | 'exercise'>('notes');
   const [selectedModuleId, setSelectedModuleId] = useState('');
   const [lessonForm, setLessonForm] = useState<LessonForm>({
     moduleId: '',
     title: '',
     lessonNumber: 1,
     durationMinutes: 15,
-    videoUrl: '',
     summary: '',
     writtenContent: '',
     exercisePdfUrl: '',
@@ -96,14 +97,13 @@ export default function AdminCurriculumStudioPage() {
     isFreePreview: false,
   });
 
-  // Quiz in lesson studio
+  // Quiz in lesson studio (70% pass, max 3 attempts)
   const [quizTitle, setQuizTitle] = useState('');
-  const [quizPassingScore, setQuizPassingScore] = useState(60);
+  const [quizPassingScore, setQuizPassingScore] = useState(70);
+  const [quizMaxAttempts, setQuizMaxAttempts] = useState(3);
   const [quizQuestions, setQuizQuestions] = useState<QuestionForm[]>([]);
   const [savingLesson, setSavingLesson] = useState(false);
-
-  // Previewing video in editor
-  const [previewingVideo, setPreviewingVideo] = useState(false);
+  const [previewingPdf, setPreviewingPdf] = useState(false);
 
   // Open Add Module
   const handleOpenAddModule = () => {
@@ -168,15 +168,15 @@ export default function AdminCurriculumStudioPage() {
       title: '',
       lessonNumber: 1,
       durationMinutes: 15,
-      videoUrl: '',
       summary: '',
-      writtenContent: `# Lecture Notes & Architecture\n\n### 1. Key Concepts\nWrite clear explanations here...\n\n\`\`\`typescript\n// Example code\nconsole.log("Hello DevAscent");\n\`\`\`\n\n### 2. Best Practices\n- Rule 1: Always type your interfaces.\n- Rule 2: Use transactions for database consistency.`,
+      writtenContent: `# 📖 Lesson Notes & Architecture\n\n### 🎯 By the end of this lesson, you will:\n- Understand core principles\n- Implement industry-standard patterns\n\n### 💡 Key Concepts\nWrite clear explanations here...\n\n\`\`\`typescript\n// Example code\nconsole.log("DevAscent Engineering Standards");\n\`\`\`\n\n### ⚡ Best Practices\n- Rule 1: Always type your interfaces.\n- Rule 2: Keep functions pure and decoupled.`,
       exercisePdfUrl: '',
       exercisePdfTitle: 'Capstone Project Guide & Submission Instructions',
       isFreePreview: false,
     });
-    setQuizTitle('Lesson Knowledge Check');
-    setQuizPassingScore(60);
+    setQuizTitle('Skill Assessment Quiz');
+    setQuizPassingScore(70);
+    setQuizMaxAttempts(3);
     setQuizQuestions([
       {
         question: 'What is the primary architectural advantage of modular services?',
@@ -190,7 +190,8 @@ export default function AdminCurriculumStudioPage() {
         explanation: 'Modular services separate business logic from controllers, making code maintainable and testable.',
       },
     ]);
-    setActiveStudioTab('video');
+    setActiveStudioTab('notes');
+    setPreviewingPdf(false);
     setLessonModalOpen(true);
   };
 
@@ -203,7 +204,6 @@ export default function AdminCurriculumStudioPage() {
       title: lesson.title,
       lessonNumber: lesson.lessonNumber,
       durationMinutes: lesson.durationMinutes || 15,
-      videoUrl: lesson.videoUrl || '',
       summary: lesson.summary || '',
       writtenContent: lesson.writtenContent || '',
       exercisePdfUrl: lesson.exercisePdfUrl || '',
@@ -212,25 +212,28 @@ export default function AdminCurriculumStudioPage() {
     });
 
     if (lesson.quiz) {
-      setQuizTitle(lesson.quiz.title || 'Lesson Knowledge Check');
-      setQuizPassingScore(lesson.quiz.passingScore || 60);
+      setQuizTitle(lesson.quiz.title || 'Skill Assessment Quiz');
+      setQuizPassingScore(lesson.quiz.passingScore || 70);
+      setQuizMaxAttempts(lesson.quiz.maxAttempts || 3);
       setQuizQuestions(
         lesson.quiz.questions?.map((q: any) => ({
           id: q.id,
-          question: q.question,
-          options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
+          question: q.question || q.questionText,
+          options: Array.isArray(q.options) && q.options.length ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
           correctOptionIndex: q.correctOptionIndex ?? 0,
           explanation: q.explanation || '',
           codeSnippet: q.codeSnippet || '',
         })) || []
       );
     } else {
-      setQuizTitle(`${lesson.title} - Knowledge Check`);
-      setQuizPassingScore(60);
+      setQuizTitle(`${lesson.title} - Skill Assessment`);
+      setQuizPassingScore(70);
+      setQuizMaxAttempts(3);
       setQuizQuestions([]);
     }
 
-    setActiveStudioTab('video');
+    setActiveStudioTab('notes');
+    setPreviewingPdf(Boolean(lesson.exercisePdfUrl));
     setLessonModalOpen(true);
   };
 
@@ -244,11 +247,10 @@ export default function AdminCurriculumStudioPage() {
       let lessonId = lessonForm.id;
 
       if (lessonId) {
-        // Update lesson
+        // Update lesson (Studio B - Notes, Quiz, PDF)
         await api.admin.updateLesson(courseSlug, lessonId, {
           title: lessonForm.title.trim(),
           durationMinutes: Number(lessonForm.durationMinutes),
-          videoUrl: lessonForm.videoUrl.trim() || undefined,
           summary: lessonForm.summary.trim() || undefined,
           writtenContent: lessonForm.writtenContent || undefined,
           exercisePdfUrl: lessonForm.exercisePdfUrl.trim() || undefined,
@@ -260,7 +262,6 @@ export default function AdminCurriculumStudioPage() {
         const res = await api.admin.createLesson(courseSlug, selectedModuleId, {
           title: lessonForm.title.trim(),
           durationMinutes: Number(lessonForm.durationMinutes),
-          videoUrl: lessonForm.videoUrl.trim() || undefined,
           summary: lessonForm.summary.trim() || undefined,
           writtenContent: lessonForm.writtenContent || undefined,
           exercisePdfUrl: lessonForm.exercisePdfUrl.trim() || undefined,
@@ -271,12 +272,14 @@ export default function AdminCurriculumStudioPage() {
         lessonId = created?.id;
       }
 
-      // If quiz questions exist, upsert quiz
+      // If quiz questions exist, upsert quiz (70% pass, max 3 attempts)
       if (lessonId && quizQuestions.length > 0) {
         await api.admin.upsertLessonQuiz(courseSlug, lessonId, {
           title: quizTitle.trim() || `${lessonForm.title} Quiz`,
-          passingScore: Number(quizPassingScore),
-          questions: quizQuestions.map((q) => ({
+          passingScore: Number(quizPassingScore) || 70,
+          maxAttempts: Number(quizMaxAttempts) || 3,
+          questions: quizQuestions.map((q, qIdx) => ({
+            order: qIdx + 1,
             question: q.question.trim(),
             options: q.options.map((opt) => opt.trim()),
             correctOptionIndex: Number(q.correctOptionIndex),
@@ -366,7 +369,15 @@ export default function AdminCurriculumStudioPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            href={`/admin/courses/${courseSlug}/videos`}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 hover:text-white transition-all border border-indigo-500/30 shadow-sm"
+          >
+            <Video className="w-3.5 h-3.5 text-indigo-400" />
+            <span>AI Videos Studio</span>
+          </Link>
+
           <Link
             href={`/learn/${courseSlug}`}
             target="_blank"
@@ -646,7 +657,7 @@ export default function AdminCurriculumStudioPage() {
         </div>
       )}
 
-      {/* ─── MODAL 2: 4-IN-1 LESSON STUDIO MODAL ──────────────────────────────── */}
+      {/* ─── MODAL 2: 3-IN-1 LESSON STUDIO (STUDIO B) ────────────────────────── */}
       {lessonModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full my-auto flex flex-col max-h-[92vh] shadow-2xl overflow-hidden">
@@ -658,11 +669,16 @@ export default function AdminCurriculumStudioPage() {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-bold text-white">
-                    {lessonForm.id ? `Edit Lesson: ${lessonForm.title}` : 'Create New Lesson Studio'}
-                  </h3>
-                  <p className="text-[11px] text-slate-400">
-                    Configure AI Video, GeeksforGeeks Markdown Notes, Skill Quiz, and Project PDF.
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      Studio B
+                    </span>
+                    <h3 className="text-sm sm:text-base font-bold text-white">
+                      {lessonForm.id ? `Edit Lesson: ${lessonForm.title}` : 'Create New Lesson Studio'}
+                    </h3>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Configure Written Study Notes (Markdown), Skill Quiz (3-Attempt Assessment), and Capstone Project PDF.
                   </p>
                 </div>
               </div>
@@ -674,21 +690,8 @@ export default function AdminCurriculumStudioPage() {
               </button>
             </div>
 
-            {/* 4 Studio Tabs */}
+            {/* 3 Studio Tabs */}
             <div className="bg-slate-950 border-b border-slate-800 flex items-center px-4 overflow-x-auto text-xs font-semibold shrink-0">
-              <button
-                type="button"
-                onClick={() => setActiveStudioTab('video')}
-                className={`py-3 px-4 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
-                  activeStudioTab === 'video'
-                    ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-                    : 'border-transparent text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Video className="w-3.5 h-3.5" />
-                <span>1. Video Lecture</span>
-              </button>
-
               <button
                 type="button"
                 onClick={() => setActiveStudioTab('notes')}
@@ -699,7 +702,7 @@ export default function AdminCurriculumStudioPage() {
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>2. Written Notes (Markdown)</span>
+                <span>1. Study Notes (Markdown)</span>
               </button>
 
               <button
@@ -712,7 +715,7 @@ export default function AdminCurriculumStudioPage() {
                 }`}
               >
                 <Award className="w-3.5 h-3.5" />
-                <span>3. Skill Quiz ({quizQuestions.length} Questions)</span>
+                <span>2. Skill Quiz ({quizQuestions.length} Questions)</span>
               </button>
 
               <button
@@ -725,7 +728,7 @@ export default function AdminCurriculumStudioPage() {
                 }`}
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>4. Exercise File & PDF</span>
+                <span>3. Exercise File & PDF</span>
               </button>
             </div>
 
@@ -747,7 +750,7 @@ export default function AdminCurriculumStudioPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-semibold">Est. Duration (Mins)</label>
+                  <label className="text-slate-300 font-semibold">Est. Read Time (Mins)</label>
                   <input
                     type="number"
                     value={lessonForm.durationMinutes}
@@ -758,75 +761,21 @@ export default function AdminCurriculumStudioPage() {
                 </div>
               </div>
 
-              {/* TAB 1: VIDEO LECTURE */}
-              {activeStudioTab === 'video' && (
+              {/* TAB 1: WRITTEN NOTES (Study Material Markdown) */}
+              {activeStudioTab === 'notes' && (
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-                        <Video className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>Video URL (Embed / YouTube / Cloudflare / MP4)</span>
-                      </label>
-                      <span className="text-[11px] text-amber-400/80">
-                        Leave blank if AI video is still in production
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="url"
-                        value={lessonForm.videoUrl}
-                        onChange={(e) => setLessonForm({ ...lessonForm, videoUrl: e.target.value })}
-                        placeholder="https://commondatastorage.googleapis.com/... or https://youtube.com/embed/..."
-                        className="flex-1 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
-                      />
-                      {lessonForm.videoUrl && (
-                        <button
-                          type="button"
-                          onClick={() => setPreviewingVideo(!previewingVideo)}
-                          className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-semibold flex items-center gap-1 transition-colors shrink-0"
-                        >
-                          <Play className="w-3.5 h-3.5 text-indigo-400" />
-                          <span>{previewingVideo ? 'Close' : 'Test Play'}</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Video Live Preview */}
-                  {previewingVideo && lessonForm.videoUrl && (
-                    <div className="bg-black rounded-xl overflow-hidden aspect-video max-h-64 w-full border border-slate-800 flex items-center justify-center">
-                      {isDirectVideoUrl(lessonForm.videoUrl) ? (
-                        <video
-                          src={lessonForm.videoUrl}
-                          controls
-                          controlsList="nodownload"
-                          className="w-full h-full object-contain bg-black"
-                          playsInline
-                        />
-                      ) : (
-                        <iframe
-                          src={getEmbedUrl(lessonForm.videoUrl)}
-                          title="Video Preview"
-                          className="w-full h-full border-0"
-                          allowFullScreen
-                        />
-                      )}
-                    </div>
-                  )}
-
-                  <div className="space-y-1.5">
-                    <label className="text-slate-300 font-semibold">Lesson Summary / Learning Objective</label>
+                    <label className="text-slate-300 font-semibold">Learning Objective / Summary</label>
                     <textarea
                       value={lessonForm.summary}
                       onChange={(e) => setLessonForm({ ...lessonForm, summary: e.target.value })}
                       rows={2}
-                      placeholder="Brief 1-2 sentence overview of what students will achieve in this lesson..."
+                      placeholder="Brief 1-2 sentence overview of what students will master in this lesson..."
                       className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
                     />
                   </div>
 
-                  <div className="flex items-center gap-2 pt-1">
+                  <div className="flex items-center gap-2 pt-1 pb-2">
                     <input
                       type="checkbox"
                       id="freePreviewCheck"
@@ -835,23 +784,18 @@ export default function AdminCurriculumStudioPage() {
                       className="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"
                     />
                     <label htmlFor="freePreviewCheck" className="text-slate-300 font-medium cursor-pointer">
-                      Mark as Free Preview (Allow un-enrolled students to watch & read this lesson)
+                      Mark as Free Preview (Allow un-enrolled students to read these notes)
                     </label>
                   </div>
-                </div>
-              )}
 
-              {/* TAB 2: WRITTEN NOTES (GeeksforGeeks Style Markdown) */}
-              {activeStudioTab === 'notes' && (
-                <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-bold text-white flex items-center gap-2">
                         <Code2 className="w-4 h-4 text-indigo-400" />
-                        <span>GeeksforGeeks-Style Study Material (Markdown)</span>
+                        <span>Study Material (Markdown & Syntax Highlighting)</span>
                       </h4>
                       <p className="text-[11px] text-slate-400">
-                        Supports full Markdown, code snippets, key rules, diagrams, and tables.
+                        Supports full GitHub-flavored Markdown, syntax highlighted code snippets, diagrams, and tables.
                       </p>
                     </div>
                   </div>
@@ -863,18 +807,20 @@ export default function AdminCurriculumStudioPage() {
                       <textarea
                         value={lessonForm.writtenContent}
                         onChange={(e) => setLessonForm({ ...lessonForm, writtenContent: e.target.value })}
-                        rows={14}
+                        rows={15}
                         placeholder="# Title&#10;&#10;Explain architectural patterns here...&#10;&#10;```typescript&#10;const code = 'example';&#10;```"
                         className="w-full font-mono bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl p-3 text-white focus:outline-none resize-y text-xs leading-relaxed"
                       />
                     </div>
 
-                    {/* Live Preview Panel */}
+                    {/* Live Preview Panel with syntax highlighting */}
                     <div className="space-y-1.5 flex flex-col">
-                      <label className="text-emerald-400 font-mono text-[11px]">Live Formatted Preview</label>
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 overflow-y-auto max-h-[340px] text-slate-300 prose prose-invert prose-sm max-w-none">
+                      <label className="text-emerald-400 font-mono text-[11px]">Live Formatted Preview (Highlight.js)</label>
+                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 overflow-y-auto max-h-[360px] text-slate-300 prose prose-invert prose-sm max-w-none">
                         {lessonForm.writtenContent ? (
-                          <ReactMarkdown>{lessonForm.writtenContent}</ReactMarkdown>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+                            {lessonForm.writtenContent}
+                          </ReactMarkdown>
                         ) : (
                           <p className="text-slate-600 italic">No notes written yet. Start typing on the left!</p>
                         )}
@@ -884,11 +830,11 @@ export default function AdminCurriculumStudioPage() {
                 </div>
               )}
 
-              {/* TAB 3: SKILL QUIZ BUILDER */}
+              {/* TAB 2: SKILL QUIZ BUILDER (Locked 70% passing, max 3 attempts) */}
               {activeStudioTab === 'quiz' && (
                 <div className="space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-950 rounded-xl border border-slate-800">
-                    <div className="space-y-1">
+                    <div className="space-y-1 flex-1">
                       <label className="text-slate-300 font-semibold">Quiz Title</label>
                       <input
                         type="text"
@@ -899,16 +845,30 @@ export default function AdminCurriculumStudioPage() {
                       />
                     </div>
 
-                    <div className="space-y-1 shrink-0">
-                      <label className="text-slate-300 font-semibold">Passing Threshold (%)</label>
-                      <input
-                        type="number"
-                        value={quizPassingScore}
-                        onChange={(e) => setQuizPassingScore(Number(e.target.value))}
-                        className="w-28 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-indigo-500"
-                        min={10}
-                        max={100}
-                      />
+                    <div className="flex items-center gap-3">
+                      <div className="space-y-1 shrink-0">
+                        <label className="text-slate-300 font-semibold">Passing (%)</label>
+                        <input
+                          type="number"
+                          value={quizPassingScore}
+                          onChange={(e) => setQuizPassingScore(Number(e.target.value))}
+                          className="w-24 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-indigo-500"
+                          min={10}
+                          max={100}
+                        />
+                      </div>
+
+                      <div className="space-y-1 shrink-0">
+                        <label className="text-slate-300 font-semibold">Max Attempts</label>
+                        <input
+                          type="number"
+                          value={quizMaxAttempts}
+                          onChange={(e) => setQuizMaxAttempts(Number(e.target.value))}
+                          className="w-24 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-indigo-500"
+                          min={1}
+                          max={10}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -930,7 +890,7 @@ export default function AdminCurriculumStudioPage() {
 
                     {!quizQuestions.length ? (
                       <div className="p-6 text-center text-slate-500 border border-dashed border-slate-800 rounded-xl space-y-2">
-                        <p>No questions configured for this lesson.</p>
+                        <p>No questions configured for this lesson assessment.</p>
                         <button
                           type="button"
                           onClick={handleAddQuestion}
@@ -1041,26 +1001,9 @@ export default function AdminCurriculumStudioPage() {
                 </div>
               )}
 
-              {/* TAB 4: EXERCISE FILE & PDF LINK */}
+              {/* TAB 3: EXERCISE FILE & PDF */}
               {activeStudioTab === 'exercise' && (
                 <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-slate-300 font-semibold flex items-center gap-2">
-                      <Download className="w-4 h-4 text-indigo-400" />
-                      <span>Official Exercise / Capstone Assignment PDF URL</span>
-                    </label>
-                    <input
-                      type="url"
-                      value={lessonForm.exercisePdfUrl}
-                      onChange={(e) => setLessonForm({ ...lessonForm, exercisePdfUrl: e.target.value })}
-                      placeholder="https://.../assignments/week-1-capstone.pdf"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
-                    />
-                    <p className="text-[11px] text-slate-500">
-                      If left blank, the student portal gracefully displays "Admin PDF Upload Pending" while still showcasing the 5 GitHub Capstone Projects.
-                    </p>
-                  </div>
-
                   <div className="space-y-1.5">
                     <label className="text-slate-300 font-semibold">Exercise PDF Display Title</label>
                     <input
@@ -1071,6 +1014,60 @@ export default function AdminCurriculumStudioPage() {
                       className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
                     />
                   </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-slate-300 font-semibold flex items-center gap-2">
+                        <Download className="w-4 h-4 text-indigo-400" />
+                        <span>Official Exercise / Capstone Assignment PDF URL</span>
+                      </label>
+                      {lessonForm.exercisePdfUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setPreviewingPdf(!previewingPdf)}
+                          className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>{previewingPdf ? 'Hide PDF Preview' : 'Test PDF Preview'}</span>
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      type="url"
+                      value={lessonForm.exercisePdfUrl}
+                      onChange={(e) => setLessonForm({ ...lessonForm, exercisePdfUrl: e.target.value })}
+                      placeholder="https://res.cloudinary.com/.../assignments/week-1-capstone.pdf"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    />
+                    <p className="text-[11px] text-slate-500">
+                      Supports direct Cloudinary/S3 PDF links. If left blank, student portal displays "Admin PDF Upload Pending".
+                    </p>
+                  </div>
+
+                  {/* Inline PDF Preview */}
+                  {previewingPdf && lessonForm.exercisePdfUrl && (
+                    <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 space-y-2">
+                      <div className="flex items-center justify-between px-2 text-[11px] text-slate-400">
+                        <span>PDF Embedded Viewer</span>
+                        <a
+                          href={lessonForm.exercisePdfUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                        >
+                          <span>Open in new tab</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                      <iframe
+                        src={`https://docs.google.com/gviewer?embedded=true&url=${encodeURIComponent(
+                          lessonForm.exercisePdfUrl
+                        )}`}
+                        title="PDF Preview"
+                        className="w-full h-80 rounded-lg border border-slate-800 bg-white"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 

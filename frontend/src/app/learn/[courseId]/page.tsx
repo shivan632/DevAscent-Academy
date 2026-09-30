@@ -20,28 +20,28 @@ export default function LearnCourseRedirectPage() {
     async function loadFirstLesson() {
       try {
         setLoading(true);
-        const res = await fetchApi(`/courses/${courseSlug}`);
+        const res = await fetchApi(`/courses/${courseSlug}/curriculum`);
         const data = res?.data || res;
-        const modules = data?.modules || [];
+        const lessons = data?.lessons || [];
+        const aiVideos = data?.aiVideos || [];
 
-        // Find the first lesson in the first module
-        let targetLessonId = null;
-        for (const mod of modules) {
-          if (mod.lessons && mod.lessons.length > 0) {
-            targetLessonId = mod.lessons[0].id;
-            break;
-          }
-        }
+        // Find the first unlocked lesson or first available lesson
+        const firstUnlocked = lessons.find((l: any) => l.isUnlocked);
+        const targetLesson = firstUnlocked || lessons[0];
 
-        if (targetLessonId && isMounted) {
-          router.replace(`/learn/${courseSlug}/${targetLessonId}`);
+        // Check if Video 1 exists and hasn't been watched yet
+        const v1 = aiVideos.find((v: any) => v.order === 1);
+        const needsIntro = v1 && !v1.isWatched;
+
+        if (targetLesson && isMounted) {
+          router.replace(`/learn/${courseSlug}/${targetLesson.id}${needsIntro ? '?showVideo=1' : ''}`);
         } else if (isMounted) {
           setError('No lessons available in this course yet.');
           setLoading(false);
         }
       } catch (err: any) {
         if (isMounted) {
-          setError(err?.message || 'Failed to load course details.');
+          setError(err?.message || 'Failed to load course curriculum.');
           setLoading(false);
         }
       }

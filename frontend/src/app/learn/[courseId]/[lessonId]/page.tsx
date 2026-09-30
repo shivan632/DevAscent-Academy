@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, api } from '@/lib/api';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 import confetti from 'canvas-confetti';
 import { getEmbedUrl, isDirectVideoUrl } from '@/lib/utils';
 import {
   Play,
-  Pause,
   CheckCircle2,
   ChevronRight,
   ChevronLeft,
@@ -20,20 +22,23 @@ import {
   Award,
   ArrowLeft,
   Sparkles,
-  MessageSquare,
   Lock,
   Loader2,
-  AlertCircle,
   FileText,
   HelpCircle,
   Send,
-  VideoOff,
+  Video,
   Clock,
-  Code2,
-  ExternalLink,
   Check,
   X,
-  Share2
+  Copy,
+  ExternalLink,
+  Layers,
+  GraduationCap,
+  RefreshCw,
+  AlertTriangle,
+  Mail,
+  Maximize2
 } from 'lucide-react';
 
 const GithubIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
@@ -61,6 +66,10 @@ interface QuizData {
   id: string;
   title: string;
   passingScore: number;
+  maxAttempts?: number;
+  attemptsCount?: number;
+  attemptsExhausted?: boolean;
+  supportEmail?: string;
   isPassed?: boolean;
   questions: Question[];
 }
@@ -75,26 +84,6 @@ interface Doubt {
   userAvatar?: string | null;
 }
 
-interface LessonItem {
-  id: string;
-  lessonNumber: number;
-  title: string;
-  durationMinutes: number;
-  isFreePreview: boolean;
-  isCompleted: boolean;
-  isActive: boolean;
-  hasQuiz: boolean;
-  quizPassed?: boolean;
-}
-
-interface ModuleItem {
-  id: string;
-  moduleNumber: number;
-  title: string;
-  description?: string;
-  lessons: LessonItem[];
-}
-
 interface CapstoneProject {
   id: number;
   title: string;
@@ -105,7 +94,6 @@ interface CapstoneProject {
   linkedinTag: string;
 }
 
-// 5 Capstone Projects for GitHub Portfolio & LinkedIn Proof of Work
 const DEFAULT_CAPSTONE_PROJECTS: CapstoneProject[] = [
   {
     id: 1,
@@ -174,52 +162,9 @@ const DEFAULT_CAPSTONE_PROJECTS: CapstoneProject[] = [
   },
 ];
 
-const DEFAULT_FALLBACK_QUIZ: QuizData = {
-  id: 'fallback-lesson-quiz',
-  title: 'Lesson Knowledge Check & Skill Validation',
-  passingScore: 60,
-  questions: [
-    {
-      id: 'q1',
-      question: 'What is the primary architectural benefit of separating modular services in full-stack applications?',
-      options: [
-        'Ensures tight coupling between all components',
-        'Enhances maintainability, testability, and clear separation of concerns',
-        'Allows skipping database index optimization',
-        'Eliminates the need for API validation guards',
-      ],
-      correctOptionIndex: 1,
-      explanation: 'Modular architecture separates business logic from routing, making systems maintainable, reusable, and easy to unit-test.',
-    },
-    {
-      id: 'q2',
-      question: 'Why should database operations involving multiple dependent records be wrapped in a transaction?',
-      options: [
-        'To increase query execution time artificially',
-        'To ensure ACID properties and prevent inconsistent or orphan database states',
-        'To bypass Prisma ORM type safety checks',
-        'To disable foreign key constraints globally',
-      ],
-      correctOptionIndex: 1,
-      explanation: 'Database transactions guarantee atomicity: either all changes succeed together, or all are rolled back on error.',
-    },
-    {
-      id: 'q3',
-      question: 'How do compound indexes like @@index([userId, courseId]) improve PostgreSQL query performance?',
-      options: [
-        'They compress the entire database onto disk',
-        'They allow the query planner to quickly locate specific user records in O(log N) time without scanning all rows',
-        'They automatically encrypt stored passwords',
-        'They convert SQL queries to NoSQL documents',
-      ],
-      correctOptionIndex: 1,
-      explanation: 'Compound indexes create a B-tree search structure on multiple columns, drastically speeding up queries that filter on both keys.',
-    },
-  ],
-};
-
 export default function CourseLearningRoom() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const courseSlug = params?.courseId as string;
   const lessonId = params?.lessonId as string;
@@ -229,13 +174,19 @@ export default function CourseLearningRoom() {
   const [error, setError] = useState<string | null>(null);
   const [courseData, setCourseData] = useState<any>(null);
   const [lessonData, setLessonData] = useState<any>(null);
-  const [modules, setModules] = useState<ModuleItem[]>([]);
+  const [curriculumItems, setCurriculumItems] = useState<any[]>([]);
+  const [aiVideos, setAiVideos] = useState<any[]>([]);
   const [navigation, setNavigation] = useState<any>(null);
+
+  // Active AI Overview Video modal / theater state
+  const [activeVideoModal, setActiveVideoModal] = useState<any | null>(null);
+  const [markingVideoWatched, setMarkingVideoWatched] = useState(false);
 
   // Interaction states
   const [activeTab, setActiveTab] = useState<'notes' | 'quiz' | 'exercise'>('notes');
   const [isCompleted, setIsCompleted] = useState(false);
   const [togglingComplete, setTogglingComplete] = useState(false);
+  const [copiedCodeSnippet, setCopiedCodeSnippet] = useState<string | null>(null);
 
   // Doubt states
   const [doubtText, setDoubtText] = useState('');
@@ -247,8 +198,10 @@ export default function CourseLearningRoom() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizResult, setQuizResult] = useState<any>(null);
   const [submittingQuiz, setSubmittingQuiz] = useState(false);
+  const [attemptsCount, setAttemptsCount] = useState<number>(0);
+  const [attemptsExhausted, setAttemptsExhausted] = useState<boolean>(false);
 
-  // Load lesson data from API
+  // Load lesson and curriculum data
   const loadLessonData = useCallback(async () => {
     if (!courseSlug || !lessonId) return;
 
@@ -265,10 +218,25 @@ export default function CourseLearningRoom() {
 
       setLessonData(data.lesson);
       setCourseData(data.course);
-      setModules(data.modules || []);
       setNavigation(data.navigation || null);
+      setCurriculumItems(data.interleavedCurriculum || []);
+      setAiVideos(data.aiVideos || []);
       setIsCompleted(data.lesson.isCompleted || false);
       setDoubtsList(data.lesson.doubts || []);
+
+      if (data.lesson.quiz) {
+        setAttemptsCount(data.lesson.quiz.attemptsCount || 0);
+        setAttemptsExhausted(data.lesson.quiz.attemptsExhausted || false);
+      }
+
+      // Check if URL requested a specific AI Video modal (e.g. ?showVideo=1)
+      const requestedVideoOrder = searchParams.get('showVideo');
+      if (requestedVideoOrder && data.aiVideos) {
+        const targetVideo = data.aiVideos.find((v: any) => String(v.order) === requestedVideoOrder);
+        if (targetVideo) {
+          setActiveVideoModal(targetVideo);
+        }
+      }
 
       // Reset quiz local selection
       setSelectedAnswers({});
@@ -280,11 +248,39 @@ export default function CourseLearningRoom() {
     } finally {
       setLoading(false);
     }
-  }, [courseSlug, lessonId]);
+  }, [courseSlug, lessonId, searchParams]);
 
   useEffect(() => {
     loadLessonData();
   }, [loadLessonData]);
+
+  // Handle Mark AI Overview Video as Watched
+  const handleMarkVideoWatched = async (videoId: string) => {
+    try {
+      setMarkingVideoWatched(true);
+      await api.markAiVideoWatched(videoId);
+
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+
+      // Update local AI video state
+      setAiVideos((prev) =>
+        prev.map((v) => (v.id === videoId ? { ...v, isWatched: true } : v))
+      );
+
+      // Close modal and reload curriculum progression
+      setActiveVideoModal(null);
+      await loadLessonData();
+
+    } catch (err: any) {
+      alert(err?.message || 'Failed to mark video as watched.');
+    } finally {
+      setMarkingVideoWatched(false);
+    }
+  };
 
   // Handle Mark Complete toggle
   const handleToggleComplete = async () => {
@@ -297,16 +293,6 @@ export default function CourseLearningRoom() {
       const data = res?.data || res;
 
       setIsCompleted(data?.isCompleted ?? !isCompleted);
-      
-      // Update local sidebar list
-      setModules((prev) =>
-        prev.map((mod) => ({
-          ...mod,
-          lessons: mod.lessons.map((l) =>
-            l.id === lessonId ? { ...l, isCompleted: data?.isCompleted ?? !isCompleted } : l
-          ),
-        }))
-      );
 
       if (data?.isCompleted) {
         confetti({
@@ -315,6 +301,8 @@ export default function CourseLearningRoom() {
           origin: { y: 0.8 },
         });
       }
+
+      await loadLessonData();
     } catch (err: any) {
       console.error('Error toggling completion:', err);
     } finally {
@@ -348,18 +336,18 @@ export default function CourseLearningRoom() {
 
   // Handle Quiz Answer Selection
   const handleSelectOption = (questionId: string, optionIndex: number) => {
-    if (quizSubmitted) return;
+    if (quizSubmitted || attemptsExhausted) return;
     setSelectedAnswers((prev) => ({
       ...prev,
       [questionId]: optionIndex,
     }));
   };
 
-  const currentQuiz: QuizData = lessonData?.quiz || DEFAULT_FALLBACK_QUIZ;
+  const currentQuiz: QuizData | null = lessonData?.quiz || null;
 
   // Handle Quiz Submit
   const handleQuizSubmit = async () => {
-    if (!currentQuiz || submittingQuiz) return;
+    if (!currentQuiz || submittingQuiz || attemptsExhausted) return;
 
     const answersArray = currentQuiz.questions.map((q: Question) => ({
       questionId: q.id,
@@ -369,74 +357,76 @@ export default function CourseLearningRoom() {
     try {
       setSubmittingQuiz(true);
 
-      if (lessonData?.quiz?.id) {
-        const res = await fetchApi(`/courses/${courseSlug}/lessons/${lessonId}/quiz-submit`, {
-          method: 'POST',
-          body: JSON.stringify({
-            quizId: lessonData.quiz.id,
-            answers: answersArray,
-          }),
+      const res = await fetchApi(`/courses/${courseSlug}/lessons/${lessonId}/quiz-submit`, {
+        method: 'POST',
+        body: JSON.stringify({
+          quizId: currentQuiz.id,
+          answers: answersArray,
+        }),
+      });
+      const data = res?.data || res;
+      setQuizResult(data);
+      setQuizSubmitted(true);
+      setAttemptsCount(data.attemptNum || attemptsCount + 1);
+      setAttemptsExhausted(data.attemptsExhausted || false);
+
+      if (data?.passed) {
+        setIsCompleted(true);
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
         });
-        const data = res?.data || res;
-        setQuizResult(data);
-        setQuizSubmitted(true);
-
-        if (data?.passed) {
-          setIsCompleted(true);
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
-        }
-      } else {
-        let correct = 0;
-        const feedback = currentQuiz.questions.map((q: Question) => {
-          const userSel = selectedAnswers[q.id];
-          const isCorrect = userSel === q.correctOptionIndex;
-          if (isCorrect) correct++;
-          return {
-            questionId: q.id,
-            isCorrect,
-            correctOptionIndex: q.correctOptionIndex,
-            explanation: q.explanation,
-          };
-        });
-
-        const scorePct = Math.round((correct / currentQuiz.questions.length) * 100);
-        const passed = scorePct >= currentQuiz.passingScore;
-
-        setQuizResult({
-          scorePct,
-          passed,
-          passingScore: currentQuiz.passingScore,
-          feedback,
-          correctCount: correct,
-          totalQuestions: currentQuiz.questions.length,
-        });
-        setQuizSubmitted(true);
-
-        if (passed) {
-          handleToggleComplete();
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
-        }
+        await loadLessonData();
       }
     } catch (err: any) {
       console.error('Quiz submission error:', err);
+      alert(err?.message || 'Failed to submit quiz.');
+      if (err?.message?.includes('exceeded') || err?.message?.includes('used all')) {
+        setAttemptsExhausted(true);
+      }
     } finally {
       setSubmittingQuiz(false);
     }
   };
 
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCodeSnippet(code);
+    setTimeout(() => setCopiedCodeSnippet(null), 2000);
+  };
+
+  // Skeleton Loader for smooth page transitions
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-300 gap-4">
-        <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-        <p className="text-sm font-medium animate-pulse">Loading DevAscent Virtual Classroom...</p>
+      <div className="min-h-screen bg-slate-950 flex flex-col text-slate-400">
+        <header className="h-16 bg-slate-900 border-b border-slate-800 px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-24 h-8 bg-slate-800 rounded-lg animate-pulse" />
+            <div className="w-48 h-5 bg-slate-800 rounded-md animate-pulse" />
+          </div>
+          <div className="w-32 h-8 bg-slate-800 rounded-lg animate-pulse" />
+        </header>
+        <div className="flex-1 flex flex-col lg:flex-row">
+          <main className="flex-1 p-8 space-y-6">
+            <div className="w-3/4 h-8 bg-slate-800 rounded-lg animate-pulse" />
+            <div className="w-1/2 h-4 bg-slate-800 rounded-md animate-pulse" />
+            <div className="w-full h-64 bg-slate-900 rounded-2xl border border-slate-800 animate-pulse" />
+            <div className="space-y-3">
+              <div className="w-full h-4 bg-slate-800/80 rounded animate-pulse" />
+              <div className="w-5/6 h-4 bg-slate-800/80 rounded animate-pulse" />
+              <div className="w-4/6 h-4 bg-slate-800/80 rounded animate-pulse" />
+            </div>
+          </main>
+          <aside className="w-full lg:w-88 bg-slate-900 border-l border-slate-800 p-4 space-y-3 hidden lg:block">
+            <div className="w-1/2 h-5 bg-slate-800 rounded animate-pulse" />
+            <div className="space-y-2 pt-2">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="w-full h-10 bg-slate-800/60 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          </aside>
+        </div>
       </div>
     );
   }
@@ -444,12 +434,12 @@ export default function CourseLearningRoom() {
   if (error || !lessonData) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-300 p-6">
-        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-4">
+        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-4 shadow-2xl">
           <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto text-red-400">
             <Lock className="w-6 h-6" />
           </div>
           <h2 className="text-lg font-bold text-white">Access Notice</h2>
-          <p className="text-sm text-slate-400">{error || 'Lesson unavailable.'}</p>
+          <p className="text-sm text-slate-400 leading-relaxed">{error || 'Lesson unavailable.'}</p>
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/enrolled-courses"
@@ -473,7 +463,7 @@ export default function CourseLearningRoom() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
       
-      {/* Top Classroom Bar */}
+      {/* ─── TOP CLASSROOM NAVIGATION BAR ─── */}
       <header className="h-16 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between z-30 shrink-0 sticky top-0">
         <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
           <Link
@@ -487,7 +477,7 @@ export default function CourseLearningRoom() {
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-[11px] text-indigo-400 font-semibold uppercase tracking-wider shrink-0">
-                Lesson {navigation?.currentIndex || lessonData.lessonNumber} of {navigation?.totalLessons || '15'}
+                Lesson {lessonData.globalSeq || lessonData.lessonNumber} of {navigation?.totalLessons || '15'}
               </span>
               <span className="hidden md:inline-block text-slate-600 text-xs">•</span>
               <span className="hidden md:inline-block text-xs text-slate-400 truncate max-w-xs">
@@ -514,572 +504,685 @@ export default function CourseLearningRoom() {
             </span>
           </div>
 
-          <button
-            onClick={handleToggleComplete}
-            disabled={togglingComplete}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm ${
-              isCompleted
-                ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-600/30'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20'
-            }`}
-          >
-            {togglingComplete ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : isCompleted ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            ) : (
-              <Check className="w-3.5 h-3.5" />
-            )}
-            <span className="hidden sm:inline">{isCompleted ? 'Completed ✓' : 'Mark as Complete'}</span>
-          </button>
+          {!lessonData.isLocked && (
+            <button
+              onClick={handleToggleComplete}
+              disabled={togglingComplete}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm ${
+                isCompleted
+                  ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-600/30'
+                  : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20'
+              }`}
+            >
+              {togglingComplete ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : isCompleted ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              ) : (
+                <Check className="w-3.5 h-3.5" />
+              )}
+              <span className="hidden sm:inline">{isCompleted ? 'Completed ✓' : 'Mark as Complete'}</span>
+            </button>
+          )}
         </div>
       </header>
 
-      {/* Main Workspace Layout */}
+      {/* ─── MAIN WORKSPACE LAYOUT ─── */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
-        {/* Left / Center Area: Video Area & Tabs */}
+        {/* Center Main Stage */}
         <div className="flex-1 flex flex-col overflow-y-auto border-r border-slate-800/80">
           
-          {/* Video Player Canvas / AI Video Notice */}
-          <div className="bg-slate-950 relative aspect-video max-h-[480px] w-full flex items-center justify-center border-b border-slate-800 overflow-hidden">
-            {lessonData.videoUrl ? (
-              <div className="relative w-full h-full flex items-center justify-center bg-black">
-                {isDirectVideoUrl(lessonData.videoUrl) ? (
-                  <video
-                    src={lessonData.videoUrl}
-                    controls
-                    controlsList="nodownload"
-                    className="w-full h-full object-contain bg-black"
-                    playsInline
-                  />
-                ) : (
-                  <iframe
-                    src={getEmbedUrl(lessonData.videoUrl)}
-                    title={lessonData.title}
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+          {/* Locked Lesson State Overlay */}
+          {lessonData.isLocked ? (
+            <div className="p-8 sm:p-12 flex flex-col items-center justify-center text-center max-w-lg mx-auto my-auto space-y-5">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-xl shadow-amber-500/10">
+                <Lock className="w-8 h-8" />
+              </div>
+              <div className="space-y-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+                  Progression Locked
+                </span>
+                <h2 className="text-xl font-bold text-white">
+                  {lessonData.title}
+                </h2>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  {lessonData.lockReason || 'Please complete prior milestone overview videos and pass quizzes (70%+) to unlock this lesson.'}
+                </p>
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                {aiVideos && aiVideos.length > 0 && (
+                  <button
+                    onClick={() => setActiveVideoModal(aiVideos[0])}
+                    className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all"
+                  >
+                    <Play className="w-4 h-4" />
+                    <span>Watch AI Overview Video</span>
+                  </button>
+                )}
+                {navigation?.prevLesson?.isUnlocked && (
+                  <Link
+                    href={`/learn/${courseSlug}/${navigation.prevLesson.id}`}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-2 transition-all border border-slate-700"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Previous Lesson</span>
+                  </Link>
                 )}
               </div>
-            ) : (
-              // AI Video Coming Soon State
-              <div className="relative w-full h-full p-6 flex flex-col items-center justify-center text-center bg-gradient-to-b from-slate-900/90 via-slate-950 to-slate-950">
-                <div className="absolute inset-0 bg-radial from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
-                
-                <div className="relative z-10 max-w-lg space-y-3.5">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold">
-                    <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '4s' }} />
-                    <span>AI Video Generation Pipeline</span>
+            </div>
+          ) : (
+            <>
+              {/* Clean Lecture Header */}
+              <div className="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border-b border-slate-800 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                      Lesson #{lessonData.globalSeq || lessonData.lessonNumber}
+                    </span>
+                    <span className="flex items-center gap-1 text-xs text-slate-400">
+                      <Clock className="w-3.5 h-3.5 text-slate-500" />
+                      <span>{lessonData.durationMinutes || 15} mins study</span>
+                    </span>
                   </div>
-
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 flex items-center justify-center mx-auto text-indigo-400 shadow-xl shadow-indigo-500/10">
-                    <VideoOff className="w-7 h-7" />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <h3 className="text-base font-bold text-white">AI Video Lecture in Production</h3>
-                    <p className="text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
-                      The AI Video Lecture for this topic will be uploaded soon by the Course Instructor / Admin. 
-                      You can continue learning seamlessly with the comprehensive <strong className="text-indigo-300">Written Notes</strong> and test your skills in the <strong className="text-emerald-300">Quiz tab</strong> below!
-                    </p>
-                  </div>
-
-                  <div className="pt-1 flex items-center justify-center gap-3">
-                    <button
-                      onClick={() => setActiveTab('notes')}
-                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all border border-slate-700"
-                    >
-                      <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>Read Written Notes</span>
-                    </button>
-                    <button
-                      onClick={() => setActiveTab('quiz')}
-                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-lg shadow-indigo-600/20"
-                    >
-                      <Award className="w-3.5 h-3.5" />
-                      <span>Take Skill Quiz</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-800/60 pt-2">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-slate-400" />
-                    Est. Duration: {lessonData.durationMinutes || 15} mins
-                  </span>
-                  <span className="text-amber-400/80 bg-amber-400/10 px-2 py-0.5 rounded text-[10px] font-medium border border-amber-400/20">
-                    Admin Video Upload Pending
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 3 Main Tabs: Notes, Quiz, Exercise */}
-          <div className="bg-slate-900/90 border-b border-slate-800 flex items-center px-4 sm:px-6 sticky top-0 z-20 overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('notes')}
-              className={`py-3.5 px-4 border-b-2 text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
-                activeTab === 'notes'
-                  ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>📖 Lecture Notes</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('quiz')}
-              className={`py-3.5 px-4 border-b-2 text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
-                activeTab === 'quiz'
-                  ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Award className="w-4 h-4" />
-              <span>🧠 Skill Quiz {quizResult?.passed ? '✓' : ''}</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('exercise')}
-              className={`py-3.5 px-4 border-b-2 text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
-                activeTab === 'exercise'
-                  ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <FileCode className="w-4 h-4" />
-              <span>📁 Exercise & Projects</span>
-            </button>
-          </div>
-
-          {/* Tab Content Display */}
-          <div className="p-6 sm:p-8 space-y-6 text-slate-300 max-w-4xl text-sm leading-relaxed">
-            
-            {/* TAB 1: LECTURE NOTES (GeeksforGeeks Style) */}
-            {activeTab === 'notes' && (
-              <div className="space-y-6">
-                <div className="border-b border-slate-800 pb-4">
-                  <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                  <h1 className="text-xl sm:text-2xl font-extrabold text-white">
                     {lessonData.title}
                   </h1>
-                  <p className="text-xs text-slate-400">
-                    Comprehensive study notes, architectural rules, and implementation patterns for {courseData?.title}.
-                  </p>
+                  {lessonData.summary && (
+                    <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
+                      {lessonData.summary}
+                    </p>
+                  )}
                 </div>
 
-                {lessonData.writtenContent ? (
-                  <div className="prose prose-invert max-w-none text-slate-300 text-sm space-y-4">
-                    <ReactMarkdown>{lessonData.writtenContent}</ReactMarkdown>
-                  </div>
-                ) : (
+                {/* Action Buttons: Milestone AI Video & Mark Complete */}
+                <div className="flex flex-wrap items-center gap-3 shrink-0">
+                  {aiVideos && aiVideos.length > 0 && (
+                    <button
+                      onClick={() => {
+                        const relevantVideo = aiVideos.find(
+                          (v) => (lessonData.globalSeq || 1) >= v.unlocksFromLesson && (lessonData.globalSeq || 1) <= v.unlocksToLesson
+                        ) || aiVideos[0];
+                        setActiveVideoModal(relevantVideo);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-indigo-300 text-xs font-semibold flex items-center gap-2 transition-all hover:border-indigo-500/40"
+                    >
+                      <Video className="w-4 h-4 text-indigo-400" />
+                      <span>Milestone Video</span>
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleToggleComplete}
+                    disabled={togglingComplete}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all ${
+                      isCompleted
+                        ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300'
+                        : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20'
+                    }`}
+                  >
+                    {togglingComplete ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : isCompleted ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    ) : (
+                      <Check className="w-4 h-4" />
+                    )}
+                    <span>{isCompleted ? 'Marked Complete ✓' : 'Mark Complete'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 3 Main Studio Tabs: Notes, Quiz, Exercise */}
+              <div className="bg-slate-900/90 border-b border-slate-800 flex items-center px-4 sm:px-6 sticky top-0 z-20 overflow-x-auto backdrop-blur-md">
+                <button
+                  onClick={() => setActiveTab('notes')}
+                  className={`py-3.5 px-4 border-b-2 text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'notes'
+                      ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
+                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>1. Study Notes (Markdown)</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('quiz')}
+                  className={`py-3.5 px-4 border-b-2 text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'quiz'
+                      ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
+                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Award className="w-4 h-4" />
+                  <span>2. Skill Quiz {isCompleted || lessonData?.quiz?.isPassed ? '✓' : ''}</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('exercise')}
+                  className={`py-3.5 px-4 border-b-2 text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === 'exercise'
+                      ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
+                      : 'border-transparent text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <FileCode className="w-4 h-4" />
+                  <span>3. Exercise & PDF</span>
+                </button>
+              </div>
+
+              {/* ─── TAB CONTENT DISPLAY ─── */}
+              <div className="p-6 sm:p-8 space-y-6 text-slate-300 max-w-4xl text-sm leading-relaxed">
+                
+                {/* TAB 1: STUDY NOTES (MARKDOWN WITH SYNTAX HIGHLIGHTING) */}
+                {activeTab === 'notes' && (
                   <div className="space-y-6">
-                    <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
-                      <h3 className="text-base font-bold text-white flex items-center gap-2">
-                        <Code2 className="w-4 h-4 text-indigo-400" />
-                        <span>Core Engineering Concepts & Architecture</span>
-                      </h3>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        In this module, we focus on high-throughput backend architecture, resilient data modeling, and clean full-stack integrations. Applying production patterns right from the start ensures code maintainability, type safety, and scalability.
+                    {lessonData.writtenContent ? (
+                      <div className="prose prose-invert max-w-none text-slate-300 text-sm space-y-4">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeHighlight]}
+                          components={{
+                            code({ node, inline, className, children, ...props }: any) {
+                              const match = /language-(\w+)/.exec(className || '');
+                              const rawCode = String(children).replace(/\n$/, '');
+                              return !inline ? (
+                                <div className="relative group my-4 rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                                  <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400 font-mono">
+                                    <span>{match ? match[1] : 'code'}</span>
+                                    <button
+                                      onClick={() => handleCopyCode(rawCode)}
+                                      className="flex items-center gap-1 hover:text-white text-[11px] transition-colors"
+                                    >
+                                      {copiedCodeSnippet === rawCode ? (
+                                        <>
+                                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                          <span className="text-emerald-400">Copied!</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Copy className="w-3.5 h-3.5" />
+                                          <span>Copy Code</span>
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                  <pre className="p-4 overflow-x-auto text-xs font-mono">
+                                    <code className={className} {...props}>
+                                      {children}
+                                    </code>
+                                  </pre>
+                                </div>
+                              ) : (
+                                <code className="px-1.5 py-0.5 rounded bg-slate-800 text-indigo-300 font-mono text-xs" {...props}>
+                                  {children}
+                                </code>
+                              );
+                            },
+                          }}
+                        >
+                          {lessonData.writtenContent}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-3">
+                          <h3 className="text-base font-bold text-white flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-indigo-400" />
+                            <span>Core Engineering Architecture & Patterns</span>
+                          </h3>
+                          <p className="text-xs text-slate-300 leading-relaxed">
+                            Master this topic by practicing real-world code architecture. Review the key production standards below and test your knowledge in the <strong>Skill Quiz</strong> tab.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                          <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-1.5">
+                            <p className="font-semibold text-white">1. Strict Type Safety</p>
+                            <p className="text-slate-400">
+                              Define exhaustive TypeScript interfaces and DTOs to catch regression bugs at compile-time.
+                            </p>
+                          </div>
+                          <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-1.5">
+                            <p className="font-semibold text-white">2. Atomic Transactions</p>
+                            <p className="text-slate-400">
+                              Wrap multi-step database mutations with Prisma <code className="text-indigo-300">$transaction</code> to prevent orphan records.
+                            </p>
+                          </div>
+                          <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-1.5">
+                            <p className="font-semibold text-white">3. Query Optimization</p>
+                            <p className="text-slate-400">
+                              Use targeted compound indexes for sub-10ms response times on frequently filtered columns.
+                            </p>
+                          </div>
+                          <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-1.5">
+                            <p className="font-semibold text-white">4. Secure Authorization</p>
+                            <p className="text-slate-400">
+                              Guard endpoints with JWT middleware and role checks before accessing sensitive business logic.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 2: SKILL QUIZ (70% THRESHOLD & 3 ATTEMPTS) */}
+                {activeTab === 'quiz' && (
+                  <div className="space-y-6">
+                    {currentQuiz && currentQuiz.questions && currentQuiz.questions.length > 0 ? (
+                      <>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                          <div>
+                            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                              <Award className="w-5 h-5 text-indigo-400" />
+                              <span>{currentQuiz.title}</span>
+                            </h2>
+                            <p className="text-xs text-slate-400 mt-1">
+                              Passing score is <strong className="text-emerald-400">{currentQuiz.passingScore}%</strong>. Max {currentQuiz.maxAttempts || 3} attempts per assessment.
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs font-semibold bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg shrink-0">
+                            <span className="text-slate-400">Attempt Counter:</span>
+                            <span className={`font-mono ${attemptsExhausted ? 'text-red-400' : 'text-indigo-400'}`}>
+                              Attempt {Math.min(attemptsCount + 1, currentQuiz.maxAttempts || 3)} of {currentQuiz.maxAttempts || 3}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Exhausted Attempts Warning Banner */}
+                        {attemptsExhausted && (
+                          <div className="p-5 rounded-2xl bg-red-950/30 border border-red-800/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+                                <AlertTriangle className="w-5 h-5" />
+                              </div>
+                              <div className="space-y-0.5">
+                                <h4 className="text-sm font-bold text-white">Assessment Attempts Exhausted</h4>
+                                <p className="text-xs text-slate-300">
+                                  You have used all 3 attempts. Please reach out to <a href="mailto:support@devascentacademy.me" className="text-indigo-400 underline font-semibold">support@devascentacademy.me</a> to request an attempt reset.
+                                </p>
+                              </div>
+                            </div>
+
+                            <a
+                              href="mailto:support@devascentacademy.me?subject=Assessment%20Reset%20Request"
+                              className="px-4 py-2 rounded-xl bg-red-600/30 hover:bg-red-600/50 border border-red-500/40 text-red-200 text-xs font-semibold flex items-center gap-2 transition-all shrink-0"
+                            >
+                              <Mail className="w-4 h-4" />
+                              <span>Contact Support</span>
+                            </a>
+                          </div>
+                        )}
+
+                        {/* Questions List */}
+                        <div className="space-y-5">
+                          {currentQuiz.questions.map((q: Question, qIdx: number) => {
+                            const userSelected = selectedAnswers[q.id];
+                            const feedbackItem = quizResult?.feedback?.find((f: any) => f.questionId === q.id);
+
+                            return (
+                              <div
+                                key={q.id}
+                                className={`p-5 rounded-2xl border transition-all ${
+                                  quizSubmitted
+                                    ? feedbackItem?.isCorrect
+                                      ? 'bg-emerald-950/20 border-emerald-800/40'
+                                      : 'bg-red-950/20 border-red-800/40'
+                                    : 'bg-slate-900/70 border-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <span className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 text-xs font-bold flex items-center justify-center shrink-0 text-indigo-400">
+                                    {qIdx + 1}
+                                  </span>
+                                  <div className="space-y-3 flex-1">
+                                    <h4 className="text-sm font-semibold text-white leading-snug">
+                                      {q.question}
+                                    </h4>
+
+                                    {q.codeSnippet && (
+                                      <pre className="p-3 bg-slate-950 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto border border-slate-800">
+                                        {q.codeSnippet}
+                                      </pre>
+                                    )}
+
+                                    {/* Options List */}
+                                    <div className="space-y-2 pt-1">
+                                      {q.options.map((opt: string, optIdx: number) => {
+                                        const isSelected = userSelected === optIdx;
+                                        const isCorrectOption = feedbackItem?.correctOptionIndex === optIdx;
+
+                                        let optionStyle = 'border-slate-800 bg-slate-950/50 hover:bg-slate-800/80 text-slate-300';
+                                        if (quizSubmitted) {
+                                          if (isCorrectOption) {
+                                            optionStyle = 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300 font-semibold';
+                                          } else if (isSelected && !feedbackItem?.isCorrect) {
+                                            optionStyle = 'border-red-500/60 bg-red-500/10 text-red-300';
+                                          } else {
+                                            optionStyle = 'border-slate-800/50 opacity-60 text-slate-500';
+                                          }
+                                        } else if (isSelected) {
+                                          optionStyle = 'border-indigo-500 bg-indigo-600/20 text-indigo-200 font-medium';
+                                        }
+
+                                        return (
+                                          <button
+                                            key={optIdx}
+                                            type="button"
+                                            onClick={() => handleSelectOption(q.id, optIdx)}
+                                            disabled={quizSubmitted || attemptsExhausted}
+                                            className={`w-full text-left p-3 rounded-xl border text-xs flex items-center justify-between gap-3 transition-all ${optionStyle}`}
+                                          >
+                                            <div className="flex items-center gap-2.5">
+                                              <span className="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center text-[10px] shrink-0 font-mono">
+                                                {String.fromCharCode(65 + optIdx)}
+                                              </span>
+                                              <span>{opt}</span>
+                                            </div>
+                                            {quizSubmitted && isCorrectOption && (
+                                              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                            )}
+                                            {quizSubmitted && isSelected && !feedbackItem?.isCorrect && (
+                                              <X className="w-4 h-4 text-red-400 shrink-0" />
+                                            )}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+
+                                    {/* Explanation on Submit */}
+                                    {quizSubmitted && feedbackItem?.explanation && (
+                                      <div className="mt-3 p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-1">
+                                        <p className="font-bold text-indigo-400 flex items-center gap-1.5">
+                                          <Sparkles className="w-3.5 h-3.5" />
+                                          <span>Explanation:</span>
+                                        </p>
+                                        <p className="text-slate-400 leading-relaxed">{feedbackItem.explanation}</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Quiz Controls & Score Result */}
+                        <div className="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                          {quizSubmitted ? (
+                            <div className="flex items-center gap-3">
+                              <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base ${
+                                quizResult?.passed ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                              }`}>
+                                {quizResult?.scorePct}%
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-white">
+                                  {quizResult?.passed ? '🎉 Passed! Lesson marked as completed.' : 'Score below 70%. Review notes and retry.'}
+                                </h4>
+                                <p className="text-xs text-slate-400">
+                                  {quizResult?.correctCount || 0} of {quizResult?.totalQuestions || currentQuiz.questions.length} questions correct
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-xs text-slate-400">
+                              Answered: {Object.keys(selectedAnswers).length} of {currentQuiz.questions.length}
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-3 w-full sm:w-auto">
+                            {quizSubmitted ? (
+                              <button
+                                onClick={() => {
+                                  if (!attemptsExhausted) {
+                                    setQuizSubmitted(false);
+                                    setQuizResult(null);
+                                    setSelectedAnswers({});
+                                  }
+                                }}
+                                disabled={attemptsExhausted}
+                                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:pointer-events-none text-slate-200 text-xs font-semibold transition-all border border-slate-700"
+                              >
+                                Retake Quiz
+                              </button>
+                            ) : (
+                              <button
+                                onClick={handleQuizSubmit}
+                                disabled={submittingQuiz || attemptsExhausted || Object.keys(selectedAnswers).length < currentQuiz.questions.length}
+                                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all"
+                              >
+                                {submittingQuiz ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Grading...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Award className="w-4 h-4" />
+                                    <span>Submit Quiz & Validate</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="p-8 text-center bg-slate-900/60 rounded-2xl border border-slate-800 space-y-3">
+                        <Award className="w-8 h-8 text-indigo-400 mx-auto" />
+                        <h4 className="text-sm font-bold text-white">No Quiz Required For This Lesson</h4>
+                        <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                          You can mark this lesson complete directly using the top completion button or continue to the Exercise tab.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 3: EXERCISE FILES & PDF VIEWER */}
+                {activeTab === 'exercise' && (
+                  <div className="space-y-6">
+                    <div className="border-b border-slate-800 pb-4">
+                      <h2 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                        <FileCode className="w-5 h-5 text-indigo-400" />
+                        <span>Exercise File & Capstone Projects</span>
+                      </h2>
+                      <p className="text-xs text-slate-400">
+                        Official exercise PDF materials and 5 capstone project blueprints for GitHub & LinkedIn proof-of-work.
                       </p>
                     </div>
 
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-bold text-white uppercase tracking-wider text-emerald-400">
-                        Key Production Standards
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                        <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800/80 space-y-1.5">
-                          <p className="font-semibold text-white">1. Strict Type Safety</p>
-                          <p className="text-slate-400">
-                            Always define rigorous DTOs and interfaces. Prevent runtime failures by validating incoming payloads with Zod or class-validator.
-                          </p>
+                    {/* PDF Download + Embedded iframe Viewer Section */}
+                    <div className="space-y-4">
+                      <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+                            <FileText className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-white">
+                              {lessonData.exercisePdfTitle || `${lessonData.title} - Exercise Guide`}
+                            </h4>
+                            <p className="text-xs text-slate-400 mt-0.5">
+                              {lessonData.exercisePdfUrl
+                                ? 'Includes step-by-step instructions, starter schema, and verification rubrics.'
+                                : 'PDF guide not attached for this lesson. Work on the 5 blueprints below.'}
+                            </p>
+                          </div>
                         </div>
-                        <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800/80 space-y-1.5">
-                          <p className="font-semibold text-white">2. Relational Database Indexing</p>
-                          <p className="text-slate-400">
-                            Apply compound indexes on foreign keys and frequently queried filter columns to maintain sub-10ms query execution times.
-                          </p>
-                        </div>
-                        <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800/80 space-y-1.5">
-                          <p className="font-semibold text-white">3. Atomic Transactions</p>
-                          <p className="text-slate-400">
-                            Use database transactions whenever mutating multiple linked models (e.g. creating enrollments and decrementing course seats).
-                          </p>
-                        </div>
-                        <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800/80 space-y-1.5">
-                          <p className="font-semibold text-white">4. Secure Authorization Layers</p>
-                          <p className="text-slate-400">
-                            Enforce JWT validation guards and role-based permissions (RBAC) on all protected mutation endpoints.
-                          </p>
-                        </div>
+
+                        {lessonData.exercisePdfUrl ? (
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={lessonData.exercisePdfUrl}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all shrink-0"
+                            >
+                              <Download className="w-4 h-4" />
+                              <span>Download PDF</span>
+                            </a>
+                            <a
+                              href={lessonData.exercisePdfUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition-all"
+                              title="Open in new tab"
+                            >
+                              <Maximize2 className="w-4 h-4" />
+                            </a>
+                          </div>
+                        ) : (
+                          <span className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 text-xs font-medium shrink-0">
+                            Self-Study Mode
+                          </span>
+                        )}
                       </div>
+
+                      {/* Embedded PDF iframe Viewer */}
+                      {lessonData.exercisePdfUrl && (
+                        <div className="w-full rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 aspect-[4/3] sm:h-[600px] shadow-2xl">
+                          <iframe
+                            src={`${lessonData.exercisePdfUrl}#toolbar=1`}
+                            title={lessonData.exercisePdfTitle || 'Exercise PDF'}
+                            className="w-full h-full border-0"
+                          />
+                        </div>
+                      )}
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
-                        <span className="flex items-center gap-1.5">
-                          <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-                          <span>Implementation Pattern Example</span>
-                        </span>
-                        <span className="text-emerald-400 text-[11px]">TypeScript</span>
-                      </div>
-                      <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto space-y-1.5">
-                        <p className="text-slate-500">// Service layer execution with transaction safety</p>
-                        <p className="text-purple-400">async function <span className="text-amber-300">executeEnrollment</span>(userId: <span className="text-emerald-400">string</span>, courseId: <span className="text-emerald-400">string</span>) {'{'}</p>
-                        <p className="pl-4 text-slate-300">return await prisma.<span className="text-indigo-400">$transaction</span>(async (tx) =&gt; {'{'}</p>
-                        <p className="pl-8 text-slate-400">// 1. Verify seat availability</p>
-                        <p className="pl-8">const course = await tx.course.findUnique({'{'} where: {'{'} id: courseId {'}'} {'}'});</p>
-                        <p className="pl-8 text-slate-400">// 2. Create active enrollment record</p>
-                        <p className="pl-8">const enrollment = await tx.enrollment.create({'{'}</p>
-                        <p className="pl-12">data: {'{'} userId, courseId, status: <span className="text-amber-300">'ACTIVE'</span>, progressPct: 0 {'}'}</p>
-                        <p className="pl-8">{'}'});</p>
-                        <p className="pl-8">return enrollment;</p>
-                        <p className="pl-4">{'}'});</p>
-                        <p className="text-purple-400">{'}'}</p>
+                    {/* 5 Essential Capstones */}
+                    <div className="space-y-4 pt-2">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+                        <GithubIcon className="w-4 h-4" />
+                        <span>5 Essential Portfolio Projects</span>
+                      </h3>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        {DEFAULT_CAPSTONE_PROJECTS.map((proj) => (
+                          <div
+                            key={proj.id}
+                            className="p-5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800/90 rounded-2xl space-y-3 transition-all"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                                <span className="w-5 h-5 rounded-md bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-mono">
+                                  #{proj.id}
+                                </span>
+                                <span>{proj.title}</span>
+                              </h4>
+                              
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                {proj.techStack.map((tech, tidx) => (
+                                  <span
+                                    key={tidx}
+                                    className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-mono border border-slate-700"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            <p className="text-xs text-slate-400 leading-relaxed">
+                              {proj.description}
+                            </p>
+
+                            <div className="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-400 border-t border-slate-800/60">
+                              <div className="flex items-center gap-1.5 font-mono text-slate-400">
+                                <GithubIcon className="w-3.5 h-3.5 text-slate-300" />
+                                <span>Repo: <strong className="text-slate-200">{proj.githubRepoSuggestion}</strong></span>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-indigo-400 font-mono">
+                                <LinkedinIcon className="w-3.5 h-3.5" />
+                                <span>{proj.linkedinTag}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
                 )}
-              </div>
-            )}
 
-            {/* TAB 2: SKILL QUIZ */}
-            {activeTab === 'quiz' && (
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-                  <div>
-                    <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                      <Award className="w-5 h-5 text-indigo-400" />
-                      <span>{currentQuiz.title}</span>
-                    </h2>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Answer all questions correctly. Score 60% or above to pass and mark this lesson complete.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-semibold bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg shrink-0">
-                    <span className="text-slate-400">Passing Threshold:</span>
-                    <span className="text-emerald-400">{currentQuiz.passingScore}%</span>
-                  </div>
-                </div>
-
-                {/* Questions List */}
-                <div className="space-y-5">
-                  {currentQuiz.questions.map((q: Question, qIdx: number) => {
-                    const userSelected = selectedAnswers[q.id];
-                    const feedbackItem = quizResult?.feedback?.find((f: any) => f.questionId === q.id);
-
-                    return (
-                      <div
-                        key={q.id}
-                        className={`p-5 rounded-2xl border transition-all ${
-                          quizSubmitted
-                            ? feedbackItem?.isCorrect
-                              ? 'bg-emerald-950/20 border-emerald-800/40'
-                              : 'bg-red-950/20 border-red-800/40'
-                            : 'bg-slate-900/70 border-slate-800'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <span className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 text-xs font-bold flex items-center justify-center shrink-0 text-indigo-400">
-                            {qIdx + 1}
-                          </span>
-                          <div className="space-y-3 flex-1">
-                            <h4 className="text-sm font-semibold text-white leading-snug">
-                              {q.question}
-                            </h4>
-
-                            {q.codeSnippet && (
-                              <pre className="p-3 bg-slate-950 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto border border-slate-800">
-                                {q.codeSnippet}
-                              </pre>
-                            )}
-
-                            {/* Options List */}
-                            <div className="space-y-2 pt-1">
-                              {q.options.map((opt: string, optIdx: number) => {
-                                const isSelected = userSelected === optIdx;
-                                const isCorrectOption = feedbackItem?.correctOptionIndex === optIdx;
-
-                                let optionStyle = 'border-slate-800 bg-slate-950/50 hover:bg-slate-800/80 text-slate-300';
-                                if (quizSubmitted) {
-                                  if (isCorrectOption) {
-                                    optionStyle = 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300 font-semibold';
-                                  } else if (isSelected && !feedbackItem?.isCorrect) {
-                                    optionStyle = 'border-red-500/60 bg-red-500/10 text-red-300';
-                                  } else {
-                                    optionStyle = 'border-slate-800/50 opacity-60 text-slate-500';
-                                  }
-                                } else if (isSelected) {
-                                  optionStyle = 'border-indigo-500 bg-indigo-600/20 text-indigo-200 font-medium';
-                                }
-
-                                return (
-                                  <button
-                                    key={optIdx}
-                                    type="button"
-                                    onClick={() => handleSelectOption(q.id, optIdx)}
-                                    disabled={quizSubmitted}
-                                    className={`w-full text-left p-3 rounded-xl border text-xs flex items-center justify-between gap-3 transition-all ${optionStyle}`}
-                                  >
-                                    <div className="flex items-center gap-2.5">
-                                      <span className="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center text-[10px] shrink-0 font-mono">
-                                        {String.fromCharCode(65 + optIdx)}
-                                      </span>
-                                      <span>{opt}</span>
-                                    </div>
-                                    {quizSubmitted && isCorrectOption && (
-                                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                                    )}
-                                    {quizSubmitted && isSelected && !feedbackItem?.isCorrect && (
-                                      <X className="w-4 h-4 text-red-400 shrink-0" />
-                                    )}
-                                  </button>
-                                );
-                              })}
-                            </div>
-
-                            {/* Explanation Box on Submit */}
-                            {quizSubmitted && feedbackItem?.explanation && (
-                              <div className="mt-3 p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-1">
-                                <p className="font-bold text-indigo-400 flex items-center gap-1.5">
-                                  <Sparkles className="w-3.5 h-3.5" />
-                                  <span>Explanation:</span>
-                                </p>
-                                <p className="text-slate-400 leading-relaxed">{feedbackItem.explanation}</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Quiz Result Banner & Submit Controls */}
-                <div className="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  {quizSubmitted ? (
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
-                        quizResult?.passed ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                      }`}>
-                        {quizResult?.scorePct}%
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-white">
-                          {quizResult?.passed ? '🎉 Congratulations! You Passed!' : 'Review the concepts and try again'}
-                        </h4>
-                        <p className="text-xs text-slate-400">
-                          {quizResult?.correctCount || 0} of {quizResult?.totalQuestions || currentQuiz.questions.length} questions correct
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-slate-400">
-                      Answered: {Object.keys(selectedAnswers).length} of {currentQuiz.questions.length}
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
-                    {quizSubmitted ? (
-                      <button
-                        onClick={() => {
-                          setQuizSubmitted(false);
-                          setQuizResult(null);
-                          setSelectedAnswers({});
-                        }}
-                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700"
-                      >
-                        Retake Quiz
-                      </button>
-                    ) : (
-                      <button
-                        onClick={handleQuizSubmit}
-                        disabled={submittingQuiz || Object.keys(selectedAnswers).length < currentQuiz.questions.length}
-                        className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all"
-                      >
-                        {submittingQuiz ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Grading...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Award className="w-4 h-4" />
-                            <span>Submit Quiz & Validate</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: EXERCISE FILES & 5 CAPSTONE PROJECTS */}
-            {activeTab === 'exercise' && (
-              <div className="space-y-6">
-                <div className="border-b border-slate-800 pb-4">
-                  <h2 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
-                    <FileCode className="w-5 h-5 text-indigo-400" />
-                    <span>Exercise Files & GitHub Portfolio Projects</span>
-                  </h2>
-                  <p className="text-xs text-slate-400">
-                    Official exercise materials and 5 capstone project blueprints to build your GitHub repositories and showcase your proof-of-work on LinkedIn.
-                  </p>
-                </div>
-
-                {/* PDF Download Section / Notice */}
-                <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
-                      <FileText className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white">
-                        {lessonData.exercisePdfUrl ? lessonData.exercisePdfTitle : 'Official Course Capstone Exercise PDF'}
-                      </h4>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        {lessonData.exercisePdfUrl
-                          ? 'Includes starter codebase, test cases, and deployment checklist.'
-                          : 'PDF not uploaded yet by Admin. In the meantime, build the 5 project blueprints below!'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {lessonData.exercisePdfUrl ? (
-                    <a
-                      href={lessonData.exercisePdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all shrink-0"
+                {/* Bottom Navigation Buttons (Prev / Next) */}
+                <div className="pt-8 border-t border-slate-800 flex items-center justify-between gap-4">
+                  {navigation?.prevLesson ? (
+                    <Link
+                      href={`/learn/${courseSlug}/${navigation.prevLesson.id}`}
+                      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold border border-slate-800 transition-all ${
+                        !navigation.prevLesson.isUnlocked ? 'opacity-50 pointer-events-none' : ''
+                      }`}
                     >
-                      <Download className="w-4 h-4" />
-                      <span>Download PDF</span>
-                    </a>
+                      <ChevronLeft className="w-4 h-4" />
+                      <span className="hidden sm:inline">Previous:</span>
+                      <span className="truncate max-w-[140px]">{navigation.prevLesson.title}</span>
+                    </Link>
                   ) : (
-                    <span className="px-3 py-1.5 rounded-lg bg-slate-800/90 text-amber-400 text-xs font-medium border border-amber-400/20 shrink-0">
-                      Admin PDF Upload Pending
-                    </span>
+                    <div />
+                  )}
+
+                  {/* Center: Mark Complete status / toggle */}
+                  <button
+                    onClick={handleToggleComplete}
+                    disabled={togglingComplete}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                      isCompleted
+                        ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300'
+                        : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                    }`}
+                  >
+                    {togglingComplete ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : isCompleted ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    ) : (
+                      <Check className="w-4 h-4" />
+                    )}
+                    <span>{isCompleted ? 'Lesson Completed' : 'Mark Lesson Complete'}</span>
+                  </button>
+
+                  {navigation?.nextLesson ? (
+                    <Link
+                      href={`/learn/${courseSlug}/${navigation.nextLesson.id}`}
+                      className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all ${
+                        !navigation.nextLesson.isUnlocked ? 'opacity-50 pointer-events-none' : ''
+                      }`}
+                    >
+                      <span className="hidden sm:inline">Next Lesson:</span>
+                      <span className="truncate max-w-[140px]">{navigation.nextLesson.title}</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/dashboard`}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all"
+                    >
+                      <span>Complete Course</span>
+                      <Award className="w-4 h-4" />
+                    </Link>
                   )}
                 </div>
 
-                {/* 5 Basic Projects For GitHub & LinkedIn */}
-                <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-                      <GithubIcon className="w-4 h-4" />
-                      <span>5 Essential Capstone Projects for GitHub & LinkedIn</span>
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4">
-                    {DEFAULT_CAPSTONE_PROJECTS.map((proj) => (
-                      <div
-                        key={proj.id}
-                        className="p-5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800/90 rounded-2xl space-y-3 transition-all"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-md bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-mono">
-                              #{proj.id}
-                            </span>
-                            <span>{proj.title}</span>
-                          </h4>
-                          
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            {proj.techStack.map((tech, tidx) => (
-                              <span
-                                key={tidx}
-                                className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-mono border border-slate-700"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                          {proj.description}
-                        </p>
-
-                        <div className="space-y-1.5 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 text-xs">
-                          <p className="font-semibold text-slate-300 text-[11px] uppercase tracking-wider text-emerald-400">
-                            Key Deliverables:
-                          </p>
-                          <ul className="list-disc list-inside space-y-1 text-slate-400 text-[11px]">
-                            {proj.features.map((feat, fidx) => (
-                              <li key={fidx}>{feat}</li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        <div className="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-400 border-t border-slate-800/60">
-                          <div className="flex items-center gap-1.5 font-mono text-slate-400">
-                            <GithubIcon className="w-3.5 h-3.5 text-slate-300" />
-                            <span>Repo: <strong className="text-slate-200">{proj.githubRepoSuggestion}</strong></span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-indigo-400 font-mono">
-                            <LinkedinIcon className="w-3.5 h-3.5" />
-                            <span>{proj.linkedinTag}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
-            )}
+            </>
+          )}
 
-            {/* Bottom Navigation Buttons (Prev / Next Lesson) */}
-            <div className="pt-8 border-t border-slate-800 flex items-center justify-between gap-4">
-              {navigation?.prevLesson ? (
-                <Link
-                  href={`/learn/${courseSlug}/${navigation.prevLesson.id}`}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold border border-slate-800 transition-all"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">Previous:</span>
-                  <span className="truncate max-w-[140px]">{navigation.prevLesson.title}</span>
-                </Link>
-              ) : (
-                <div />
-              )}
-
-              {navigation?.nextLesson ? (
-                <Link
-                  href={`/learn/${courseSlug}/${navigation.nextLesson.id}`}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all"
-                >
-                  <span className="hidden sm:inline">Next Lesson:</span>
-                  <span className="truncate max-w-[140px]">{navigation.nextLesson.title}</span>
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              ) : (
-                <Link
-                  href={`/dashboard`}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all"
-                >
-                  <span>Complete Course</span>
-                  <Award className="w-4 h-4" />
-                </Link>
-              )}
-            </div>
-
-          </div>
         </div>
 
-        {/* Right Sidebar: Curriculum Tree & Ask Doubt */}
+        {/* ─── RIGHT SIDEBAR: INTERLEAVED CURRICULUM TREE & ASK DOUBT ─── */}
         <aside className="w-full lg:w-88 bg-slate-900/95 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col shrink-0 overflow-hidden">
           
           {/* Syllabus Header */}
           <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
             <div className="space-y-0.5">
               <h3 className="font-bold text-xs uppercase tracking-wider text-slate-300">
-                Cohort Curriculum
+                Course Progression
               </h3>
               <p className="text-[11px] text-slate-500 truncate max-w-[200px]">
                 {courseData?.title}
@@ -1090,63 +1193,109 @@ export default function CourseLearningRoom() {
             </span>
           </div>
 
-          {/* Scrollable Curriculum Tree */}
+          {/* Scrollable Interleaved Curriculum List */}
           <div className="flex-1 overflow-y-auto divide-y divide-slate-800/60 text-xs">
-            {modules.map((mod) => (
-              <div key={mod.id} className="p-3 space-y-2">
-                <div className="px-1 flex items-center justify-between">
-                  <h4 className="font-bold text-slate-300 text-[11px]">
-                    Module {mod.moduleNumber}: {mod.title}
-                  </h4>
-                  <span className="text-[10px] text-slate-500">
-                    {mod.lessons.length} {mod.lessons.length === 1 ? 'lesson' : 'lessons'}
-                  </span>
-                </div>
+            {curriculumItems.map((entry, idx) => {
+              if (entry.type === 'ai-video') {
+                const video = entry.item;
+                return (
+                  <div
+                    key={`ai-video-${video.id || idx}`}
+                    onClick={() => {
+                      if (video.isUnlocked) {
+                        setActiveVideoModal(video);
+                      }
+                    }}
+                    className={`p-3.5 transition-all cursor-pointer ${
+                      video.isWatched
+                        ? 'bg-emerald-950/20 hover:bg-emerald-950/30 border-l-4 border-emerald-500'
+                        : video.isUnlocked
+                        ? 'bg-indigo-950/30 hover:bg-indigo-950/50 border-l-4 border-indigo-500'
+                        : 'bg-slate-950/40 opacity-60 border-l-4 border-slate-700 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-indigo-400">
+                        <Video className="w-3.5 h-3.5" />
+                        <span>Milestone {video.order} Overview</span>
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {video.durationSec ? `${video.durationSec}s` : 'Intro'}
+                      </span>
+                    </div>
 
-                <div className="space-y-1">
-                  {mod.lessons.map((lesson) => {
-                    const isCurrent = lesson.id === lessonId;
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-semibold text-xs text-white truncate">
+                        {video.title}
+                      </p>
+                      {video.isWatched ? (
+                        <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full shrink-0">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>Watched</span>
+                        </span>
+                      ) : video.isUnlocked ? (
+                        <span className="flex items-center gap-1 text-[10px] font-semibold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full shrink-0">
+                          <Play className="w-3 h-3" />
+                          <span>Watch</span>
+                        </span>
+                      ) : (
+                        <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      )}
+                    </div>
+                  </div>
+                );
+              }
 
-                    return (
-                      <button
-                        key={lesson.id}
-                        onClick={() => router.push(`/learn/${courseSlug}/${lesson.id}`)}
-                        className={`w-full text-left p-2.5 rounded-xl flex items-center justify-between gap-2.5 transition-all ${
-                          isCurrent
-                            ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 font-semibold shadow-sm'
-                            : 'hover:bg-slate-800/60 text-slate-400 border border-transparent'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 truncate min-w-0">
-                          {lesson.isCompleted ? (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                          ) : isCurrent ? (
-                            <div className="w-4 h-4 rounded-full border border-indigo-400 flex items-center justify-center shrink-0">
-                              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
-                            </div>
-                          ) : (
-                            <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0"></div>
-                          )}
-                          <span className="truncate">{lesson.title}</span>
-                        </div>
+              // Standard Lesson item
+              const lesson = entry.item;
+              const isCurrent = lesson.id === lessonId;
 
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          {lesson.isFreePreview && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                              Preview
-                            </span>
-                          )}
-                          <span className="text-[10px] text-slate-500">{lesson.durationMinutes || 15}m</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+              return (
+                <button
+                  key={`lesson-${lesson.id}`}
+                  onClick={() => {
+                    if (lesson.isUnlocked) {
+                      router.push(`/learn/${courseSlug}/${lesson.id}`);
+                    }
+                  }}
+                  disabled={!lesson.isUnlocked}
+                  className={`w-full text-left p-3 flex items-center justify-between gap-2.5 transition-all ${
+                    isCurrent
+                      ? 'bg-indigo-600/20 text-indigo-300 border-l-4 border-indigo-500 font-semibold shadow-sm'
+                      : lesson.isUnlocked
+                      ? 'hover:bg-slate-800/60 text-slate-300'
+                      : 'opacity-50 text-slate-500 cursor-not-allowed'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 truncate min-w-0">
+                    {lesson.isCompleted ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    ) : isCurrent ? (
+                      <div className="w-4 h-4 rounded-full border border-indigo-400 flex items-center justify-center shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                      </div>
+                    ) : lesson.isUnlocked ? (
+                      <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0"></div>
+                    ) : (
+                      <Lock className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                    )}
+                    <span className="truncate">{lesson.globalSeq}. {lesson.title}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {lesson.hasQuiz && (
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-800 text-slate-400">
+                        Quiz
+                      </span>
+                    )}
+                    <span className="text-[10px] text-slate-500">{lesson.durationMinutes || 15}m</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Ask a Doubt / Mentor Q&A Section */}
+          {/* Ask a Doubt / Mentor Support */}
           <div className="border-t border-slate-800 bg-slate-950/90 p-4 space-y-3 shrink-0">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
@@ -1157,15 +1306,13 @@ export default function CourseLearningRoom() {
             </div>
 
             <form onSubmit={handleSubmitDoubt} className="space-y-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={doubtText}
-                  onChange={(e) => setDoubtText(e.target.value)}
-                  placeholder="Ask any question about this lesson..."
-                  className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none transition-colors"
-                />
-              </div>
+              <input
+                type="text"
+                value={doubtText}
+                onChange={(e) => setDoubtText(e.target.value)}
+                placeholder="Ask any question about this lesson..."
+                className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none transition-colors"
+              />
               <button
                 type="submit"
                 disabled={submittingDoubt || !doubtText.trim()}
@@ -1182,11 +1329,11 @@ export default function CourseLearningRoom() {
               </button>
             </form>
 
-            {/* List Recent Doubts */}
+            {/* Recent doubts */}
             {doubtsList.length > 0 && (
-              <div className="space-y-2 max-h-36 overflow-y-auto pr-1 text-xs">
-                {doubtsList.slice(0, 3).map((d) => (
-                  <div key={d.id} className="p-2.5 bg-slate-900/60 rounded-lg border border-slate-800/80 space-y-1">
+              <div className="space-y-2 max-h-32 overflow-y-auto pr-1 text-xs">
+                {doubtsList.slice(0, 2).map((d) => (
+                  <div key={d.id} className="p-2 bg-slate-900/60 rounded-lg border border-slate-800/80 space-y-1">
                     <div className="flex items-center justify-between text-[10px]">
                       <span className="font-semibold text-slate-300">{d.userName}</span>
                       <span className={`px-1.5 py-0.2 rounded text-[9px] font-semibold ${
@@ -1195,7 +1342,7 @@ export default function CourseLearningRoom() {
                         {d.status}
                       </span>
                     </div>
-                    <p className="text-slate-400 text-[11px] line-clamp-2">{d.question}</p>
+                    <p className="text-slate-400 text-[11px] line-clamp-1">{d.question}</p>
                     {d.answer && (
                       <div className="pt-1 border-t border-slate-800 text-[10px] text-indigo-300">
                         <strong>Mentor:</strong> {d.answer}
@@ -1205,15 +1352,104 @@ export default function CourseLearningRoom() {
                 ))}
               </div>
             )}
-
-            <div className="text-[10px] text-slate-500 text-center">
-              Direct Mentor Support: <a href="mailto:devascentacademy@gmail.com" className="text-indigo-400 hover:underline">devascentacademy@gmail.com</a>
-            </div>
           </div>
 
         </aside>
 
       </div>
+
+      {/* ─── AI OVERVIEW VIDEO THEATER MODAL ─── */}
+      {activeVideoModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl space-y-0 my-auto animate-in fade-in duration-200">
+            
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                  <Video className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">
+                    Milestone {activeVideoModal.order} AI Overview Video
+                  </span>
+                  <h3 className="text-sm sm:text-base font-bold text-white truncate max-w-md">
+                    {activeVideoModal.title}
+                  </h3>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setActiveVideoModal(null)}
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Video Player Box */}
+            <div className="bg-black aspect-video w-full flex items-center justify-center overflow-hidden">
+              {activeVideoModal.videoUrl ? (
+                isDirectVideoUrl(activeVideoModal.videoUrl) ? (
+                  <video
+                    src={activeVideoModal.videoUrl}
+                    controls
+                    autoPlay
+                    controlsList="nodownload"
+                    className="w-full h-full object-contain bg-black"
+                  />
+                ) : (
+                  <iframe
+                    src={getEmbedUrl(activeVideoModal.videoUrl)}
+                    title={activeVideoModal.title}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                )
+              ) : (
+                <div className="p-8 text-center text-slate-500 text-xs">
+                  Video URL not configured yet.
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer / Completion Action */}
+            <div className="p-5 bg-slate-950/80 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="space-y-0.5 text-left w-full sm:w-auto">
+                <span className="text-xs font-semibold text-slate-300">
+                  Unlocks Lessons {activeVideoModal.unlocksFromLesson}–{activeVideoModal.unlocksToLesson}
+                </span>
+                <p className="text-[11px] text-slate-500">
+                  {activeVideoModal.isWatched
+                    ? '✅ You have marked this overview video as watched.'
+                    : 'Watch this overview, then click below to unlock the lesson batch.'}
+                </p>
+              </div>
+
+              <button
+                onClick={() => handleMarkVideoWatched(activeVideoModal.id)}
+                disabled={markingVideoWatched}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all"
+              >
+                {markingVideoWatched ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Unlocking Lessons...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>I&apos;ve Watched This Intro — Unlock Next Lessons</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
