@@ -182,13 +182,26 @@ export class CertificatesService {
     const certs = await this.prisma.certificate.findMany({
       where: { userId },
       orderBy: { issuedAt: 'desc' },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
     });
 
     return certs.map((c) => ({
+      id: c.id,
       certId: c.certId,
       sha256Hash: c.sha256Hash,
       recipientName: c.recipientName,
       courseTitle: c.courseTitle,
+      courseName: c.course?.title || c.courseTitle,
+      courseId: c.courseId,
+      course: c.course,
       issuedAt: c.issuedAt.toISOString(),
       verifyUrl: `/verify/${c.certId}`,
       grade: c.grade,

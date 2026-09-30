@@ -239,8 +239,11 @@ function DashboardContent() {
 
         if (certsRes.status === 'fulfilled' && certsRes.value) {
           const val = certsRes.value;
-          if (Array.isArray(val)) {
-            setCertificates(val);
+          const payload = val?.data !== undefined ? val.data : val;
+          if (Array.isArray(payload)) {
+            setCertificates(payload);
+          } else if (Array.isArray(payload?.certificates)) {
+            setCertificates(payload.certificates);
           } else if (Array.isArray(val?.certificates)) {
             setCertificates(val.certificates);
           } else {
@@ -250,8 +253,11 @@ function DashboardContent() {
 
         if (subsRes.status === 'fulfilled' && subsRes.value) {
           const val = subsRes.value;
-          if (Array.isArray(val)) {
-            setSubmissions(val);
+          const payload = val?.data !== undefined ? val.data : val;
+          if (Array.isArray(payload)) {
+            setSubmissions(payload);
+          } else if (Array.isArray(payload?.submissions)) {
+            setSubmissions(payload.submissions);
           } else if (Array.isArray(val?.submissions)) {
             setSubmissions(val.submissions);
           } else {
@@ -1257,7 +1263,7 @@ function DashboardContent() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {safeCertificates.map((cert) => {
-                        const hash = cert.certificateHash || 'e5370db083db47569c4fdb4f5110c2ac6cf8bb4f46e53525cd006c4993000a';
+                        const hash = cert.sha256Hash || cert.certificateHash || cert.hash || 'e5370db083db47569c4fdb4f5110c2ac6cf8bb4f46e53525cd006c4993000a';
                         return (
                           <div
                             key={cert.certId || cert.id}
