@@ -80,13 +80,17 @@ export class CertificatesService {
     });
 
     // Send official certificate email with PDF attachment
-    await this.mailService.sendCertificateEmail(
-      user.email,
-      user.name,
-      course.title,
-      certificate.certId,
-      pdfBuffer,
-    );
+    try {
+      await this.mailService.sendCertificateEmail(
+        user.email,
+        user.name,
+        course.title,
+        certificate.certId,
+        pdfBuffer,
+      );
+    } catch (mailErr: any) {
+      console.warn(`[CertificatesService] Certificate issued, but email delivery skipped/failed: ${mailErr?.message}`);
+    }
 
     return {
       certificate: {

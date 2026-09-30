@@ -51,6 +51,7 @@ function IssueCertificateModal({
   onSuccess: () => void;
 }) {
   const [studentSearch, setStudentSearch] = useState('');
+  const [allStudents, setAllStudents] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
   const [searchingStudents, setSearchingStudents] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
@@ -65,54 +66,96 @@ function IssueCertificateModal({
   const [issuedResult, setIssuedResult] = useState<any | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Fetch courses on mount
+  // Fetch courses and all students on modal open
   useEffect(() => {
     if (!isOpen) return;
-    const fetchCourses = async () => {
+    const fetchInitialData = async () => {
       try {
         setLoadingCourses(true);
-        const res = await api.getCourses();
-        const courseList = res?.courses || res?.data?.courses || res || [];
+        setSearchingStudents(true);
+
+        const [coursesRes, studentsRes] = await Promise.all([
+          api.admin.getCourseStats().catch(() => api.getCourses()),
+          api.admin.getStudents({ limit: 100 }).catch(() => ({ data: [] })),
+        ]);
+
+        const courseList =
+          coursesRes?.courses ||
+          coursesRes?.data?.courses ||
+          (Array.isArray(coursesRes?.data) ? coursesRes.data : []) ||
+          (Array.isArray(coursesRes) ? coursesRes : []);
+
+        const studentsPayload = studentsRes?.data || studentsRes;
+        const studentList = Array.isArray(studentsPayload?.data)
+          ? studentsPayload.data
+          : Array.isArray(studentsPayload?.students)
+          ? studentsPayload.students
+          : Array.isArray(studentsPayload)
+          ? studentsPayload
+          : [];
+
         setCourses(Array.isArray(courseList) ? courseList : []);
         if (courseList.length > 0) {
           setSelectedCourseId(courseList[0].id);
         }
+
+        setAllStudents(studentList);
+        setStudents(studentList);
+
+        // If only 1 student exists, pre-select them for convenience
+        if (studentList.length === 1) {
+          setSelectedStudent(studentList[0]);
+        }
       } catch (err) {
-        console.error('Failed to fetch courses:', err);
+        console.error('Failed to fetch initial certificate data:', err);
       } finally {
         setLoadingCourses(false);
-      }
-    };
-    fetchCourses();
-  }, [isOpen]);
-
-  // Debounced search for students
-  useEffect(() => {
-    if (!studentSearch.trim() || selectedStudent) {
-      if (!studentSearch.trim()) setStudents([]);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      try {
-        setSearchingStudents(true);
-        const res = await api.admin.getStudents({ search: studentSearch.trim(), limit: 10 });
-        const list = res?.students || res?.data?.students || [];
-        setStudents(Array.isArray(list) ? list : []);
-      } catch (err) {
-        console.error('Failed to search students:', err);
-      } finally {
         setSearchingStudents(false);
       }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [studentSearch, selectedStudent]);
+    };
+    fetchInitialData();
+  }, [isOpen]);
+
+  // Dynamic filter for students
+  useEffect(() => {
+    if (selectedStudent) return;
+    const q = studentSearch.trim().toLowerCase();
+    if (!q) {
+      setStudents(allStudents);
+      return;
+    }
+    const filtered = allStudents.filter(
+      (s) =>
+        s.name?.toLowerCase().includes(q) ||
+        s.email?.toLowerCase().includes(q)
+    );
+    setStudents(filtered);
+  }, [studentSearch, allStudents, selectedStudent]);
 
   if (!isOpen) return null;
 
   const handleIssue = async () => {
     setIssueError('');
-    if (!selectedStudent) {
-      setIssueError('Please select a student.');
+    let studentToIssue = selectedStudent;
+
+    // If user typed name without clicking dropdown, try matching
+    if (!studentToIssue && studentSearch.trim()) {
+      const q = studentSearch.trim().toLowerCase();
+      const match = allStudents.find(
+        (s) =>
+          s.name?.toLowerCase() === q ||
+          s.email?.toLowerCase() === q ||
+          s.name?.toLowerCase().includes(q) ||
+          s.email?.toLowerCase().includes(q)
+      );
+      if (match) {
+        studentToIssue = match;
+        setSelectedStudent(match);
+      }
+    }
+
+    if (!studentToIssue) {
+      setIssueError('Please select a student from the list.');
       return;
     }
     if (!selectedCourseId) {
@@ -123,7 +166,7 @@ function IssueCertificateModal({
     try {
       setIssuing(true);
       const res = await api.admin.issueCertificate({
-        userId: selectedStudent.id,
+        userId: studentToIssue.id,
         courseId: selectedCourseId,
         grade,
       });
@@ -294,7 +337,7 @@ function IssueCertificateModal({
               <button
                 type="button"
                 onClick={handleIssue}
-                disabled={issuing || !selectedStudent || !selectedCourseId}
+                disabled={issuing || (!selectedStudent && !studentSearch.trim()) || !selectedCourseId}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 border border-violet-400/30 text-xs font-black text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-lg shadow-violet-600/20"
               >
                 {issuing ? (
