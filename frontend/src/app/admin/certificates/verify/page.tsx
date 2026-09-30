@@ -36,21 +36,21 @@ export default function AdminCertificateVerifyPage() {
     setErrorMsg('');
     try {
       const res = await api.verifyCertificatePublic(cleaned);
-      if (res && res.verified !== false && (res.verified || res.certId || res.certificate || res.recipient || res.recipientName)) {
-        const cert = res?.certificate || res?.data?.certificate || res?.data || res;
+      const payload = res?.data !== undefined && typeof res.data === 'object' && res.data !== null ? res.data : res;
+      if (payload && payload.verified !== false && (payload.verified || payload.certId || payload.recipient || payload.recipientName || payload.courseTitle)) {
         setResult({
-          certId: cert.certId || cleaned,
-          recipientName: cert.recipientName || cert.recipient?.name || cert.user?.name || 'Verified Student',
-          courseTitle: cert.courseTitle || cert.course?.title || 'DevAscent Academy',
-          grade: cert.grade || cert.course?.grade || 'Distinction (A+)',
-          issuedAt: cert.issuedAt || cert.course?.completedAt || cert.ledgerTimestamp,
-          sha256Hash: cert.sha256Hash || cert.hash,
-          ...cert,
+          certId: payload.certId || cleaned,
+          recipientName: payload.recipientName || payload.recipient?.name || payload.user?.name || 'Verified Student',
+          courseTitle: payload.courseTitle || payload.course?.title || 'DevAscent Academy',
+          grade: payload.grade || payload.course?.grade || 'Distinction (A+)',
+          issuedAt: payload.issuedAt || payload.course?.completedAt || payload.ledgerTimestamp,
+          sha256Hash: payload.sha256Hash || payload.hash,
+          ...payload,
         });
         setState('valid');
       } else {
         setResult(null);
-        setErrorMsg(res?.message || 'Certificate not found on public ledger');
+        setErrorMsg(payload?.message || res?.message || 'Certificate not found on public ledger');
         setState('invalid');
       }
     } catch (err: any) {

@@ -41,7 +41,7 @@ export class PdfService {
   }
 
   /**
-   * Generates a PDF buffer for the given certificate details.
+   * Generates a single-page luxury dark blue PDF buffer for the given certificate details.
    */
   async generatePdfBuffer(details: {
     certId: string;
@@ -52,22 +52,38 @@ export class PdfService {
     verifyUrl: string;
     sha256Hash?: string;
   }): Promise<Buffer> {
-    // Generate QR Code Buffer
+    // Format issue date nicely (e.g. "30 September 2026")
+    let formattedDate = details.issuedAt;
+    try {
+      const d = new Date(details.issuedAt);
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString('en-US', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        });
+      }
+    } catch {
+      // keep fallback
+    }
+
+    // Generate QR Code with white background and deep dark navy code
     const qrBuffer = await QRCode.toBuffer(details.verifyUrl, {
-      width: 110,
+      width: 90,
       margin: 1,
       color: {
-        dark: '#1e1b4b',
+        dark: '#070B14',
         light: '#ffffff',
       },
     });
 
     return new Promise<Buffer>((resolve, reject) => {
-      // Landscape A4 for classic premium certificate layout
+      // Single Landscape A4 (841.89 x 595.28 pt)
       const doc = new PDFDocument({
         size: 'A4',
         layout: 'landscape',
-        margin: 40,
+        margin: 0,
+        autoFirstPage: true,
       });
 
       const chunks: Buffer[] = [];
@@ -75,76 +91,145 @@ export class PdfService {
       doc.on('end', () => resolve(Buffer.concat(chunks)));
       doc.on('error', (err) => reject(err));
 
-      const width = doc.page.width;
-      const height = doc.page.height;
+      const W = 841.89; // Page width
+      const H = 595.28; // Page height
 
-      // Decorative double border
-      doc.rect(20, 20, width - 40, height - 40).lineWidth(3).strokeColor('#4f46e5').stroke();
-      doc.rect(26, 26, width - 52, height - 52).lineWidth(1).strokeColor('#c7d2fe').stroke();
+      // 1. Dark Luxurious Background
+      doc.rect(0, 0, W, H).fill('#080D1A');
 
-      // Top corner badge accents
-      doc.save();
-      doc.fillColor('#e0e7ff').circle(30, 30, 8).fill();
-      doc.fillColor('#e0e7ff').circle(width - 30, 30, 8).fill();
-      doc.fillColor('#e0e7ff').circle(30, height - 30, 8).fill();
-      doc.fillColor('#e0e7ff').circle(width - 30, height - 30, 8).fill();
-      doc.restore();
+      // Subtle gradient-like inner backdrop
+      doc.rect(20, 20, W - 40, H - 40).fill('#0B1224');
 
-      // Organization Logo (if exists)
+      // 2. Decorative Double Borders (Cyan & Gold / Slate)
+      doc.rect(20, 20, W - 40, H - 40).lineWidth(2).strokeColor('#38BDF8').stroke();
+      doc.rect(26, 26, W - 52, H - 52).lineWidth(1).strokeColor('#1E293B').stroke();
+      doc.rect(28, 28, W - 56, H - 56).lineWidth(0.5).strokeColor('#38BDF8').stroke();
+
+      // Corner Accents
+      const cornerSize = 16;
+      const corners = [
+        [28, 28],
+        [W - 28 - cornerSize, 28],
+        [28, H - 28 - cornerSize],
+        [W - 28 - cornerSize, H - 28 - cornerSize],
+      ];
+      corners.forEach(([cx, cy]) => {
+        doc.rect(cx, cy, cornerSize, cornerSize).lineWidth(1.5).strokeColor('#F59E0B').stroke();
+      });
+
+      // 3. Organization Logo at Top Center
       const logoPath = this.getLogoPath();
       if (logoPath) {
         try {
-          doc.image(logoPath, width / 2 - 35, 42, { width: 70 });
+          doc.image(logoPath, W / 2 - 28, 38, { width: 56 });
         } catch (e) {
           // fallback gracefully
         }
       }
 
-      // Title & Academy Name
-      doc.fontSize(14).font('Helvetica-Bold').fillColor('#6366f1').text('DEVASCENT ACADEMY', 0, 120, { align: 'center', characterSpacing: 2 });
-      doc.fontSize(28).font('Helvetica-Bold').fillColor('#0f172a').text('CERTIFICATE OF ACHIEVEMENT', 0, 142, { align: 'center', characterSpacing: 1 });
+      // 4. Academy Title
+      doc.fontSize(13).font('Helvetica-Bold').fillColor('#38BDF8')
+        .text('DEVASCENT ACADEMY', 0, 102, { align: 'center', characterSpacing: 3 });
 
-      // Subtitle
-      doc.fontSize(12).font('Helvetica').fillColor('#64748b').text('THIS IS PROUDLY PRESENTED TO', 0, 185, { align: 'center', characterSpacing: 1.5 });
+      // 5. Certificate Heading
+      doc.fontSize(24).font('Helvetica-Bold').fillColor('#FFFFFF')
+        .text('CERTIFICATE OF ACHIEVEMENT', 0, 124, { align: 'center', characterSpacing: 1.5 });
 
-      // Recipient Name
-      doc.fontSize(28).font('Helvetica-Bold').fillColor('#1e1b4b').text(details.recipientName, 0, 210, { align: 'center' });
+      // 6. Presentation text
+      doc.fontSize(10).font('Helvetica').fillColor('#94A3B8')
+        .text('THIS IS PROUDLY PRESENTED TO', 0, 162, { align: 'center', characterSpacing: 2 });
 
-      // Description text
-      doc.fontSize(13).font('Helvetica').fillColor('#334155').text('for successfully completing all curriculum modules, engineering assignments, and', 0, 255, { align: 'center' });
-      doc.text('rigorous project assessments with distinction in', 0, 273, { align: 'center' });
+      // 7. Large Recipient Name (Centerpiece)
+      doc.fontSize(32).font('Helvetica-Bold').fillColor('#F8FAFC')
+        .text(details.recipientName, 0, 184, { align: 'center' });
 
-      // Course Title
-      doc.fontSize(20).font('Helvetica-Bold').fillColor('#4338ca').text(details.courseTitle, 0, 298, { align: 'center' });
+      // Name underline accent (gold gradient line)
+      const nameLineWidth = 240;
+      doc.moveTo(W / 2 - nameLineWidth / 2, 226)
+        .lineTo(W / 2 + nameLineWidth / 2, 226)
+        .lineWidth(1.5)
+        .strokeColor('#F59E0B')
+        .stroke();
 
-      // Grade & Issued Date
-      doc.fontSize(12).font('Helvetica-Bold').fillColor('#059669').text(`Grade Awarded: ${details.grade}`, 0, 332, { align: 'center' });
-      doc.fontSize(11).font('Helvetica').fillColor('#64748b').text(`Issued Date: ${details.issuedAt}`, 0, 350, { align: 'center' });
+      // 8. Body Text (Clean grammar)
+      doc.fontSize(11.5).font('Helvetica').fillColor('#CBD5E1')
+        .text('for successfully completing all curriculum modules, engineering assignments,', 0, 242, { align: 'center' });
+      doc.text('and rigorous project assessments in', 0, 258, { align: 'center' });
 
-      // Footer - QR Code and Verification info
-      doc.image(qrBuffer, 55, height - 150, { width: 85 });
-      doc.fontSize(9).font('Helvetica-Bold').fillColor('#1e293b').text('Scan to Verify Credential', 50, height - 60, { width: 95, align: 'center' });
+      // 9. Course Title (Prominent highlighted cyan / white)
+      doc.fontSize(20).font('Helvetica-Bold').fillColor('#38BDF8')
+        .text(details.courseTitle, 0, 282, { align: 'center' });
 
-      // Tamper-proof Cert ID and Hash
-      doc.fontSize(10).font('Helvetica-Bold').fillColor('#1e1b4b').text(`Credential ID: ${details.certId}`, 160, height - 110);
-      if (details.sha256Hash) {
-        doc.fontSize(8).font('Courier').fillColor('#64748b').text(`Fingerprint: ${details.sha256Hash.substring(0, 32)}...`, 160, height - 94);
-      }
-      doc.fontSize(9).font('Helvetica').fillColor('#4f46e5').text(`Verify: ${details.verifyUrl}`, 160, height - 78, { link: details.verifyUrl });
+      // 10. Grade & Issued Date Badges
+      doc.fontSize(11).font('Helvetica-Bold').fillColor('#10B981')
+        .text(`Grade Awarded: ${details.grade}`, 0, 318, { align: 'center' });
 
-      // Founder Signatory with Founder signature image
-      const signX = width - 230;
+      doc.fontSize(10).font('Helvetica').fillColor('#94A3B8')
+        .text(`Issued On: ${formattedDate}`, 0, 336, { align: 'center' });
+
+      // 11. Divider line before footer
+      doc.moveTo(45, H - 150)
+        .lineTo(W - 45, H - 150)
+        .lineWidth(0.5)
+        .strokeColor('#1E293B')
+        .stroke();
+
+      // 12. Footer Left: QR Code + Verification
+      const qrX = 55;
+      const qrY = H - 138;
+      doc.image(qrBuffer, qrX, qrY, { width: 75 });
+
+      doc.fontSize(8).font('Helvetica-Bold').fillColor('#E2E8F0')
+        .text('Scan to Verify Credential', qrX - 5, qrY + 80, { width: 85, align: 'center' });
+
+      // Credential details next to QR
+      const metaX = qrX + 95;
+      doc.fontSize(9).font('Helvetica-Bold').fillColor('#F1F5F9')
+        .text(`Credential ID: ${details.certId}`, metaX, qrY + 8);
+
+      doc.fontSize(7.5).font('Helvetica').fillColor('#64748B')
+        .text(`Security: SHA-256 Public Ledger Immutable Record`, metaX, qrY + 24);
+
+      doc.fontSize(8).font('Helvetica').fillColor('#38BDF8')
+        .text(`Verify URL: ${details.verifyUrl}`, metaX, qrY + 40, { link: details.verifyUrl });
+
+      // 13. Center Official Seal Graphic
+      const sealX = W / 2;
+      const sealY = H - 85;
+      doc.save();
+      doc.circle(sealX, sealY, 26).lineWidth(1.5).strokeColor('#F59E0B').stroke();
+      doc.circle(sealX, sealY, 22).lineWidth(0.5).strokeColor('#38BDF8').stroke();
+      doc.fontSize(7).font('Helvetica-Bold').fillColor('#F59E0B')
+        .text('OFFICIAL', sealX - 25, sealY - 10, { width: 50, align: 'center' });
+      doc.text('SEAL', sealX - 25, sealY, { width: 50, align: 'center' });
+      doc.fontSize(5.5).font('Helvetica').fillColor('#94A3B8')
+        .text('DEVASCENT', sealX - 25, sealY + 9, { width: 50, align: 'center' });
+      doc.restore();
+
+      // 14. Footer Right: Founder Signature Image & Name
+      const signX = W - 230;
+      const signY = H - 142;
       const signatureImgPath = this.getSignaturePath();
       if (signatureImgPath) {
         try {
-          doc.image(signatureImgPath, signX + 20, height - 125, { width: 120 });
+          doc.image(signatureImgPath, signX + 20, signY, { width: 120 });
         } catch (e) {
-          console.warn('[PdfService] Signature image render error:', e);
+          console.warn('[PdfService] Signature render warning:', e);
         }
       }
-      doc.moveTo(signX, height - 72).lineTo(signX + 160, height - 72).lineWidth(1).strokeColor('#94a3b8').stroke();
-      doc.fontSize(12).font('Helvetica-Bold').fillColor('#0f172a').text('Shivan Mishra', signX, height - 66, { width: 160, align: 'center' });
-      doc.fontSize(9).font('Helvetica').fillColor('#64748b').text('Founder & Lead Instructor', signX, height - 50, { width: 160, align: 'center' });
+
+      const lineY = H - 64;
+      doc.moveTo(signX, lineY)
+        .lineTo(signX + 160, lineY)
+        .lineWidth(1)
+        .strokeColor('#475569')
+        .stroke();
+
+      doc.fontSize(11).font('Helvetica-Bold').fillColor('#FFFFFF')
+        .text('Shivan Mishra', signX, lineY + 6, { width: 160, align: 'center' });
+
+      doc.fontSize(8.5).font('Helvetica').fillColor('#94A3B8')
+        .text('Founder & Lead Instructor', signX, lineY + 20, { width: 160, align: 'center' });
 
       doc.end();
     });
