@@ -41,7 +41,7 @@ export class PdfService {
   }
 
   /**
-   * Generates a single-page luxury dark blue PDF buffer for the given certificate details.
+   * Generates a single-page modern luxury dark-mode PDF buffer for the given certificate details.
    */
   async generatePdfBuffer(details: {
     certId: string;
@@ -52,7 +52,7 @@ export class PdfService {
     verifyUrl: string;
     sha256Hash?: string;
   }): Promise<Buffer> {
-    // Format issue date nicely (e.g. "30 September 2026")
+    // Format issue date nicely (e.g. "September 30, 2026")
     let formattedDate = details.issuedAt;
     try {
       const d = new Date(details.issuedAt);
@@ -67,9 +67,9 @@ export class PdfService {
       // keep fallback
     }
 
-    // Generate QR Code with white background and deep dark navy code
+    // Generate high-contrast QR Code with dark navy and pure white background
     const qrBuffer = await QRCode.toBuffer(details.verifyUrl, {
-      width: 90,
+      width: 140,
       margin: 1,
       color: {
         dark: '#070B14',
@@ -94,142 +94,215 @@ export class PdfService {
       const W = 841.89; // Page width
       const H = 595.28; // Page height
 
-      // 1. Dark Luxurious Background
-      doc.rect(0, 0, W, H).fill('#080D1A');
+      // 1. Deep Matte Obsidian Slate Backdrop
+      doc.rect(0, 0, W, H).fill('#050811');
 
-      // Subtle gradient-like inner backdrop
-      doc.rect(20, 20, W - 40, H - 40).fill('#0B1224');
+      // Inner card backdrop with subtle depth
+      doc.rect(16, 16, W - 32, H - 32).fill('#090E1C');
 
-      // 2. Decorative Double Borders (Cyan & Gold / Slate)
-      doc.rect(20, 20, W - 40, H - 40).lineWidth(2).strokeColor('#38BDF8').stroke();
-      doc.rect(26, 26, W - 52, H - 52).lineWidth(1).strokeColor('#1E293B').stroke();
-      doc.rect(28, 28, W - 56, H - 56).lineWidth(0.5).strokeColor('#38BDF8').stroke();
+      // 2. Subtle Geometric Security Watermark Grid
+      doc.save();
+      doc.lineWidth(0.3).strokeColor('#16233B');
+      const step = 42;
+      for (let x = 30; x < W - 30; x += step) {
+        doc.moveTo(x, 26).lineTo(x, H - 26).stroke();
+      }
+      for (let y = 30; y < H - 30; y += step) {
+        doc.moveTo(26, y).lineTo(W - 26, y).stroke();
+      }
+      doc.restore();
 
-      // Corner Accents
-      const cornerSize = 16;
-      const corners = [
-        [28, 28],
-        [W - 28 - cornerSize, 28],
-        [28, H - 28 - cornerSize],
-        [W - 28 - cornerSize, H - 28 - cornerSize],
+      // Inner content container backdrop
+      doc.rect(24, 24, W - 48, H - 48).fill('#090E1C');
+
+      // 3. Luxurious Double Borders (Champagne Gold & Cyber Blue)
+      doc.rect(16, 16, W - 32, H - 32).lineWidth(1.8).strokeColor('#D4AF37').stroke();
+      doc.rect(22, 22, W - 44, H - 44).lineWidth(0.6).strokeColor('#1E3A5F').stroke();
+      doc.rect(24, 24, W - 48, H - 48).lineWidth(1).strokeColor('#38BDF8').stroke();
+
+      // 4. Refined Corner Insets & Diamond Accents
+      const cornerLen = 22;
+      const cornerInset = 24;
+
+      // Top-Left L-bracket
+      doc.moveTo(cornerInset, cornerInset + cornerLen).lineTo(cornerInset, cornerInset).lineTo(cornerInset + cornerLen, cornerInset).lineWidth(2.5).strokeColor('#E5C07B').stroke();
+      // Top-Right L-bracket
+      doc.moveTo(W - cornerInset - cornerLen, cornerInset).lineTo(W - cornerInset, cornerInset).lineTo(W - cornerInset, cornerInset + cornerLen).lineWidth(2.5).strokeColor('#E5C07B').stroke();
+      // Bottom-Left L-bracket
+      doc.moveTo(cornerInset, H - cornerInset - cornerLen).lineTo(cornerInset, H - cornerInset).lineTo(cornerInset + cornerLen, H - cornerInset).lineWidth(2.5).strokeColor('#E5C07B').stroke();
+      // Bottom-Right L-bracket
+      doc.moveTo(W - cornerInset - cornerLen, H - cornerInset).lineTo(W - cornerInset, H - cornerInset).lineTo(W - cornerInset, H - cornerInset - cornerLen).lineWidth(2.5).strokeColor('#E5C07B').stroke();
+
+      // Corner Diamonds (Rotated 45 deg)
+      const diamondPts = [
+        [36, 36],
+        [W - 36, 36],
+        [36, H - 36],
+        [W - 36, H - 36],
       ];
-      corners.forEach(([cx, cy]) => {
-        doc.rect(cx, cy, cornerSize, cornerSize).lineWidth(1.5).strokeColor('#F59E0B').stroke();
+      diamondPts.forEach(([dx, dy]) => {
+        doc.save();
+        doc.translate(dx, dy);
+        doc.rotate(45);
+        doc.rect(-3.5, -3.5, 7, 7).fill('#E5C07B');
+        doc.restore();
       });
 
-      // 3. Organization Logo at Top Center
+      // 5. Official Company Logo at Top Center
       const logoPath = this.getLogoPath();
       if (logoPath) {
         try {
-          doc.image(logoPath, W / 2 - 28, 38, { width: 56 });
+          doc.image(logoPath, W / 2 - 27, 34, { width: 54, height: 54 });
         } catch (e) {
           // fallback gracefully
         }
       }
 
-      // 4. Academy Title
-      doc.fontSize(13).font('Helvetica-Bold').fillColor('#38BDF8')
-        .text('DEVASCENT ACADEMY', 0, 102, { align: 'center', characterSpacing: 3 });
+      // 6. Academy Header & Subtitle
+      doc.fontSize(14).font('Helvetica-Bold').fillColor('#E5C07B')
+        .text('DEVASCENT ACADEMY', 0, 96, { align: 'center', characterSpacing: 3.5 });
 
-      // 5. Certificate Heading
-      doc.fontSize(24).font('Helvetica-Bold').fillColor('#FFFFFF')
-        .text('CERTIFICATE OF ACHIEVEMENT', 0, 124, { align: 'center', characterSpacing: 1.5 });
+      doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#38BDF8')
+        .text('ACCREDITED TECHNOLOGY ENGINEERING BOARD', 0, 114, { align: 'center', characterSpacing: 2 });
 
-      // 6. Presentation text
-      doc.fontSize(10).font('Helvetica').fillColor('#94A3B8')
-        .text('THIS IS PROUDLY PRESENTED TO', 0, 162, { align: 'center', characterSpacing: 2 });
+      // 7. Certificate Heading
+      doc.fontSize(23).font('Helvetica-Bold').fillColor('#FFFFFF')
+        .text('CERTIFICATE OF ACHIEVEMENT', 0, 130, { align: 'center', characterSpacing: 1.8 });
 
-      // 7. Large Recipient Name (Centerpiece)
-      doc.fontSize(32).font('Helvetica-Bold').fillColor('#F8FAFC')
-        .text(details.recipientName, 0, 184, { align: 'center' });
+      // Decorative Line with "THIS IS PROUDLY PRESENTED TO"
+      doc.moveTo(W / 2 - 170, 161).lineTo(W / 2 - 105, 161).lineWidth(0.8).strokeColor('#D4AF37').stroke();
+      doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#94A3B8')
+        .text('THIS IS PROUDLY PRESENTED TO', 0, 156, { align: 'center', characterSpacing: 2 });
+      doc.moveTo(W / 2 + 105, 161).lineTo(W / 2 + 170, 161).lineWidth(0.8).strokeColor('#D4AF37').stroke();
 
-      // Name underline accent (gold gradient line)
-      const nameLineWidth = 240;
-      doc.moveTo(W / 2 - nameLineWidth / 2, 226)
-        .lineTo(W / 2 + nameLineWidth / 2, 226)
-        .lineWidth(1.5)
-        .strokeColor('#F59E0B')
+      // 8. Large Recipient Name (Centerpiece)
+      doc.fontSize(34).font('Helvetica-Bold').fillColor('#F8FAFC')
+        .text(details.recipientName, 0, 174, { align: 'center' });
+
+      // Recipient Divider with center diamond accent
+      const lineWidth = 260;
+      doc.moveTo(W / 2 - lineWidth / 2, 218)
+        .lineTo(W / 2 + lineWidth / 2, 218)
+        .lineWidth(1.2)
+        .strokeColor('#D4AF37')
         .stroke();
 
-      // 8. Body Text (Clean grammar)
-      doc.fontSize(11.5).font('Helvetica').fillColor('#CBD5E1')
-        .text('for successfully completing all curriculum modules, engineering assignments,', 0, 242, { align: 'center' });
-      doc.text('and rigorous project assessments in', 0, 258, { align: 'center' });
+      doc.save();
+      doc.translate(W / 2, 218);
+      doc.rotate(45);
+      doc.rect(-3, -3, 6, 6).fill('#E5C07B');
+      doc.restore();
 
-      // 9. Course Title (Prominent highlighted cyan / white)
+      // 9. Narrative Body Text
+      doc.fontSize(10.5).font('Helvetica').fillColor('#94A3B8')
+        .text('for successfully completing all advanced curriculum modules, practical engineering assignments,', 0, 234, { align: 'center' });
+      doc.text('and rigorous production-grade capstone assessments in', 0, 248, { align: 'center' });
+
+      // 10. Course Title (Prominent Glowing Cyan)
       doc.fontSize(20).font('Helvetica-Bold').fillColor('#38BDF8')
-        .text(details.courseTitle, 0, 282, { align: 'center' });
+        .text(details.courseTitle, 0, 270, { align: 'center' });
 
-      // 10. Grade & Issued Date Badges
-      doc.fontSize(11).font('Helvetica-Bold').fillColor('#10B981')
-        .text(`Grade Awarded: ${details.grade}`, 0, 318, { align: 'center' });
+      // 11. Grade Awarded & Issued Date Badges
+      doc.fontSize(10.5).font('Helvetica-Bold').fillColor('#10B981')
+        .text(`Grade Awarded: ${details.grade}`, 0, 302, { align: 'center' });
 
-      doc.fontSize(10).font('Helvetica').fillColor('#94A3B8')
-        .text(`Issued On: ${formattedDate}`, 0, 336, { align: 'center' });
+      doc.fontSize(9.5).font('Helvetica').fillColor('#CBD5E1')
+        .text(`Issued On: ${formattedDate}`, 0, 318, { align: 'center' });
 
-      // 11. Divider line before footer
-      doc.moveTo(45, H - 150)
-        .lineTo(W - 45, H - 150)
-        .lineWidth(0.5)
+      // 12. Fine Divider Line before Footer
+      doc.moveTo(45, H - 146)
+        .lineTo(W - 45, H - 146)
+        .lineWidth(0.6)
         .strokeColor('#1E293B')
         .stroke();
 
-      // 12. Footer Left: QR Code + Verification
-      const qrX = 55;
-      const qrY = H - 138;
-      doc.image(qrBuffer, qrX, qrY, { width: 75 });
+      // 13. Footer Left: QR Code + Verifiable Credential Details
+      const qrX = 52;
+      const qrY = H - 132;
+      const qrSize = 72;
 
-      doc.fontSize(8).font('Helvetica-Bold').fillColor('#E2E8F0')
-        .text('Scan to Verify Credential', qrX - 5, qrY + 80, { width: 85, align: 'center' });
+      // QR Code container with crisp white card & gold hairline
+      doc.rect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6).fill('#FFFFFF');
+      doc.image(qrBuffer, qrX, qrY, { width: qrSize, height: qrSize });
+      doc.rect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6).lineWidth(1).strokeColor('#D4AF37').stroke();
 
-      // Credential details next to QR
-      const metaX = qrX + 95;
-      doc.fontSize(9).font('Helvetica-Bold').fillColor('#F1F5F9')
-        .text(`Credential ID: ${details.certId}`, metaX, qrY + 8);
+      // QR Meta text (clean hierarchy without wrapping/overlapping)
+      const metaX = qrX + qrSize + 16;
+      doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#F1F5F9')
+        .text('SCAN TO VERIFY CREDENTIAL', metaX, qrY + 4, { characterSpacing: 0.5 });
 
-      doc.fontSize(7.5).font('Helvetica').fillColor('#64748B')
-        .text(`Security: SHA-256 Public Ledger Immutable Record`, metaX, qrY + 24);
+      doc.fontSize(9).font('Helvetica-Bold').fillColor('#E5C07B')
+        .text(`Credential ID: ${details.certId}`, metaX, qrY + 19);
 
-      doc.fontSize(8).font('Helvetica').fillColor('#38BDF8')
-        .text(`Verify URL: ${details.verifyUrl}`, metaX, qrY + 40, { link: details.verifyUrl });
+      doc.fontSize(7).font('Helvetica').fillColor('#64748B')
+        .text('Security: SHA-256 Public Ledger Immutable Record', metaX, qrY + 34);
 
-      // 13. Center Official Seal Graphic
+      doc.fontSize(7.5).font('Helvetica').fillColor('#38BDF8')
+        .text(`Verify URL: ${details.verifyUrl}`, metaX, qrY + 48, { link: details.verifyUrl, width: 220 });
+
+      // 14. Footer Center: Gold Foil Medallion Official Seal
       const sealX = W / 2;
-      const sealY = H - 85;
+      const sealY = H - 82;
+      const sealR = 34;
+
       doc.save();
-      doc.circle(sealX, sealY, 26).lineWidth(1.5).strokeColor('#F59E0B').stroke();
-      doc.circle(sealX, sealY, 22).lineWidth(0.5).strokeColor('#38BDF8').stroke();
-      doc.fontSize(7).font('Helvetica-Bold').fillColor('#F59E0B')
-        .text('OFFICIAL', sealX - 25, sealY - 10, { width: 50, align: 'center' });
-      doc.text('SEAL', sealX - 25, sealY, { width: 50, align: 'center' });
-      doc.fontSize(5.5).font('Helvetica').fillColor('#94A3B8')
-        .text('DEVASCENT', sealX - 25, sealY + 9, { width: 50, align: 'center' });
+      // Outer 24-point Scalloped Star/Medallion Points
+      const points = 24;
+      doc.save();
+      doc.translate(sealX, sealY);
+      doc.beginPath();
+      for (let i = 0; i < points * 2; i++) {
+        const radius = i % 2 === 0 ? sealR + 4 : sealR - 1;
+        const angle = (i * Math.PI) / points;
+        const px = Math.cos(angle) * radius;
+        const py = Math.sin(angle) * radius;
+        if (i === 0) doc.moveTo(px, py);
+        else doc.lineTo(px, py);
+      }
+      doc.closePath();
+      doc.fillColor('#D4AF37').fill();
       doc.restore();
 
-      // 14. Footer Right: Founder Signature Image & Name
-      const signX = W - 230;
-      const signY = H - 142;
+      // Concentric Seal Rings
+      doc.circle(sealX, sealY, sealR).fillColor('#0A0F1D').fill();
+      doc.circle(sealX, sealY, sealR).lineWidth(1.8).strokeColor('#E5C07B').stroke();
+      doc.circle(sealX, sealY, sealR - 4).lineWidth(0.6).strokeColor('#D4AF37').stroke();
+      doc.circle(sealX, sealY, sealR - 7).fillColor('#090E1C').fill();
+      doc.circle(sealX, sealY, sealR - 7).lineWidth(1.2).strokeColor('#E5C07B').stroke();
+
+      // Inner Medallion Text & DA Monogram
+      doc.fontSize(6).font('Helvetica-Bold').fillColor('#FFF59D')
+        .text('DEVASCENT', sealX - 25, sealY - 18, { width: 50, align: 'center', characterSpacing: 1 });
+      doc.fontSize(10).font('Helvetica-Bold').fillColor('#E5C07B')
+        .text('DA', sealX - 25, sealY - 7, { width: 50, align: 'center' });
+      doc.fontSize(5.5).font('Helvetica-Bold').fillColor('#FFF59D')
+        .text('OFFICIAL SEAL', sealX - 25, sealY + 8, { width: 50, align: 'center', characterSpacing: 0.8 });
+      doc.restore();
+
+      // 15. Footer Right: Authentic Founder Signature & Lead Instructor
+      const signX = W - 225;
+      const signY = H - 138;
       const signatureImgPath = this.getSignaturePath();
       if (signatureImgPath) {
         try {
-          doc.image(signatureImgPath, signX + 20, signY, { width: 120 });
+          doc.image(signatureImgPath, signX + 22, signY - 4, { width: 115 });
         } catch (e) {
           console.warn('[PdfService] Signature render warning:', e);
         }
       }
 
-      const lineY = H - 64;
-      doc.moveTo(signX, lineY)
-        .lineTo(signX + 160, lineY)
+      const signLineY = H - 64;
+      doc.moveTo(signX, signLineY)
+        .lineTo(signX + 160, signLineY)
         .lineWidth(1)
-        .strokeColor('#475569')
+        .strokeColor('#D4AF37')
         .stroke();
 
-      doc.fontSize(11).font('Helvetica-Bold').fillColor('#FFFFFF')
-        .text('Shivan Mishra', signX, lineY + 6, { width: 160, align: 'center' });
+      doc.fontSize(12).font('Helvetica-Bold').fillColor('#FFFFFF')
+        .text('Shivan Mishra', signX, signLineY + 6, { width: 160, align: 'center' });
 
       doc.fontSize(8.5).font('Helvetica').fillColor('#94A3B8')
-        .text('Founder & Lead Instructor', signX, lineY + 20, { width: 160, align: 'center' });
+        .text('Founder & Lead Instructor', signX, signLineY + 20, { width: 160, align: 'center' });
 
       doc.end();
     });

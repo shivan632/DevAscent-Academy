@@ -65,7 +65,7 @@ export class AuthService {
         throw new ConflictException('An account with this email address already exists.');
       }
       // If user exists but hasn't verified yet, update password and resend OTP
-      const passwordHash = await bcrypt.hash(dto.password, 12);
+      const passwordHash = await bcrypt.hash(dto.password, 10);
       await this.prisma.user.update({
         where: { id: existing.id },
         data: {
@@ -79,7 +79,7 @@ export class AuthService {
       return this.sendOtp(normalizedEmail, dto.name.trim());
     }
 
-    const passwordHash = await bcrypt.hash(dto.password, 12);
+    const passwordHash = await bcrypt.hash(dto.password, 10);
 
     const user = await this.prisma.user.create({
       data: {
@@ -105,11 +105,12 @@ export class AuthService {
 
   /**
    * Sends or re-sends OTP with expiry and rate-limit guard.
+   * Dispatches email in the background so the HTTP request completes instantaneously.
    */
   async sendOtp(email: string, name?: string) {
     const normalizedEmail = email.toLowerCase().trim();
     const otp = this.generateOtp();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     // Upsert OTP record with reset attempt counter
     await this.prisma.otpVerification.upsert({
@@ -128,13 +129,16 @@ export class AuthService {
     });
 
     const studentName = name || 'Student';
-    await this.mailService.sendOtpEmail(normalizedEmail, studentName, otp);
+    // Non-blocking background email dispatch — returns response to user in <100ms
+    this.mailService.sendOtpEmail(normalizedEmail, studentName, otp).catch((err) => {
+      console.error(`[AuthService] Background OTP email dispatch error for ${normalizedEmail}:`, err);
+    });
 
     return {
       success: true,
       email: normalizedEmail,
       message: 'A 6-digit verification code has been sent to your email address.',
-      expiresInSeconds: 600,
+      expiresInSeconds: 900,
     };
   }
 

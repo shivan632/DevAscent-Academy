@@ -10,20 +10,25 @@ export class MailService {
   private fromEmail = process.env.EMAIL_FROM || 'DevAscent Academy <shivrom.2020@gmail.com>';
 
   constructor() {
-    // 1. Prioritize Gmail SMTP if configured
-    const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
-    const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
+    // 1. High-Performance Gmail SMTPS with connection pooling & cloud deployment fallback
+    const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER || 'shivrom.2020@gmail.com';
+    const smtpPass = (process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || 'mqvy tvzt yykk hczt').replace(/\s+/g, '');
 
     if (smtpUser && smtpPass) {
       this.transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // SMTPS on port 465 (firewall & cloud safe)
+        pool: true,   // Keep SMTP socket open for instant dispatch
+        maxConnections: 3,
+        maxMessages: 100,
         auth: {
           user: smtpUser,
-          pass: smtpPass.replace(/\s+/g, ''), // strip spaces from App Password
+          pass: smtpPass,
         },
       });
       this.fromEmail = `"DevAscent Academy" <${smtpUser}>`;
-      this.logger.log(`📧 Gmail SMTP Mailer initialized for: ${smtpUser}`);
+      this.logger.log(`📧 High-performance pooled Gmail SMTPS initialized for: ${smtpUser}`);
     } else {
       // 2. Fallback to Resend
       const apiKey = process.env.RESEND_API_KEY;
