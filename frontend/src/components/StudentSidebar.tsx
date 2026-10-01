@@ -97,7 +97,7 @@ export default function StudentSidebar({
     close();
   };
 
-  const primarySlug = enrolledCourses.length > 0 ? enrolledCourses[0].courseSlug : 'react-foundations-free';
+  const primarySlug = mounted && enrolledCourses.length > 0 ? enrolledCourses[0].courseSlug : 'react-foundations-free';
 
   const sidebarContent = (
     <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800/80 p-4 sm:p-5 shadow-sm space-y-5">
@@ -153,7 +153,7 @@ export default function StudentSidebar({
                 <Icon className="w-4 h-4" />
                 <span>{item.label}</span>
               </div>
-              {item.count !== undefined && item.count > 0 && (
+              {mounted && item.count !== undefined && item.count > 0 && (
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                     isActive ? 'bg-white/20 text-white' : item.countColor
