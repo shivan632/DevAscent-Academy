@@ -1,0 +1,31 @@
+- generic [ref=e12]:
+  - generic [ref=e13]:
+    - img "DevAscent Academy Logo" [ref=e15]
+    - generic [ref=e16]: DevAscent Academy
+    - generic [ref=e17]: Accredited Technology Engineering Board
+  - generic [ref=e18]:
+    - heading "Certificate of Achievement" [level=1] [ref=e19]
+    - generic [ref=e20]: This is proudly presented to
+  - heading "Raja Mishra" [level=2] [ref=e25]
+  - generic [ref=e30]:
+    - paragraph [ref=e31]: for successfully completing all advanced curriculum modules, practical engineering assignments, and rigorous production-grade capstone assessments in
+    - heading "Web Development Virtual Internship" [level=3] [ref=e32]
+    - generic [ref=e33]:
+      - generic [ref=e34]: "Grade Awarded: Distinction (A+)"
+      - generic [ref=e35]: "Issued On: September 30, 2026"
+  - generic [ref=e36]:
+    - generic [ref=e37]:
+      - img "Verification QR Code" [ref=e38]
+      - generic [ref=e39]:
+        - generic [ref=e40]: Scan to Verify
+        - generic [ref=e41]: "Credential ID: DEV-2026-751244"
+        - generic [ref=e42]: "Security: SHA-256 Public Ledger Immutable Record"
+        - generic [ref=e43]: "Verify URL: https://dev-ascent-academy.vercel.app/verify"
+    - img [ref=e45]:
+      - generic [ref=e51]: DEVASCENT
+      - generic [ref=e54]: DA
+      - generic [ref=e56]: OFFICIAL SEAL
+    - generic [ref=e57]:
+      - img "Signature" [ref=e59]
+      - generic [ref=e61]: Shivan Mishra
+      - generic [ref=e62]: Founder & Lead Instructor
