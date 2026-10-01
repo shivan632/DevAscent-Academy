@@ -176,11 +176,26 @@ export class PdfService {
         doc.restore();
       });
 
-      // 5. Official Company Logo at Top Center
+      // 5. Official Company Logo at Top Center (Round Shape with Accent Border)
       const logoPath = this.getLogoPath();
+      const logoCenterX = W / 2;
+      const logoCenterY = 48;
+      const logoRadius = 23;
+
       if (logoPath) {
         try {
-          doc.image(logoPath, W / 2 - 24, 25, { width: 48, height: 48 });
+          doc.save();
+          doc.circle(logoCenterX, logoCenterY, logoRadius).fillColor('#0B1222').fill();
+          doc.circle(logoCenterX, logoCenterY, logoRadius).clip();
+          doc.image(logoPath, logoCenterX - logoRadius, logoCenterY - logoRadius, {
+            width: logoRadius * 2,
+            height: logoRadius * 2,
+          });
+          doc.restore();
+
+          // Refined Circular Borders (Gold & Cyan)
+          doc.circle(logoCenterX, logoCenterY, logoRadius).lineWidth(1.2).strokeColor('#D4AF37').stroke();
+          doc.circle(logoCenterX, logoCenterY, logoRadius + 2.5).lineWidth(0.5).strokeColor('#38BDF8').stroke();
         } catch (e) {
           // fallback gracefully
         }
