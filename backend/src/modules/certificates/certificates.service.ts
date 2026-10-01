@@ -84,6 +84,8 @@ export class CertificatesService {
         issuedAt: issuedAtStr,
         verifyUrl,
         sha256Hash: certificate.sha256Hash,
+        duration: course.durationWeeks ? `${course.durationWeeks} Weeks / ${course.durationWeeks * 10} Hours` : '4 Weeks / 40 Hours',
+        batch: course.cohortNumber ? `Winter 2026 Cohort ${course.cohortNumber}` : 'Winter 2026 Cohort',
       });
 
       try {
@@ -239,6 +241,9 @@ export class CertificatesService {
           mode: 'insensitive',
         },
       },
+      include: {
+        course: true,
+      },
     });
 
     if (!cert) {
@@ -257,6 +262,8 @@ export class CertificatesService {
       issuedAt: issuedAtStr,
       verifyUrl,
       sha256Hash: cert.sha256Hash,
+      duration: cert.course?.durationWeeks ? `${cert.course.durationWeeks} Weeks / ${cert.course.durationWeeks * 10} Hours` : '4 Weeks / 40 Hours',
+      batch: cert.course?.cohortNumber ? `Winter 2026 Cohort ${cert.course.cohortNumber}` : 'Winter 2026 Cohort',
     });
 
     return {
