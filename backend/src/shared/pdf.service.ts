@@ -95,8 +95,12 @@ export class PdfService {
       gradeText = `Distinction (${gradeText})`;
     }
 
+    const verifyUrl = details.verifyUrl
+      ? details.verifyUrl.replace('https://www.devascentacademy.me', 'https://dev-ascent-academy.vercel.app')
+      : `https://dev-ascent-academy.vercel.app/verify/${details.certId}`;
+
     // Generate high-contrast QR Code with dark navy and pure white background
-    const qrBuffer = await QRCode.toBuffer(details.verifyUrl, {
+    const qrBuffer = await QRCode.toBuffer(verifyUrl, {
       width: 140,
       margin: 1,
       color: {
@@ -282,7 +286,7 @@ export class PdfService {
         .text('Security: SHA-256 Public Ledger Immutable Record', metaX, qrY + 31);
 
       doc.fontSize(7).font('Helvetica').fillColor('#38BDF8')
-        .text(`Verify: ${details.verifyUrl}`, metaX, qrY + 44, { link: details.verifyUrl, width: 230 });
+        .text(`Verify: ${verifyUrl}`, metaX, qrY + 44, { link: verifyUrl, width: 230 });
 
       // 14. Footer Center: Gold Foil Medallion Official Seal
       const sealX = W / 2;

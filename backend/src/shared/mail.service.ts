@@ -127,7 +127,7 @@ export class MailService {
     certId: string,
     pdfBuffer: Buffer,
   ): Promise<boolean> {
-    const verifyUrl = `${process.env.FRONTEND_URL || 'https://www.devascentacademy.me'}/verify/${certId}`;
+    const verifyUrl = `${process.env.FRONTEND_URL || 'https://dev-ascent-academy.vercel.app'}/verify/${certId}`;
     const subject = `🎉 Congratulations ${name}! Your Official Certificate for ${courseTitle}`;
     const html = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">

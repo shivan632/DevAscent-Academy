@@ -71,7 +71,7 @@ export class CertificatesService {
       });
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://dev-ascent-academy.vercel.app';
     const verifyUrl = `${frontendUrl}/verify/${certificate.certId}`;
 
     // Generate PDF + send email — wrapped in try/catch so a failure here never returns 500
@@ -155,7 +155,7 @@ export class CertificatesService {
       }),
     ]);
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://dev-ascent-academy.vercel.app';
 
     return {
       total,
@@ -250,7 +250,7 @@ export class CertificatesService {
       throw new NotFoundException(`Certificate ${certId} not found`);
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://dev-ascent-academy.vercel.app';
     const verifyUrl = `${frontendUrl}/verify/${cert.certId}`;
     const issuedAtStr = cert.issuedAt.toISOString().split('T')[0];
 
