@@ -204,80 +204,39 @@ export class PdfService {
       doc.moveTo(W / 2 + 100, 133).lineTo(W / 2 + 165, 133).lineWidth(0.8).strokeColor('#D4AF37').stroke();
 
       // 8. Large Recipient Name (Centerpiece)
-      doc.fontSize(27).font('Helvetica-Bold').fillColor('#F8FAFC')
-        .text(details.recipientName, 0, 143, { align: 'center' });
+      doc.fontSize(32).font('Helvetica-Bold').fillColor('#F8FAFC')
+        .text(details.recipientName, 0, 156, { align: 'center' });
 
       // Recipient Divider with center diamond accent
       const lineWidth = 240;
-      doc.moveTo(W / 2 - lineWidth / 2, 178)
-        .lineTo(W / 2 + lineWidth / 2, 178)
+      doc.moveTo(W / 2 - lineWidth / 2, 196)
+        .lineTo(W / 2 + lineWidth / 2, 196)
         .lineWidth(1.2)
         .strokeColor('#D4AF37')
         .stroke();
 
       doc.save();
-      doc.translate(W / 2, 178);
+      doc.translate(W / 2, 196);
       doc.rotate(45);
       doc.rect(-3, -3, 6, 6).fill('#E5C07B');
       doc.restore();
 
-      // 9. Narrative Body Text
+      // 9. Narrative Body Text (3-line comprehensive achievement text)
       doc.fontSize(9.5).font('Helvetica').fillColor('#94A3B8')
-        .text('for successfully completing all advanced curriculum modules, practical engineering assignments,', 0, 192, { align: 'center' });
-      doc.text('and rigorous production-grade capstone assessments in', 0, 205, { align: 'center' });
+        .text('for successfully completing all advanced curriculum modules, practical engineering assignments,', 0, 212, { align: 'center' });
+      doc.text('and rigorous production-grade capstone assessments spanning software design, algorithmic development,', 0, 226, { align: 'center' });
+      doc.text('enterprise architecture, and modern framework implementation, demonstrating exceptional technical proficiency throughout the', 0, 240, { align: 'center' });
 
       // 10. Course Title (Prominent Glowing Cyan)
-      doc.fontSize(16).font('Helvetica-Bold').fillColor('#38BDF8')
-        .text(details.courseTitle.toUpperCase(), 0, 224, { align: 'center', characterSpacing: 0.8 });
+      doc.fontSize(19).font('Helvetica-Bold').fillColor('#38BDF8')
+        .text(details.courseTitle, 0, 264, { align: 'center' });
 
-      // 11. Program Details Container Box
-      const boxW = 460;
-      const boxH = 92;
-      const boxX = W / 2 - boxW / 2;
-      const boxY = 248;
+      // 11. Grade Awarded & Issued On
+      doc.fontSize(10.5).font('Helvetica-Bold').fillColor('#10B981')
+        .text(`Grade Awarded: ${gradeText}`, 0, 296, { align: 'center' });
 
-      doc.roundedRect(boxX, boxY, boxW, boxH, 8).fill('#0B1222');
-      doc.roundedRect(boxX, boxY, boxW, boxH, 8).lineWidth(0.8).strokeColor('#1E2E4A').stroke();
-
-      // Row 1: Program Duration & Batch
-      const col1X = boxX + 24;
-      const col2X = boxX + boxW / 2 + 16;
-      const row1Y = boxY + 12;
-
-      doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#64748B')
-        .text('Program Duration: ', col1X, row1Y, { continued: true })
-        .font('Helvetica-Bold').fillColor('#E2E8F0')
-        .text(durationText);
-
-      doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#64748B')
-        .text('Batch: ', col2X, row1Y, { continued: true })
-        .font('Helvetica-Bold').fillColor('#E2E8F0')
-        .text(batchText);
-
-      // Row 2: Started & Completed Dates
-      const row2Y = boxY + 32;
-
-      doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#64748B')
-        .text('Started: ', col1X, row2Y, { continued: true })
-        .font('Helvetica-Bold').fillColor('#E2E8F0')
-        .text(formattedStartedDate);
-
-      doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#64748B')
-        .text('Completed: ', col2X, row2Y, { continued: true })
-        .font('Helvetica-Bold').fillColor('#E2E8F0')
-        .text(formattedCompletedDate);
-
-      // Row 3: Grade Awarded Badge (Centered)
-      const row3Y = boxY + 58;
-      const gradePillW = 260;
-      const gradePillH = 22;
-      const gradePillX = boxX + (boxW - gradePillW) / 2;
-
-      doc.roundedRect(gradePillX, row3Y, gradePillW, gradePillH, 11).fill('#06281E');
-      doc.roundedRect(gradePillX, row3Y, gradePillW, gradePillH, 11).lineWidth(0.8).strokeColor('#059669').stroke();
-
-      doc.fontSize(9).font('Helvetica-Bold').fillColor('#10B981')
-        .text(`Grade Awarded: ${gradeText}`, gradePillX, row3Y + 6, { width: gradePillW, align: 'center', characterSpacing: 0.5 });
+      doc.fontSize(9.5).font('Helvetica').fillColor('#CBD5E1')
+        .text(`Issued On: ${formattedCompletedDate}`, 0, 313, { align: 'center' });
 
       // 12. Fine Divider Line before Footer
       doc.moveTo(40, H - 146)
