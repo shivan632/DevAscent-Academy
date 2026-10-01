@@ -250,17 +250,15 @@ export class PdfService {
       const points = 24;
       doc.save();
       doc.translate(sealX, sealY);
-      doc.beginPath();
+      const starPoints: [number, number][] = [];
       for (let i = 0; i < points * 2; i++) {
         const radius = i % 2 === 0 ? sealR + 4 : sealR - 1;
         const angle = (i * Math.PI) / points;
         const px = Math.cos(angle) * radius;
         const py = Math.sin(angle) * radius;
-        if (i === 0) doc.moveTo(px, py);
-        else doc.lineTo(px, py);
+        starPoints.push([px, py]);
       }
-      doc.closePath();
-      doc.fillColor('#D4AF37').fill();
+      doc.polygon(...starPoints).fillColor('#D4AF37').fill();
       doc.restore();
 
       // Concentric Seal Rings
