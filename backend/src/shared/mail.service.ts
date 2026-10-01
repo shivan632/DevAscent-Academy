@@ -10,34 +10,26 @@ export class MailService {
   private fromEmail = process.env.EMAIL_FROM || 'DevAscent Academy <shivrom.2020@gmail.com>';
 
   constructor() {
-    // 1. High-Performance Gmail SMTPS with connection pooling & cloud deployment fallback
+    // 1. Prioritize Resend HTTP API (Port 443 HTTPS - works on Render Free Tier without SMTP blocks)
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey && !resendKey.includes('placeholder')) {
+      this.resend = new Resend(resendKey);
+      this.logger.log('📧 Resend HTTP API Mailer initialized (Port 443 HTTPS - Render firewall proof)');
+    }
+
+    // 2. Secondary: Gmail SMTP (for local environment or paid servers where SMTP is open)
     const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER || 'shivrom.2020@gmail.com';
     const smtpPass = (process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || 'mqvy tvzt yykk hczt').replace(/\s+/g, '');
 
     if (smtpUser && smtpPass) {
       this.transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // SMTPS on port 465 (firewall & cloud safe)
-        pool: true,   // Keep SMTP socket open for instant dispatch
-        maxConnections: 3,
-        maxMessages: 100,
+        service: 'gmail',
         auth: {
           user: smtpUser,
           pass: smtpPass,
         },
       });
-      this.fromEmail = `"DevAscent Academy" <${smtpUser}>`;
-      this.logger.log(`📧 High-performance pooled Gmail SMTPS initialized for: ${smtpUser}`);
-    } else {
-      // 2. Fallback to Resend
-      const apiKey = process.env.RESEND_API_KEY;
-      if (apiKey) {
-        this.resend = new Resend(apiKey);
-        this.logger.log('📧 Resend Mailer initialized.');
-      } else {
-        this.logger.warn('No SMTP or Resend credentials configured. Emails will be logged to console.');
-      }
+      this.logger.log(`📧 Gmail SMTP Mailer initialized for: ${smtpUser}`);
     }
   }
 
@@ -59,7 +51,7 @@ export class MailService {
           </div>
         </div>
         <p style="font-size: 13px; color: #64748b; text-align: center;">
-          ⏳ This code is valid for <strong>10 minutes</strong>. For your security, do not share this code with anyone.
+          ⏳ This code is valid for <strong>15 minutes</strong>. For your security, do not share this code with anyone.
         </p>
         <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
         <p style="font-size: 12px; color: #94a3b8; text-align: center; margin: 0;">
@@ -68,7 +60,29 @@ export class MailService {
       </div>
     `;
 
-    // Try Nodemailer first
+    // 1. Send via Resend HTTP API first (Never blocked by Render cloud firewall)
+    if (this.resend) {
+      try {
+        const fromHeader = process.env.RESEND_FROM || 'DevAscent Academy <onboarding@resend.dev>';
+        const response = await this.resend.emails.send({
+          from: fromHeader,
+          to: toEmail,
+          subject,
+          html,
+        });
+
+        if (response.error) {
+          this.logger.error(`Resend email error: ${JSON.stringify(response.error)}`);
+        } else {
+          this.logger.log(`✅ OTP email delivered to ${toEmail} via Resend HTTP API`);
+          return true;
+        }
+      } catch (err: any) {
+        this.logger.error(`Failed to send OTP email via Resend: ${err.message}`);
+      }
+    }
+
+    // 2. Fallback to Nodemailer SMTP (Works on local or hosts where SMTP ports are open)
     if (this.transporter) {
       try {
         await this.transporter.sendMail({
@@ -81,26 +95,6 @@ export class MailService {
         return true;
       } catch (err: any) {
         this.logger.error(`Gmail SMTP OTP send failed: ${err.message}`);
-      }
-    }
-
-    // Fallback to Resend
-    if (this.resend) {
-      try {
-        const response = await this.resend.emails.send({
-          from: this.fromEmail,
-          to: toEmail,
-          subject,
-          html,
-        });
-        if (response.error) {
-          this.logger.error(`Resend email error: ${JSON.stringify(response.error)}`);
-          return false;
-        }
-        return true;
-      } catch (err: any) {
-        this.logger.error(`Failed to send OTP email via Resend: ${err.message}`);
-        return false;
       }
     }
 
@@ -163,7 +157,34 @@ export class MailService {
       </div>
     `;
 
-    // Try Nodemailer first
+    // 1. Send via Resend HTTP API first (Render firewall proof)
+    if (this.resend) {
+      try {
+        const fromHeader = process.env.RESEND_FROM || 'DevAscent Academy <onboarding@resend.dev>';
+        const response = await this.resend.emails.send({
+          from: fromHeader,
+          to: toEmail,
+          subject,
+          html,
+          attachments: [
+            {
+              filename: `${certId}.pdf`,
+              content: pdfBuffer,
+            },
+          ],
+        });
+        if (response.error) {
+          this.logger.error(`Resend certificate email error: ${JSON.stringify(response.error)}`);
+        } else {
+          this.logger.log(`✅ Certificate email delivered to ${toEmail} via Resend HTTP API`);
+          return true;
+        }
+      } catch (err: any) {
+        this.logger.error(`Failed to send certificate email via Resend: ${err.message}`);
+      }
+    }
+
+    // 2. Fallback to Nodemailer SMTP
     if (this.transporter) {
       try {
         await this.transporter.sendMail({
@@ -182,32 +203,6 @@ export class MailService {
         return true;
       } catch (err: any) {
         this.logger.error(`Gmail SMTP Certificate send failed: ${err.message}`);
-      }
-    }
-
-    // Fallback to Resend
-    if (this.resend) {
-      try {
-        const response = await this.resend.emails.send({
-          from: this.fromEmail,
-          to: toEmail,
-          subject,
-          html,
-          attachments: [
-            {
-              filename: `${certId}.pdf`,
-              content: pdfBuffer,
-            },
-          ],
-        });
-        if (response.error) {
-          this.logger.error(`Resend certificate email error: ${JSON.stringify(response.error)}`);
-          return false;
-        }
-        return true;
-      } catch (err: any) {
-        this.logger.error(`Failed to send certificate email via Resend: ${err.message}`);
-        return false;
       }
     }
 
