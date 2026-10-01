@@ -22,6 +22,10 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
+  async mailDiagnostic() {
+    return this.mailService.testDiagnostic();
+  }
+
   private getCookieOptions(maxAgeMs: number) {
     const isProd = process.env.NODE_ENV === 'production';
     return {

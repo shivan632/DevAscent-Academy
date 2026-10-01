@@ -108,6 +108,24 @@ export class MailService {
     return true;
   }
 
+  async testDiagnostic(toEmail = 'shivanmishra203@gmail.com'): Promise<any> {
+    if (!this.transporter) {
+      return { status: 'no_transporter', fromEmail: this.fromEmail, resend: !!this.resend };
+    }
+    try {
+      const verifyRes = await this.transporter.verify();
+      const sendRes = await this.transporter.sendMail({
+        from: this.fromEmail,
+        to: toEmail,
+        subject: `[Diagnostic] DevAscent SMTP Test ${new Date().toISOString()}`,
+        text: 'SMTP diagnostic test from server.',
+      });
+      return { status: 'success', verify: verifyRes, messageId: sendRes.messageId, response: sendRes.response };
+    } catch (err: any) {
+      return { status: 'error', message: err.message, code: err.code, response: err.response, stack: err.stack };
+    }
+  }
+
   async sendCertificateEmail(
     toEmail: string,
     name: string,

@@ -38,10 +38,15 @@ export class AuthController {
   }
 
   @Post('send-otp')
-  @Throttle({ default: { limit: 3, ttl: 600000 } }) // max 3 per 10 minutes
+  @Throttle({ default: { limit: 10, ttl: 600000 } })
   @HttpCode(HttpStatus.OK)
   async sendOtp(@Body() body: { email: string; name?: string }) {
     return this.authService.sendOtp(body.email, body.name);
+  }
+
+  @Get('mail-diagnostic')
+  async mailDiagnostic() {
+    return this.authService.mailDiagnostic();
   }
 
   @Post('login')
