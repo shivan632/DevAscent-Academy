@@ -26,6 +26,7 @@ import {
   UserCircle,
   IndianRupee,
   ScanLine,
+  ClipboardList,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -46,6 +47,7 @@ const navGroups = [
     items: [
       { href: '/admin/courses', label: 'Courses & Curriculum', icon: BookOpen },
       { href: '/admin/students', label: 'Students', icon: Users },
+      { href: '/admin/enrollments', label: 'Enrollments', icon: ClipboardList },
       { href: '/admin/submissions', label: 'Submissions', icon: FileCheck, badgeKey: 'pendingSubmissions' as const },
     ],
   },
