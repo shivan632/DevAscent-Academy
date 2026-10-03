@@ -58,7 +58,7 @@ export class AiVideosController {
   @UseGuards(JwtAuthGuard)
   async getCourseVideos(
     @Param('slug') slug: string,
-    @CurrentUser('userId') userId: string,
+    @CurrentUser('id') userId: string,
   ) {
     return this.aiVideosService.getVideosForCourse(slug, userId);
   }
@@ -67,7 +67,7 @@ export class AiVideosController {
   @UseGuards(JwtAuthGuard)
   async markVideoWatched(
     @Param('id') id: string,
-    @CurrentUser('userId') userId: string,
+    @CurrentUser('id') userId: string,
   ) {
     return this.aiVideosService.markWatched(userId, id);
   }

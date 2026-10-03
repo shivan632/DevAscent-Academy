@@ -176,6 +176,10 @@ export class AiVideosService {
    * Student: Mark AI Video as Watched (Boolean explicit trigger)
    */
   async markWatched(userId: string, videoId: string) {
+    if (!userId) {
+      throw new BadRequestException('Authentication required: user ID is missing');
+    }
+
     const video = await this.prisma.aiVideo.findUnique({
       where: { id: videoId },
       include: { course: true },
