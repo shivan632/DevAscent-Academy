@@ -22,9 +22,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; email: string; role: string }) {
+  async validate(payload: any) {
+    const userId = payload?.sub || payload?.id || payload?.userId;
+    if (!userId || typeof userId !== 'string') {
+      throw new UnauthorizedException('Invalid or expired authentication session');
+    }
+
     const user = await this.prisma.user.findUnique({
-      where: { id: payload.sub },
+      where: { id: userId },
       select: {
         id: true,
         email: true,

@@ -41,7 +41,8 @@ export class ProgressService {
       enrollments: enrollments.map((enr) => {
         const cert = certificates.find((c) => c.courseId === enr.courseId);
         const sub = submissions.find((s) => s.courseId === enr.courseId);
-        const allLessons = enr.course.modules.flatMap((m) => m.lessons);
+        const modules = enr.course?.modules || [];
+        const allLessons = modules.flatMap((m) => m.lessons || []);
         const nextLesson = allLessons.length > 0 ? allLessons[0] : null;
 
         return {
@@ -50,22 +51,22 @@ export class ProgressService {
           studentName: enr.user?.name,
           studentEmail: enr.user?.email,
           courseId: enr.courseId,
-          courseSlug: enr.course.slug,
-          courseTitle: enr.course.title,
-          courseType: enr.course.type,
-          description: enr.course.description,
-          domain: enr.course.domain,
-          level: enr.course.level,
-          isFree: enr.course.isFree,
-          durationWeeks: enr.course.durationWeeks,
-          stipendDetails: enr.course.stipendDetails,
-          thumbnail: enr.course.thumbnail,
+          courseSlug: enr.course?.slug || '',
+          courseTitle: enr.course?.title || 'Untitled Track',
+          courseType: enr.course?.type || 'COURSE',
+          description: enr.course?.description || '',
+          domain: enr.course?.domain || 'General',
+          level: enr.course?.level || 'Beginner',
+          isFree: enr.course?.isFree ?? false,
+          durationWeeks: enr.course?.durationWeeks ?? 4,
+          stipendDetails: enr.course?.stipendDetails || null,
+          thumbnail: enr.course?.thumbnail || '',
           progressPct: enr.progressPct,
           enrolledAt: enr.enrolledAt,
           status: enr.status,
           nextLesson: nextLesson ? { id: nextLesson.id, title: nextLesson.title } : null,
           totalLessons: allLessons.length,
-          totalModules: enr.course.modules.length,
+          totalModules: modules.length,
           certificate: cert
             ? {
                 certId: cert.certId,
