@@ -110,7 +110,7 @@ export default function StudentSidebar({
     close();
   };
 
-  const primarySlug = mounted && enrolledCourses.length > 0 ? enrolledCourses[0].courseSlug : 'react-foundations-free';
+  const primarySlug = mounted && enrolledCourses.length > 0 ? (enrolledCourses[0]?.courseSlug || '') : '';
 
   const sidebarContent = (
     <div className="bg-white/95 dark:bg-[#0A0D16]/90 backdrop-blur-2xl rounded-3xl border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 shadow-xl shadow-black/5 dark:shadow-black/40 space-y-5">
@@ -221,7 +221,7 @@ export default function StudentSidebar({
         </span>
 
         <Link
-          href={`/learn/${primarySlug}`}
+          href={primarySlug ? `/learn/${primarySlug}` : '/enrolled-courses'}
           onClick={close}
           className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/20 font-semibold transition-all duration-200 group"
         >
