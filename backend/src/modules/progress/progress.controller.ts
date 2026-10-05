@@ -19,6 +19,12 @@ export class ProgressController {
     return this.progressService.getMyStats(userId);
   }
 
+  @Get('me/analytics')
+  @UseGuards(JwtAuthGuard)
+  async getMyAnalytics(@CurrentUser('id') userId: string) {
+    return this.progressService.getMyAnalytics(userId);
+  }
+
   @Post('progress/track')
   @UseGuards(JwtAuthGuard)
   async trackProgress(

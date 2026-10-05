@@ -27,7 +27,7 @@ import {
   Flame,
   Check,
 } from 'lucide-react';
-import { ALL_COURSES_CATALOG } from '../courses/page';
+import { ALL_COURSES_CATALOG } from '../../lib/courseCatalogData';
 import { api } from '../../lib/api';
 
 function CheckoutForm() {
@@ -61,11 +61,13 @@ function CheckoutForm() {
   const [university, setUniversity] = useState(user?.college || user?.degree || '');
   
   // Coupon & Price State
-  const [couponCode, setCouponCode] = useState('DEVASCENT');
-  const [couponApplied, setCouponApplied] = useState(true);
-  const [couponDiscount, setCouponDiscount] = useState(courseStandard - initialEarlyBird);
+  const initialCoupon = searchParams.get('coupon') || '';
+  const [couponCode, setCouponCode] = useState(initialCoupon);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponError, setCouponError] = useState('');
-  const [couponSuccessMsg, setCouponSuccessMsg] = useState('Special Early-Bird Scholarship Applied!');
+  const [couponSuccessMsg, setCouponSuccessMsg] = useState('');
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   
   // Submission & Processing state
   const [isProcessing, setIsProcessing] = useState(false);
@@ -83,45 +85,53 @@ function CheckoutForm() {
   }, [user]);
 
   // Recalculate prices
-  const basePrice = courseStandard;
+  const basePrice = initialEarlyBird;
   const finalPrice = Math.max(0, basePrice - (couponApplied ? couponDiscount : 0));
-  const totalDiscount = basePrice - finalPrice;
+  const totalDiscount = couponApplied ? couponDiscount : 0;
 
-  const handleApplyCoupon = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleApplyCoupon = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const code = couponCode.toUpperCase().trim();
     if (!code) {
-      setCouponError('Please enter a coupon or referral code.');
+      setCouponError('Please enter a coupon code.');
       setCouponApplied(false);
+      setCouponDiscount(0);
       return;
     }
 
-    if (code === 'DEVASCENT' || code === 'CODSOFT' || code === 'EARLYBIRD70') {
-      const discount = courseStandard - initialEarlyBird;
-      setCouponDiscount(discount);
+    setIsValidatingCoupon(true);
+    setCouponError('');
+    setCouponSuccessMsg('');
+
+    try {
+      const res = await api.validateCoupon(
+        code,
+        selectedCourse.slug,
+        Math.round(basePrice * 100),
+      );
+
+      const discountInRupees = Math.round(res.discountInPaise / 100);
+      setCouponDiscount(discountInRupees);
       setCouponApplied(true);
       setCouponError('');
-      setCouponSuccessMsg(`Scholarship "${code}" applied! You saved ₹${discount}`);
-    } else if (code === 'LAUNCH70' || code === 'DEV500') {
-      const extraDiscount = Math.round((courseStandard - initialEarlyBird) + (initialEarlyBird * 0.15));
-      setCouponDiscount(extraDiscount);
-      setCouponApplied(true);
-      setCouponError('');
-      setCouponSuccessMsg(`VIP Launch Code "${code}" applied! Extra 15% discount unlocked.`);
-    } else if (code === 'VIP100' || code === 'ADMIN100') {
-      const tokenDiscount = courseStandard - 99;
-      setCouponDiscount(tokenDiscount);
-      setCouponApplied(true);
-      setCouponError('');
-      setCouponSuccessMsg(`Admin Referral Pass applied! Instant fee reduced to ₹99.`);
-    } else {
-      // Treat custom admin referral codes as valid early-bird grant
-      const standardDiscount = courseStandard - initialEarlyBird;
-      setCouponDiscount(standardDiscount);
-      setCouponApplied(true);
-      setCouponError('');
-      setCouponSuccessMsg(`Referral code "${code}" verified! Early-Bird grant active.`);
+      setCouponSuccessMsg(
+        `Coupon "${res.code}" applied! You saved ₹${discountInRupees.toLocaleString()}`,
+      );
+    } catch (err: any) {
+      setCouponApplied(false);
+      setCouponDiscount(0);
+      setCouponError(err.message || 'Invalid or expired coupon code.');
+    } finally {
+      setIsValidatingCoupon(false);
     }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponCode('');
+    setCouponApplied(false);
+    setCouponDiscount(0);
+    setCouponError('');
+    setCouponSuccessMsg('');
   };
 
   const handlePayNow = async (e: React.FormEvent) => {
@@ -462,22 +472,40 @@ function CheckoutForm() {
 
               {/* Coupon / Referral Code Box */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-300">Coupon / Referral Code</label>
+                <label className="block text-xs font-bold text-slate-300">Discount Coupon Code</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
+                    disabled={couponApplied || isValidatingCoupon}
                     value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="DEVASCENT"
-                    className="flex-1 uppercase px-3.5 py-2.5 text-xs font-mono bg-slate-950/90 text-white placeholder-slate-600 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase().replace(/\s+/g, ''))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!couponApplied) handleApplyCoupon();
+                      }
+                    }}
+                    placeholder="ENTER CODE"
+                    className="flex-1 uppercase px-3.5 py-2.5 text-xs font-mono font-bold tracking-wider bg-slate-950/90 text-white placeholder-slate-600 border border-slate-800 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all disabled:opacity-60"
                   />
-                  <button
-                    type="button"
-                    onClick={handleApplyCoupon}
-                    className="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-600/20 transition-all"
-                  >
-                    Apply
-                  </button>
+                  {couponApplied ? (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 text-xs font-bold px-3.5 py-2.5 rounded-xl transition-all"
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={isValidatingCoupon || !couponCode.trim()}
+                      onClick={() => handleApplyCoupon()}
+                      className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 active:scale-95 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-600/20 transition-all"
+                    >
+                      {isValidatingCoupon ? 'Checking...' : 'Apply'}
+                    </button>
+                  )}
                 </div>
 
                 {couponApplied && (

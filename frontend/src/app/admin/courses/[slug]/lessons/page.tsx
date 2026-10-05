@@ -5,11 +5,14 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { api, fetchApi } from '@/lib/api';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeHighlight from 'rehype-highlight';
-import 'highlight.js/styles/github-dark.css';
+import dynamic from 'next/dynamic';
 import { getEmbedUrl, isDirectVideoUrl } from '@/lib/utils';
+import EmbeddedDocViewer from '@/components/learn/EmbeddedDocViewer';
+
+const MarkdownViewer = dynamic(() => import('@/components/MarkdownViewer'), {
+  ssr: false,
+  loading: () => <p className="text-slate-500 italic text-xs">Loading live preview...</p>,
+});
 import {
   BookOpen,
   Plus,
@@ -818,9 +821,7 @@ export default function AdminCurriculumStudioPage() {
                       <label className="text-emerald-400 font-mono text-[11px]">Live Formatted Preview (Highlight.js)</label>
                       <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 overflow-y-auto max-h-[360px] text-slate-300 prose prose-invert prose-sm max-w-none">
                         {lessonForm.writtenContent ? (
-                          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
-                            {lessonForm.writtenContent}
-                          </ReactMarkdown>
+                          <MarkdownViewer content={lessonForm.writtenContent} />
                         ) : (
                           <p className="text-slate-600 italic">No notes written yet. Start typing on the left!</p>
                         )}
@@ -1005,21 +1006,21 @@ export default function AdminCurriculumStudioPage() {
               {activeStudioTab === 'exercise' && (
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-slate-300 font-semibold">Exercise PDF Display Title</label>
+                    <label className="text-slate-300 font-semibold text-xs">Exercise PDF / Capstone Guide Title</label>
                     <input
                       type="text"
                       value={lessonForm.exercisePdfTitle}
                       onChange={(e) => setLessonForm({ ...lessonForm, exercisePdfTitle: e.target.value })}
-                      placeholder="e.g. Week 1 Capstone: Multi-Tenant Schema Architecture Scaffold"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
+                      placeholder="e.g. Week 1 Capstone: Fullstack Architecture Blueprint"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white text-xs focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="text-slate-300 font-semibold flex items-center gap-2">
+                      <label className="text-slate-300 font-semibold text-xs flex items-center gap-2">
                         <Download className="w-4 h-4 text-indigo-400" />
-                        <span>Official Exercise / Capstone Assignment PDF URL</span>
+                        <span>Google Drive / Cloud PDF Preview URL</span>
                       </label>
                       {lessonForm.exercisePdfUrl && (
                         <button
@@ -1036,35 +1037,23 @@ export default function AdminCurriculumStudioPage() {
                       type="url"
                       value={lessonForm.exercisePdfUrl}
                       onChange={(e) => setLessonForm({ ...lessonForm, exercisePdfUrl: e.target.value })}
-                      placeholder="https://res.cloudinary.com/.../assignments/week-1-capstone.pdf"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
+                      placeholder="https://drive.google.com/file/d/1dtrV7i90kKfAumqe0kLSfgYdYFJmevbk/preview"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none"
                     />
-                    <p className="text-[11px] text-slate-500">
-                      Supports direct Cloudinary/S3 PDF links. If left blank, student portal displays "Admin PDF Upload Pending".
-                    </p>
+                    <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                      <span className="text-indigo-400 font-medium">Tip:</span>
+                      <span>Paste your Google Drive link (e.g. <code>https://drive.google.com/file/d/FILE_ID/preview</code>) or direct PDF link.</span>
+                    </div>
                   </div>
 
-                  {/* Inline PDF Preview */}
+                  {/* Inline PDF Preview with live embed tester & permissions notice */}
                   {previewingPdf && lessonForm.exercisePdfUrl && (
-                    <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 space-y-2">
-                      <div className="flex items-center justify-between px-2 text-[11px] text-slate-400">
-                        <span>PDF Embedded Viewer</span>
-                        <a
-                          href={lessonForm.exercisePdfUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
-                        >
-                          <span>Open in new tab</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
-                      <iframe
-                        src={`https://docs.google.com/gviewer?embedded=true&url=${encodeURIComponent(
-                          lessonForm.exercisePdfUrl
-                        )}`}
-                        title="PDF Preview"
-                        className="w-full h-80 rounded-lg border border-slate-800 bg-white"
+                    <div className="pt-2">
+                      <EmbeddedDocViewer
+                        url={lessonForm.exercisePdfUrl}
+                        title={lessonForm.exercisePdfTitle || 'Live Studio PDF Preview Test'}
+                        description="Verify how students will see this Google Drive PDF preview in their learning room."
+                        accentColor="indigo"
                       />
                     </div>
                   )}

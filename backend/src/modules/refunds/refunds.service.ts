@@ -4,10 +4,14 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { MailService } from '../../shared/mail.service';
 
 @Injectable()
 export class RefundsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mailService: MailService,
+  ) {}
 
   async applyRefund(userId: string, orderId: string, reason: string, upiId?: string) {
     const payment = await this.prisma.payment.findFirst({
@@ -82,7 +86,21 @@ export class RefundsService {
         upiId,
         status: 'SUBMITTED',
       },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+      },
     });
+
+    // Send asynchronous branded refund receipt email
+    if (refund.user?.email) {
+      this.mailService.sendRefundStatusEmail(
+        refund.user.email,
+        refund.user.name || 'Student',
+        payment.razorpayOrderId || payment.id,
+        'REQUESTED',
+        Math.round(payment.amountInPaise / 100),
+      ).catch(() => {});
+    }
 
     return {
       refundId: refund.id,

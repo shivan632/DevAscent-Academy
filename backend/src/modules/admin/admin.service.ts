@@ -73,11 +73,12 @@ export class AdminService {
 
   // ─── Badge Counts (for sidebar) ─────────────────────────────────────────────
   async getBadgeCounts() {
-    const [pendingRefunds, pendingSubmissions] = await Promise.all([
+    const [pendingRefunds, pendingSubmissions, pendingQueries] = await Promise.all([
       this.prisma.refund.count({ where: { status: 'SUBMITTED' } }),
       this.prisma.completionSubmission.count({ where: { status: 'PENDING' } }),
+      this.prisma.doubt.count({ where: { status: 'PENDING' } }),
     ]);
-    return { pendingRefunds, pendingSubmissions };
+    return { pendingRefunds, pendingSubmissions, pendingQueries };
   }
 
   // ─── Students (Paginated) ───────────────────────────────────────────────────
@@ -351,7 +352,7 @@ export class AdminService {
         take: limit,
       }),
       this.prisma.payment.findMany({
-        where: { status: { in: ['PAID', 'PENDING'] } },
+        where: { status: { in: ['PAID', 'SUCCESS', 'captured', 'PENDING'] } },
         select: { amountInPaise: true, status: true },
       }),
       this.prisma.payment.count(),
@@ -362,7 +363,7 @@ export class AdminService {
 
     const paidRevenue = Math.round(
       paidPayments
-        .filter(p => p.status === 'PAID')
+        .filter(p => p.status === 'PAID' || p.status === 'SUCCESS' || p.status === 'captured')
         .reduce((acc, p) => acc + p.amountInPaise, 0) / 100,
     );
     const pendingRevenue = Math.round(
@@ -372,7 +373,7 @@ export class AdminService {
     );
     const totalRevenueInRupees = paidRevenue + pendingRevenue;
 
-    const successCount = await this.prisma.payment.count({ where: { status: 'PAID' } });
+    const successCount = await this.prisma.payment.count({ where: { status: { in: ['PAID', 'SUCCESS', 'captured'] } } });
     const pendingCount = await this.prisma.payment.count({ where: { status: 'PENDING' } });
 
     return {

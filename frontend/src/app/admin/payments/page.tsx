@@ -82,20 +82,61 @@ export default function AdminPaymentsPage() {
     ? payload.payments
     : Array.isArray(payload)
     ? payload
+    : Array.isArray(resData?.data)
+    ? resData.data
     : [];
 
-  const meta = payload?.meta || {};
-  const stats = payload?.stats || {};
+  const meta = resData?.meta || payload?.meta || {};
+  const rawStats = resData?.stats || payload?.stats || {};
   const total = meta?.total ?? paymentsList.length;
   const totalPages = meta?.totalPages ?? 1;
 
-  const totalRevenue = stats?.totalRevenue ?? 0;
-  const paidRevenue = stats?.paidRevenue ?? 0;
-  const pendingRevenue = stats?.pendingRevenue ?? 0;
-  const successCount = stats?.successCount ?? 0;
-  const pendingCount = stats?.pendingCount ?? 0;
-  const verifiedCount = stats?.verifiedCount ?? 0;
-  const totalCount = stats?.totalCount ?? total;
+  // Real DB stats with automatic fallback calculations from loaded transaction list
+  const computedPaidRevenue = paymentsList
+    .filter((p: any) => p.status === 'SUCCESS' || p.status === 'PAID')
+    .reduce((acc: number, p: any) => acc + (Number(p.amount) || 0), 0);
+
+  const computedPendingRevenue = paymentsList
+    .filter((p: any) => p.status === 'PENDING')
+    .reduce((acc: number, p: any) => acc + (Number(p.amount) || 0), 0);
+
+  const computedSuccessCount = paymentsList
+    .filter((p: any) => p.status === 'SUCCESS' || p.status === 'PAID')
+    .length;
+
+  const computedPendingCount = paymentsList
+    .filter((p: any) => p.status === 'PENDING')
+    .length;
+
+  const computedVerifiedCount = paymentsList
+    .filter((p: any) => p.emailVerified === true || p.user?.isEmailVerified === true)
+    .length;
+
+  const totalRevenue = rawStats?.totalRevenue !== undefined && rawStats?.totalRevenue > 0
+    ? rawStats.totalRevenue
+    : (computedPaidRevenue + computedPendingRevenue);
+    
+  const paidRevenue = rawStats?.paidRevenue !== undefined && rawStats?.paidRevenue > 0
+    ? rawStats.paidRevenue
+    : computedPaidRevenue;
+
+  const pendingRevenue = rawStats?.pendingRevenue !== undefined
+    ? rawStats.pendingRevenue
+    : computedPendingRevenue;
+
+  const successCount = rawStats?.successCount !== undefined && rawStats?.successCount > 0
+    ? rawStats.successCount
+    : computedSuccessCount;
+
+  const pendingCount = rawStats?.pendingCount !== undefined
+    ? rawStats.pendingCount
+    : computedPendingCount;
+
+  const verifiedCount = rawStats?.verifiedCount !== undefined && rawStats?.verifiedCount > 0
+    ? rawStats.verifiedCount
+    : computedVerifiedCount;
+
+  const totalCount = rawStats?.totalCount ?? total;
 
   const handleExport = () => {
     window.open(api.admin.exportRevenueUrl(), '_blank');

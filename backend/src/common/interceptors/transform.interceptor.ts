@@ -11,6 +11,8 @@ export interface Response<T> {
   success: boolean;
   data: T;
   meta?: any;
+  stats?: any;
+  [key: string]: any;
 }
 
 @Injectable()
@@ -23,12 +25,11 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
           return res;
         }
 
-        // If response includes meta
-        if (res && typeof res === 'object' && 'meta' in res && 'data' in res) {
+        // If response includes data and additional properties (e.g. meta, stats)
+        if (res && typeof res === 'object' && 'data' in res && !Array.isArray(res)) {
           return {
             success: true,
-            data: res.data,
-            meta: res.meta,
+            ...res,
           };
         }
 

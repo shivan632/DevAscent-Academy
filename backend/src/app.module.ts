@@ -11,6 +11,9 @@ import { SubmissionsModule } from './modules/submissions/submissions.module';
 import { RefundsModule } from './modules/refunds/refunds.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AiVideosModule } from './modules/ai-videos/ai-videos.module';
+import { CouponsModule } from './modules/coupons/coupons.module';
+import { DoubtsModule } from './modules/doubts/doubts.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -31,6 +34,9 @@ import { AiVideosModule } from './modules/ai-videos/ai-videos.module';
     RefundsModule,
     AdminModule,
     AiVideosModule,
+    CouponsModule,
+    DoubtsModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

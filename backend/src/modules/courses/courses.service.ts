@@ -10,7 +10,36 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class CoursesService {
   constructor(private prisma: PrismaService) {}
 
+  private cache = new Map<string, { data: any; expiresAt: number }>();
+
+  private getFromCache<T>(key: string): T | null {
+    const item = this.cache.get(key);
+    if (!item) return null;
+    if (Date.now() > item.expiresAt) {
+      this.cache.delete(key);
+      return null;
+    }
+    return item.data;
+  }
+
+  private setInCache<T>(key: string, data: T, ttlMs = 60000): void {
+    if (this.cache.size > 200) {
+      this.cache.clear();
+    }
+    this.cache.set(key, { data, expiresAt: Date.now() + ttlMs });
+  }
+
+  public clearCoursesCache(): void {
+    this.cache.clear();
+  }
+
   async findAll(query?: { domain?: string; level?: string; search?: string; type?: string }) {
+    const cacheKey = `findAll:${JSON.stringify(query || {})}`;
+    const cached = this.getFromCache<{ courses: any[] }>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const where: any = { isPublished: true };
 
     if (query?.domain) {
@@ -58,10 +87,17 @@ export class CoursesService {
       orderBy: { cohortNumber: 'desc' },
     });
 
-    return { courses };
+    const result = { courses };
+    this.setInCache(cacheKey, result, 60000); // 1 minute cache
+    return result;
   }
 
   async findFeatured() {
+    const cacheKey = 'findFeatured';
+    const cached = this.getFromCache<any>(cacheKey);
+    if (cached) {
+      return cached;
+    }
     const course = await this.prisma.course.findFirst({
       where: { slug: 'full-stack-accelerator', isPublished: true },
       include: {
@@ -88,7 +124,7 @@ export class CoursesService {
 
     const filledSeats = course.totalSeats - course.seatsRemaining;
 
-    return {
+    const result = {
       course,
       cohortStatus: {
         filled: filledSeats,
@@ -98,6 +134,8 @@ export class CoursesService {
         cohortNumber: course.cohortNumber,
       },
     };
+    this.setInCache(cacheKey, result, 60000);
+    return result;
   }
 
   async findBySlug(slug: string, userId?: string) {
@@ -150,15 +188,20 @@ export class CoursesService {
     let submission: any = null;
 
     if (userId) {
-      enrollment = await this.prisma.enrollment.findUnique({
-        where: { userId_courseId: { userId, courseId: course.id } },
-      });
-      application = await this.prisma.internshipApplication.findUnique({
-        where: { userId_courseId: { userId, courseId: course.id } },
-      });
-      submission = await this.prisma.completionSubmission.findUnique({
-        where: { userId_courseId: { userId, courseId: course.id } },
-      });
+      const [userEnrollment, userApplication, userSubmission] = await Promise.all([
+        this.prisma.enrollment.findUnique({
+          where: { userId_courseId: { userId, courseId: course.id } },
+        }),
+        this.prisma.internshipApplication.findUnique({
+          where: { userId_courseId: { userId, courseId: course.id } },
+        }),
+        this.prisma.completionSubmission.findUnique({
+          where: { userId_courseId: { userId, courseId: course.id } },
+        }),
+      ]);
+      enrollment = userEnrollment;
+      application = userApplication;
+      submission = userSubmission;
     }
 
     return {
@@ -264,9 +307,9 @@ export class CoursesService {
   }
 
   /**
-   * Compute interleaved curriculum with AI Overview milestone video gates and sequential lesson unlocking.
+   * Helper: compute high-performance unified curriculum state in a single query
    */
-  async getCurriculum(slugOrId: string, userId?: string) {
+  async getCurriculumData(slugOrId: string, userId?: string) {
     const course = await this.prisma.course.findFirst({
       where: {
         OR: [{ id: slugOrId }, { slug: slugOrId }],
@@ -280,7 +323,12 @@ export class CoursesService {
             lessons: {
               include: {
                 quiz: {
-                  select: { id: true, title: true, passingScore: true, maxAttempts: true },
+                  include: {
+                    questions: {
+                      select: { id: true, order: true },
+                      orderBy: { order: 'asc' },
+                    },
+                  },
                 },
               },
               orderBy: { lessonNumber: 'asc' },
@@ -297,34 +345,73 @@ export class CoursesService {
 
     let enrollment: any = null;
     let isEnrolled = false;
+    let currentUser: any = null;
+    let submission: any = null;
     const watchedAiVideoIds = new Set<string>();
     const completedLessonIds = new Set<string>();
     const passedQuizIds = new Set<string>();
+    const attemptsMap = new Map<string, { count: number; highestScorePct: number; isPassed: boolean; lastAttempt: any }>();
 
     if (userId) {
-      enrollment = await this.prisma.enrollment.findUnique({
-        where: { userId_courseId: { userId, courseId: course.id } },
-      });
-      isEnrolled = !!enrollment && enrollment.status === 'ACTIVE';
-
-      const [aiVideoProgress, lessonProgress, quizSubmissions] = await Promise.all([
+      const [enr, userDoc, aiProgress, lessonProg, quizAttempts, subDoc] = await Promise.all([
+        this.prisma.enrollment.findUnique({
+          where: { userId_courseId: { userId, courseId: course.id } },
+        }),
+        this.prisma.user.findUnique({
+          where: { id: userId },
+          select: { id: true, name: true, email: true, avatarUrl: true, role: true },
+        }),
         this.prisma.aiVideoProgress.findMany({
           where: { userId, aiVideo: { courseId: course.id }, watched: true },
         }),
         this.prisma.lessonProgress.findMany({
           where: { userId, isCompleted: true },
         }),
-        this.prisma.quizSubmission.findMany({
-          where: { userId, passed: true },
+        this.prisma.quizAttempt.findMany({
+          where: { userId },
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.completionSubmission.findUnique({
+          where: { userId_courseId: { userId, courseId: course.id } },
         }),
       ]);
 
-      aiVideoProgress.forEach((p) => watchedAiVideoIds.add(p.aiVideoId));
-      lessonProgress.forEach((p) => completedLessonIds.add(p.lessonId));
-      quizSubmissions.forEach((q) => passedQuizIds.add(q.quizId));
+      enrollment = enr;
+      isEnrolled = !!enrollment && enrollment.status === 'ACTIVE';
+      currentUser = userDoc;
+      submission = subDoc;
+
+      aiProgress.forEach((p) => watchedAiVideoIds.add(p.aiVideoId));
+      lessonProg.forEach((p) => completedLessonIds.add(p.lessonId));
+
+      // Group quiz attempts
+      quizAttempts.forEach((att) => {
+        const existing = attemptsMap.get(att.quizId);
+        if (existing) {
+          existing.count += 1;
+          if (att.score > existing.highestScorePct) existing.highestScorePct = att.score;
+          if (att.passed) {
+            existing.isPassed = true;
+            passedQuizIds.add(att.quizId);
+          }
+        } else {
+          if (att.passed) passedQuizIds.add(att.quizId);
+          attemptsMap.set(att.quizId, {
+            count: 1,
+            highestScorePct: att.score,
+            isPassed: att.passed,
+            lastAttempt: att,
+          });
+        }
+      });
     }
 
-    // Flatten all lessons into global sequence
+    // Admins bypass enrollment locks
+    if (currentUser?.role === 'ADMIN') {
+      isEnrolled = true;
+    }
+
+    // Flatten all lessons across all modules into a global sequence
     const allLessons: any[] = [];
     course.modules.forEach((m) => {
       m.lessons.forEach((l) => {
@@ -337,104 +424,13 @@ export class CoursesService {
       });
     });
 
-    // Calculate progression state for each AI Video
-    const aiVideosWithStatus = course.aiVideos.map((v) => {
-      const isWatched = watchedAiVideoIds.has(v.id);
-      let isUnlocked = false;
-      let lockReason = '';
-
-      if (!isEnrolled) {
-        isUnlocked = v.order === 1; // Preview or locked
-        if (!isUnlocked) lockReason = 'Enroll in the course to unlock';
-      } else {
-        if (v.order === 1) {
-          isUnlocked = true;
-        } else if (v.order === 2) {
-          const requiredLessonCount = Math.min(5, allLessons.length);
-          const prevLessons = allLessons.slice(0, requiredLessonCount);
-          const allPrevCompleted = prevLessons.length > 0 && prevLessons.every((l) => {
-            const completed = completedLessonIds.has(l.id);
-            const quizOk = !l.quiz || passedQuizIds.has(l.quiz.id);
-            return completed && quizOk;
-          });
-          isUnlocked = allPrevCompleted;
-          if (!isUnlocked) lockReason = `Complete Lessons 1-${requiredLessonCount} and pass their skill quizzes to unlock Video 2`;
-        } else if (v.order === 3) {
-          const requiredLessonCount = Math.min(10, allLessons.length);
-          const prevLessons = allLessons.slice(0, requiredLessonCount);
-          const allPrevCompleted = prevLessons.length > 0 && prevLessons.every((l) => {
-            const completed = completedLessonIds.has(l.id);
-            const quizOk = !l.quiz || passedQuizIds.has(l.quiz.id);
-            return completed && quizOk;
-          });
-          isUnlocked = allPrevCompleted;
-          if (!isUnlocked) lockReason = `Complete Lessons 1-${requiredLessonCount} and pass their skill quizzes to unlock Video 3`;
-        }
-      }
-
-      return {
-        id: v.id,
-        courseId: v.courseId,
-        order: v.order,
-        title: v.title,
-        description: v.description,
-        videoUrl: isUnlocked ? v.videoUrl : null,
-        durationSec: v.durationSec,
-        unlocksFromLesson: v.unlocksFromLesson,
-        unlocksToLesson: v.unlocksToLesson,
-        isUnlocked,
-        isWatched,
-        lockReason,
-      };
-    });
-
-    // Calculate progression state for lessons
-    const lessonsWithStatus = allLessons.map((l, index) => {
-      const globalSeq = index + 1; // 1-indexed
+    // Compute basic completion flags for all topics
+    const processedTopics = allLessons.map((l, index) => {
+      const globalSeq = index + 1;
       const isCompleted = completedLessonIds.has(l.id);
-      const quizPassed = l.quiz ? passedQuizIds.has(l.quiz.id) : true;
-      let isUnlocked = false;
-      let lockReason = '';
-
-      if (!isEnrolled) {
-        isUnlocked = l.isFreePreview;
-        if (!isUnlocked) lockReason = 'Enroll to access this lesson';
-      } else {
-        // Milestone gating check:
-        // L1-L5 governed by Video 1
-        // L6-L10 governed by Video 2
-        // L11-L15 governed by Video 3
-        let governingVideo: any = null;
-        if (globalSeq >= 1 && globalSeq <= 5) {
-          governingVideo = aiVideosWithStatus.find((v) => v.order === 1);
-        } else if (globalSeq >= 6 && globalSeq <= 10) {
-          governingVideo = aiVideosWithStatus.find((v) => v.order === 2);
-        } else if (globalSeq >= 11) {
-          governingVideo = aiVideosWithStatus.find((v) => v.order === 3);
-        }
-
-        const videoSatisfied = !governingVideo || governingVideo.isWatched;
-
-        if (!videoSatisfied) {
-          isUnlocked = false;
-          lockReason = `Watch AI Overview Video ${governingVideo.order} first to unlock this milestone batch`;
-        } else {
-          if (index === 0) {
-            isUnlocked = true;
-          } else {
-            const prevLesson = allLessons[index - 1];
-            const prevCompleted = completedLessonIds.has(prevLesson.id);
-            const prevQuizOk = !prevLesson.quiz || passedQuizIds.has(prevLesson.quiz.id);
-
-            if (prevCompleted && prevQuizOk) {
-              isUnlocked = true;
-            } else {
-              isUnlocked = false;
-              lockReason = `Complete Lesson ${prevLesson.lessonNumber} (${prevLesson.title}) and pass its quiz (70%+) to proceed`;
-            }
-          }
-        }
-      }
+      const quizInfo = l.quiz ? attemptsMap.get(l.quiz.id) : null;
+      const quizPassed = l.quiz ? (quizInfo?.isPassed || passedQuizIds.has(l.quiz.id)) : true;
+      const questionCount = l.quiz?.questions?.length || (globalSeq <= 10 ? 6 : 8);
 
       return {
         id: l.id,
@@ -444,59 +440,324 @@ export class CoursesService {
         lessonNumber: l.lessonNumber,
         globalSeq,
         title: l.title,
-        durationMinutes: l.durationMinutes,
+        durationMinutes: l.durationMinutes || 45,
         summary: l.summary,
         isFreePreview: l.isFreePreview,
-        isUnlocked,
         isCompleted,
-        lockReason,
-        hasQuiz: !!l.quiz,
         quizPassed,
+        exercisePdfTitle: l.exercisePdfTitle,
+        exercisePdfUrl: l.exercisePdfUrl,
+        exerciseProjects: l.exerciseProjects,
+        hasQuiz: !!l.quiz,
         quiz: l.quiz
           ? {
               id: l.quiz.id,
-              title: l.quiz.title,
-              passingScore: l.quiz.passingScore,
-              maxAttempts: l.quiz.maxAttempts,
+              title: l.quiz.title || `${l.title} - Skill Quiz`,
+              passingScore: l.quiz.passingScore || 60,
+              maxAttempts: l.quiz.maxAttempts || 3,
+              questionCount,
+              attemptsCount: quizInfo?.count || 0,
+              highestScorePct: quizInfo?.highestScorePct || 0,
+              isPassed: quizPassed,
             }
           : null,
-        exercisePdfTitle: l.exercisePdfTitle,
-        hasExercisePdf: !!l.exercisePdfUrl,
       };
     });
 
-    // Assemble Interleaved Curriculum List:
-    // [ Video 1, L1..L5, Video 2, L6..L10, Video 3, L11..L15 ]
-    const interleavedList: any[] = [];
+    // ─── UNLOCK LOGIC (LOCKED & PRECISE) ───
+    // 1. Video 1 unlocked by default
+    // 2. Topic 1 unlocks after Video 1 watched
+    // 3. Quiz 1 unlocks after Topic 1 marked complete
+    // 4. Topic 2 unlocks after Quiz 1 passed (>=60%)
+    // 5. Pattern continues through Topic 5
+    // 6. Video 2 unlocks after Topic 5 complete + Quiz 5 passed
+    // 7. Video 2 watched -> Topic 6 unlocks
+    // 8. Pattern continues through Topic 10
+    // 9. Video 3 unlocks after Topic 10 complete + Quiz 10 passed
+    // 10. Video 3 watched -> Topic 11 unlocks
+    // 11. Pattern continues through Topic 15
+    // 12. Capstone unlocks after Topic 15 + Quiz 15 passed
+
+    // 1. Calculate Video Unlocks
+    const video1 = course.aiVideos.find((v) => v.order === 1);
+    const video2 = course.aiVideos.find((v) => v.order === 2);
+    const video3 = course.aiVideos.find((v) => v.order === 3);
+
+    const v1Watched = video1 ? watchedAiVideoIds.has(video1.id) : true;
+    const v2Watched = video2 ? watchedAiVideoIds.has(video2.id) : true;
+    const v3Watched = video3 ? watchedAiVideoIds.has(video3.id) : true;
+
+    // Check module 1 completion (topics 1..5)
+    const mod1Topics = processedTopics.filter((t) => t.moduleNumber === 1 || (t.globalSeq >= 1 && t.globalSeq <= 5));
+    const mod1Complete = mod1Topics.length > 0 && mod1Topics.every((t) => t.isCompleted && t.quizPassed);
+
+    // Check module 2 completion (topics 6..10)
+    const mod2Topics = processedTopics.filter((t) => t.moduleNumber === 2 || (t.globalSeq >= 6 && t.globalSeq <= 10));
+    const mod2Complete = mod1Complete && mod2Topics.length > 0 && mod2Topics.every((t) => t.isCompleted && t.quizPassed);
+
+    // Check module 3 completion (topics 11..15)
+    const mod3Topics = processedTopics.filter((t) => t.moduleNumber === 3 || t.globalSeq >= 11);
+    const mod3Complete = mod2Complete && mod3Topics.length > 0 && mod3Topics.every((t) => t.isCompleted && t.quizPassed);
+
+    const aiVideosWithStatus = course.aiVideos.map((v) => {
+      const isWatched = watchedAiVideoIds.has(v.id);
+      let isUnlocked = false;
+      let lockReason = '';
+      let targetTopicSeq = 1;
+
+      if (!isEnrolled) {
+        isUnlocked = v.order === 1;
+        if (!isUnlocked) lockReason = 'Enroll in the course to unlock';
+      } else {
+        if (v.order === 1) {
+          isUnlocked = true;
+          targetTopicSeq = 1;
+        } else if (v.order === 2) {
+          isUnlocked = mod1Complete;
+          targetTopicSeq = 6;
+          if (!isUnlocked) lockReason = 'Complete all Module 1 topics and quizzes to unlock Video 2';
+        } else if (v.order === 3) {
+          isUnlocked = mod2Complete;
+          targetTopicSeq = 11;
+          if (!isUnlocked) lockReason = 'Complete all Module 2 topics and quizzes to unlock Video 3';
+        }
+      }
+
+      const targetTopic = processedTopics.find((t) => t.globalSeq === targetTopicSeq) || processedTopics[0];
+
+      return {
+        id: v.id,
+        courseId: v.courseId,
+        order: v.order,
+        title: v.title,
+        description: v.description,
+        videoUrl: isUnlocked ? v.videoUrl : null,
+        durationSec: v.durationSec || 15,
+        unlocksFromLesson: v.unlocksFromLesson,
+        unlocksToLesson: v.unlocksToLesson,
+        isUnlocked,
+        isWatched,
+        lockReason,
+        targetTopicId: targetTopic?.id || null,
+        targetTopicSeq,
+        url: `/learn/${course.slug}/video/${v.id}`,
+      };
+    });
+
+    // 2. Calculate Topic & Quiz Unlocks
+    const topicsWithStatus = processedTopics.map((t, idx) => {
+      let isUnlocked = false;
+      let lockReason = '';
+
+      if (!isEnrolled) {
+        isUnlocked = t.isFreePreview;
+        if (!isUnlocked) lockReason = 'Enroll to access this lesson';
+      } else {
+        if (t.globalSeq === 1) {
+          // Unlocks after Video 1 is watched
+          if (video1 && !v1Watched) {
+            isUnlocked = false;
+            lockReason = 'Watch Milestone 1 AI Overview Video first';
+          } else {
+            isUnlocked = true;
+          }
+        } else if (t.globalSeq >= 2 && t.globalSeq <= 5) {
+          const prev = processedTopics[idx - 1];
+          if (prev.isCompleted && prev.quizPassed) {
+            isUnlocked = true;
+          } else {
+            isUnlocked = false;
+            lockReason = `Complete Topic ${prev.globalSeq} and pass its quiz to unlock`;
+          }
+        } else if (t.globalSeq === 6) {
+          if (!mod1Complete) {
+            isUnlocked = false;
+            lockReason = 'Complete Module 1 topics & quizzes first';
+          } else if (video2 && !v2Watched) {
+            isUnlocked = false;
+            lockReason = 'Watch Milestone 2 AI Overview Video first';
+          } else {
+            isUnlocked = true;
+          }
+        } else if (t.globalSeq >= 7 && t.globalSeq <= 10) {
+          const prev = processedTopics[idx - 1];
+          if (prev.isCompleted && prev.quizPassed) {
+            isUnlocked = true;
+          } else {
+            isUnlocked = false;
+            lockReason = `Complete Topic ${prev.globalSeq} and pass its quiz to unlock`;
+          }
+        } else if (t.globalSeq === 11) {
+          if (!mod2Complete) {
+            isUnlocked = false;
+            lockReason = 'Complete Module 2 topics & quizzes first';
+          } else if (video3 && !v3Watched) {
+            isUnlocked = false;
+            lockReason = 'Watch Milestone 3 AI Overview Video first';
+          } else {
+            isUnlocked = true;
+          }
+        } else {
+          const prev = processedTopics[idx - 1];
+          if (prev.isCompleted && prev.quizPassed) {
+            isUnlocked = true;
+          } else {
+            isUnlocked = false;
+            lockReason = `Complete Topic ${prev.globalSeq} and pass its quiz to unlock`;
+          }
+        }
+      }
+
+      // Quiz unlocks strictly after its topic is completed
+      const quizUnlocked = isUnlocked && t.isCompleted;
+      const quizTotalQ = t.quiz?.questionCount || 6;
+      let quizScoreDisplay = '';
+
+      if (t.quiz) {
+        if (t.quiz.isPassed) {
+          const correctMarks = Math.max(1, Math.round((t.quiz.highestScorePct / 100) * quizTotalQ));
+          quizScoreDisplay = `${correctMarks}/${quizTotalQ}`;
+        } else if (t.quiz.attemptsCount > 0) {
+          const correctMarks = Math.round((t.quiz.highestScorePct / 100) * quizTotalQ);
+          quizScoreDisplay = `${correctMarks}/${quizTotalQ} Retry`;
+        }
+      }
+
+      return {
+        ...t,
+        isUnlocked,
+        lockReason,
+        url: `/learn/${course.slug}/topic/${t.id}`,
+        quiz: t.quiz
+          ? {
+              ...t.quiz,
+              isUnlocked: quizUnlocked,
+              scoreDisplay: quizScoreDisplay,
+              attemptsExhausted: t.quiz.attemptsCount >= t.quiz.maxAttempts && !t.quiz.isPassed,
+              url: `/learn/${course.slug}/quiz/${t.quiz.id}`,
+            }
+          : null,
+      };
+    });
+
+    // 3. Capstone & Certificate Status
+    const totalTopicsCount = topicsWithStatus.length;
+    const completedTopicsCount = topicsWithStatus.filter((t) => t.isCompleted).length;
+    const passedQuizzesCount = topicsWithStatus.filter((t) => t.quiz?.isPassed).length;
+    const allTopicsPassed = totalTopicsCount > 0 && topicsWithStatus.every((t) => t.isCompleted && (t.quiz ? t.quiz.isPassed : true));
+    const isCapstoneUnlocked = isEnrolled && allTopicsPassed;
+
+    const capstoneData = {
+      isUnlocked: isCapstoneUnlocked,
+      lockReason: isCapstoneUnlocked ? '' : `Complete all ${totalTopicsCount} topics and pass all quizzes to unlock Capstone Project`,
+      isSubmitted: !!submission,
+      submissionStatus: submission?.status || null,
+      submission: submission || null,
+      isEligibleForCertificate: !!submission && submission.status === 'APPROVED',
+      url: `/learn/${course.slug}/project`,
+      submitUrl: `/learn/${course.slug}/submit`,
+      exercisePdfUrl: 'https://drive.google.com/file/d/1dtrV7i90kKfAumqe0kLSfgYdYFJmevbk/preview',
+    };
+
+    // Calculate Progress %
+    const totalVideos = aiVideosWithStatus.length;
+    const watchedVideos = aiVideosWithStatus.filter((v) => v.isWatched).length;
+    const totalScoreableItems = totalVideos + (totalTopicsCount * 2); // Video + (Topic + Quiz)
+    const completedItems = watchedVideos + completedTopicsCount + passedQuizzesCount;
+    const progressPct = totalScoreableItems > 0 ? Math.min(100, Math.round((completedItems / totalScoreableItems) * 100)) : 0;
+
+    // 4. Assemble Linear Flow Chain (O(1) prev/next lookup)
+    const linearChain: any[] = [];
     const v1 = aiVideosWithStatus.find((v) => v.order === 1);
-    if (v1) interleavedList.push({ type: 'ai-video', item: v1 });
+    if (v1) linearChain.push({ type: 'video', id: v1.id, title: v1.title, url: v1.url, isUnlocked: v1.isUnlocked });
 
-    const batch1 = lessonsWithStatus.filter((l) => l.globalSeq >= 1 && l.globalSeq <= 5);
-    batch1.forEach((l) => interleavedList.push({ type: 'lesson', item: l }));
+    topicsWithStatus.forEach((t) => {
+      // If entering milestone 2 or 3, insert milestone video
+      if (t.globalSeq === 6) {
+        const v2 = aiVideosWithStatus.find((v) => v.order === 2);
+        if (v2) linearChain.push({ type: 'video', id: v2.id, title: v2.title, url: v2.url, isUnlocked: v2.isUnlocked });
+      } else if (t.globalSeq === 11) {
+        const v3 = aiVideosWithStatus.find((v) => v.order === 3);
+        if (v3) linearChain.push({ type: 'video', id: v3.id, title: v3.title, url: v3.url, isUnlocked: v3.isUnlocked });
+      }
 
-    const v2 = aiVideosWithStatus.find((v) => v.order === 2);
-    if (v2) interleavedList.push({ type: 'ai-video', item: v2 });
+      linearChain.push({
+        type: 'topic',
+        id: t.id,
+        globalSeq: t.globalSeq,
+        title: t.title,
+        url: t.url,
+        isUnlocked: t.isUnlocked,
+        isCompleted: t.isCompleted,
+      });
 
-    const batch2 = lessonsWithStatus.filter((l) => l.globalSeq >= 6 && l.globalSeq <= 10);
-    batch2.forEach((l) => interleavedList.push({ type: 'lesson', item: l }));
+      if (t.quiz) {
+        linearChain.push({
+          type: 'quiz',
+          id: t.quiz.id,
+          topicId: t.id,
+          globalSeq: t.globalSeq,
+          title: t.quiz.title,
+          url: t.quiz.url,
+          isUnlocked: t.quiz.isUnlocked,
+          isPassed: t.quiz.isPassed,
+        });
+      }
+    });
 
-    const v3 = aiVideosWithStatus.find((v) => v.order === 3);
-    if (v3) interleavedList.push({ type: 'ai-video', item: v3 });
+    linearChain.push({
+      type: 'project',
+      id: 'capstone-project',
+      title: 'Capstone Project Guidelines',
+      url: `/learn/${course.slug}/project`,
+      isUnlocked: isCapstoneUnlocked,
+    });
 
-    const batch3 = lessonsWithStatus.filter((l) => l.globalSeq >= 11);
-    batch3.forEach((l) => interleavedList.push({ type: 'lesson', item: l }));
+    linearChain.push({
+      type: 'submit',
+      id: 'capstone-submit',
+      title: 'Submit Capstone & Claim Certificate',
+      url: `/learn/${course.slug}/submit`,
+      isUnlocked: isCapstoneUnlocked,
+    });
 
-    const allLessonsCompleted = lessonsWithStatus.length > 0 && lessonsWithStatus.every((l) => l.isCompleted && l.quizPassed);
-    const allVideosWatched = aiVideosWithStatus.length === 0 || aiVideosWithStatus.every((v) => v.isWatched);
-    const isEligibleForCertificate = allLessonsCompleted && allVideosWatched;
+    // 5. Build Grouped Sidebar Representation
+    const groupedModules = course.modules.map((m) => {
+      const videoForModule = aiVideosWithStatus.find((v) => v.order === m.moduleNumber);
+      const topicsForModule = topicsWithStatus.filter((t) => t.moduleId === m.id);
 
-    const totalItems = aiVideosWithStatus.length + lessonsWithStatus.length;
-    const completedVideos = aiVideosWithStatus.filter((v) => v.isWatched).length;
-    const completedLessons = lessonsWithStatus.filter((l) => l.isCompleted && l.quizPassed).length;
-    const progressPct = totalItems > 0 ? Math.round(((completedVideos + completedLessons) / totalItems) * 100) : 0;
+      return {
+        id: m.id,
+        moduleNumber: m.moduleNumber,
+        title: m.title,
+        description: m.description,
+        aiVideo: videoForModule || null,
+        topics: topicsForModule.map((t) => ({
+          id: t.id,
+          lessonNumber: t.lessonNumber,
+          globalSeq: t.globalSeq,
+          title: t.title,
+          durationMinutes: t.durationMinutes,
+          isUnlocked: t.isUnlocked,
+          isCompleted: t.isCompleted,
+          url: t.url,
+          quiz: t.quiz
+            ? {
+                id: t.quiz.id,
+                title: t.quiz.title,
+                questionCount: t.quiz.questionCount,
+                isUnlocked: t.quiz.isUnlocked,
+                isPassed: t.quiz.isPassed,
+                attemptsCount: t.quiz.attemptsCount,
+                scoreDisplay: t.quiz.scoreDisplay,
+                url: t.quiz.url,
+              }
+            : null,
+        })),
+      };
+    });
 
     return {
-      success: true,
       course: {
         id: course.id,
         slug: course.slug,
@@ -508,172 +769,98 @@ export class CoursesService {
         level: course.level,
       },
       isEnrolled,
+      user: currentUser,
       progressPct,
-      isEligibleForCertificate,
       stats: {
-        totalVideos: aiVideosWithStatus.length,
-        watchedVideos: completedVideos,
-        totalLessons: lessonsWithStatus.length,
-        completedLessons,
-        totalItems,
-        completedItems: completedVideos + completedLessons,
+        totalTopics: totalTopicsCount,
+        completedTopics: completedTopicsCount,
+        totalQuizzes: totalTopicsCount,
+        passedQuizzes: passedQuizzesCount,
+        totalVideos,
+        watchedVideos,
+        completedItems,
+        totalScoreableItems,
       },
       aiVideos: aiVideosWithStatus,
-      lessons: lessonsWithStatus,
-      modules: course.modules.map((m) => ({
-        id: m.id,
-        moduleNumber: m.moduleNumber,
-        title: m.title,
-        description: m.description,
-        lessons: lessonsWithStatus.filter((l) => l.moduleId === m.id),
-      })),
-      interleavedCurriculum: interleavedList,
+      topics: topicsWithStatus,
+      groupedModules,
+      capstone: capstoneData,
+      linearChain,
     };
   }
 
-  async getLesson(courseSlug: string, lessonId: string, user?: any) {
-    const course = await this.prisma.course.findUnique({
-      where: { slug: courseSlug },
-      include: {
-        aiVideos: {
-          orderBy: { order: 'asc' },
-        },
-        modules: {
-          include: {
-            lessons: {
-              select: {
-                id: true,
-                lessonNumber: true,
-                title: true,
-                durationMinutes: true,
-                isFreePreview: true,
-                quiz: {
-                  select: { id: true, title: true, passingScore: true, maxAttempts: true },
-                },
-              },
-              orderBy: { lessonNumber: 'asc' },
-            },
-            quiz: {
-              select: { id: true, title: true, passingScore: true, maxAttempts: true },
-            },
-          },
-          orderBy: { moduleNumber: 'asc' },
-        },
-      },
-    });
+  /**
+   * High-speed Curriculum endpoint
+   */
+  async getCurriculum(slugOrId: string, userId?: string) {
+    const data = await this.getCurriculumData(slugOrId, userId);
+    return {
+      success: true,
+      ...data,
+      lessons: data.topics,
+      modules: data.groupedModules,
+    };
+  }
 
-    if (!course) {
-      throw new NotFoundException('Course not found');
+  /**
+   * Topic Full Page Endpoint (Notes only, 1 query)
+   */
+  async getTopicFull(slugOrId: string, topicId: string, user?: any) {
+    const userId = user?.id || user?.sub;
+    const curriculum = await this.getCurriculumData(slugOrId, userId);
+
+    const topicItem = curriculum.topics.find((t) => t.id === topicId);
+    if (!topicItem) {
+      throw new NotFoundException(`Topic ${topicId} not found`);
     }
 
-    const lesson = await this.prisma.lesson.findUnique({
-      where: { id: lessonId },
-      include: {
-        quiz: {
-          include: {
-            questions: {
-              select: {
-                id: true,
-                question: true,
-                optionsJson: true,
-                codeSnippet: true,
-                correctOptionIndex: true,
-                explanation: true,
-              },
-            },
-          },
-        },
+    // Fetch written content
+    const fullLessonDoc = await this.prisma.lesson.findUnique({
+      where: { id: topicId },
+      select: {
+        writtenContent: true,
+        exercisePdfUrl: true,
+        exercisePdfTitle: true,
+        exerciseProjects: true,
         doubts: {
-          include: {
-            user: {
-              select: { id: true, name: true, avatarUrl: true },
-            },
-          },
+          include: { user: { select: { id: true, name: true, avatarUrl: true } } },
           orderBy: { createdAt: 'desc' },
         },
-        module: {
-          include: {
-            course: true,
-            quiz: true,
-          },
-        },
       },
     });
 
-    if (!lesson) {
-      throw new NotFoundException('Lesson not found');
-    }
+    // Find Prev and Next items from linear chain
+    const chainIndex = curriculum.linearChain.findIndex((item) => item.type === 'topic' && item.id === topicId);
+    const prevItem = chainIndex > 0 ? curriculum.linearChain[chainIndex - 1] : null;
+    const nextItem = chainIndex >= 0 && chainIndex < curriculum.linearChain.length - 1 ? curriculum.linearChain[chainIndex + 1] : null;
 
-    const userId = user?.id || user?.sub;
-    const curriculumData = await this.getCurriculum(course.id, userId);
-
-    const targetLessonInCurriculum = curriculumData.lessons.find((l) => l.id === lesson.id);
-    const isLocked = targetLessonInCurriculum ? !targetLessonInCurriculum.isUnlocked : (!lesson.isFreePreview && !curriculumData.isEnrolled && user?.role !== 'ADMIN');
-    const lockReason = targetLessonInCurriculum?.lockReason || (isLocked ? 'Enroll to access this lesson' : '');
-
-    // Parse exercise projects safely
     let parsedProjects: any[] = [];
     try {
-      parsedProjects = JSON.parse(lesson.exerciseProjects || '[]');
+      parsedProjects = JSON.parse(fullLessonDoc?.exerciseProjects || '[]');
     } catch (e) {
       parsedProjects = [];
     }
 
-    // Flat list of all lessons in sequence for prev / next
-    const allSequenceLessons = curriculumData.lessons;
-    const currentIndex = allSequenceLessons.findIndex((l) => l.id === lesson.id);
-    const prevLesson = currentIndex > 0 ? allSequenceLessons[currentIndex - 1] : null;
-    const nextLesson = currentIndex < allSequenceLessons.length - 1 ? allSequenceLessons[currentIndex + 1] : null;
-
-    const currentLessonProgress = targetLessonInCurriculum?.isCompleted || false;
-
     return {
-      lesson: {
-        id: lesson.id,
-        lessonNumber: lesson.lessonNumber,
-        globalSeq: targetLessonInCurriculum?.globalSeq || lesson.lessonNumber,
-        title: lesson.title,
-        durationMinutes: lesson.durationMinutes,
-        summary: lesson.summary,
-        isFreePreview: lesson.isFreePreview,
-        isLocked,
-        lockReason,
-        writtenContent: isLocked ? null : lesson.writtenContent,
-        exercisePdfUrl: isLocked ? null : lesson.exercisePdfUrl,
-        exercisePdfTitle: lesson.exercisePdfTitle || `${lesson.title} - Capstone Exercise Guide`,
+      success: true,
+      topic: {
+        id: topicItem.id,
+        globalSeq: topicItem.globalSeq,
+        lessonNumber: topicItem.lessonNumber,
+        moduleNumber: topicItem.moduleNumber,
+        moduleTitle: topicItem.moduleTitle,
+        title: topicItem.title,
+        durationMinutes: topicItem.durationMinutes,
+        summary: topicItem.summary,
+        isUnlocked: topicItem.isUnlocked,
+        isCompleted: topicItem.isCompleted,
+        lockReason: topicItem.lockReason,
+        writtenContent: topicItem.isUnlocked ? fullLessonDoc?.writtenContent : null,
+        exercisePdfUrl: topicItem.isUnlocked ? fullLessonDoc?.exercisePdfUrl : null,
+        exercisePdfTitle: fullLessonDoc?.exercisePdfTitle || `${topicItem.title} - Resource Guide`,
         exerciseProjects: parsedProjects,
-        isCompleted: currentLessonProgress,
-        quiz: lesson.quiz
-          ? {
-              id: lesson.quiz.id,
-              title: lesson.quiz.title,
-              passingScore: lesson.quiz.passingScore,
-              maxAttempts: lesson.quiz.maxAttempts || 3,
-              isPassed: targetLessonInCurriculum?.quizPassed || false,
-              attemptsCount: userId
-                ? await this.prisma.quizAttempt.count({
-                    where: { userId, quizId: lesson.quiz.id },
-                  })
-                : 0,
-              attemptsExhausted: userId
-                ? (await this.prisma.quizAttempt.count({
-                    where: { userId, quizId: lesson.quiz.id },
-                  })) >= (lesson.quiz.maxAttempts || 3) && !(targetLessonInCurriculum?.quizPassed || false)
-                : false,
-              supportEmail: 'support@devascentacademy.me',
-              questions: isLocked
-                ? []
-                : lesson.quiz.questions.map((q) => ({
-                    id: q.id,
-                    question: q.question,
-                    options: JSON.parse(q.optionsJson || '[]'),
-                    codeSnippet: q.codeSnippet,
-                    explanation: q.explanation,
-                    correctOptionIndex: q.correctOptionIndex,
-                  })),
-            }
-          : null,
-        doubts: (lesson.doubts || []).map((d) => ({
+        associatedQuiz: topicItem.quiz,
+        doubts: (fullLessonDoc?.doubts || []).map((d) => ({
           id: d.id,
           question: d.question,
           answer: d.answer,
@@ -683,32 +870,276 @@ export class CoursesService {
           userAvatar: d.user?.avatarUrl || null,
         })),
       },
-      module: {
-        id: lesson.module.id,
-        title: lesson.module.title,
-        moduleNumber: lesson.module.moduleNumber,
+      prevItem: prevItem ? { ...prevItem } : null,
+      nextItem: nextItem ? { ...nextItem } : null,
+      curriculum: {
+        course: curriculum.course,
+        isEnrolled: curriculum.isEnrolled,
+        progressPct: curriculum.progressPct,
+        stats: curriculum.stats,
+        groupedModules: curriculum.groupedModules,
+        capstone: curriculum.capstone,
       },
-      course: {
-        id: course.id,
-        slug: course.slug,
-        title: course.title,
-        domain: course.domain,
-        level: course.level,
-        type: course.type,
-      },
-      modules: curriculumData.modules,
-      aiVideos: curriculumData.aiVideos,
-      interleavedCurriculum: curriculumData.interleavedCurriculum,
-      navigation: {
-        prevLesson: prevLesson ? { id: prevLesson.id, title: prevLesson.title, isUnlocked: prevLesson.isUnlocked } : null,
-        nextLesson: nextLesson ? { id: nextLesson.id, title: nextLesson.title, isUnlocked: nextLesson.isUnlocked } : null,
-        currentIndex: currentIndex + 1,
-        totalLessons: allSequenceLessons.length,
-        overallProgressPct: curriculumData.progressPct,
-      },
-      isEnrolled: curriculumData.isEnrolled,
-      stats: curriculumData.stats,
+      user: curriculum.user,
     };
+  }
+
+  /**
+   * AI Video Full Page Endpoint (Video only, 1 query)
+   */
+  async getVideoFull(slugOrId: string, videoId: string, user?: any) {
+    const userId = user?.id || user?.sub;
+    const curriculum = await this.getCurriculumData(slugOrId, userId);
+
+    const videoItem = curriculum.aiVideos.find((v) => v.id === videoId);
+    if (!videoItem) {
+      throw new NotFoundException(`Video ${videoId} not found`);
+    }
+
+    const chainIndex = curriculum.linearChain.findIndex((item) => item.type === 'video' && item.id === videoId);
+    const prevItem = chainIndex > 0 ? curriculum.linearChain[chainIndex - 1] : null;
+    const nextItem = chainIndex >= 0 && chainIndex < curriculum.linearChain.length - 1 ? curriculum.linearChain[chainIndex + 1] : null;
+
+    // Find the first topic of this milestone
+    const targetTopic = curriculum.topics.find((t) => t.globalSeq === videoItem.targetTopicSeq) || curriculum.topics[0];
+
+    return {
+      success: true,
+      video: {
+        id: videoItem.id,
+        order: videoItem.order,
+        title: videoItem.title,
+        description: videoItem.description,
+        videoUrl: videoItem.videoUrl,
+        durationSec: videoItem.durationSec,
+        isUnlocked: videoItem.isUnlocked,
+        isWatched: videoItem.isWatched,
+        lockReason: videoItem.lockReason,
+        targetTopicId: targetTopic?.id,
+        targetTopicSeq: videoItem.targetTopicSeq,
+        targetTopicTitle: targetTopic?.title,
+        targetTopicUrl: targetTopic?.url || `/learn/${curriculum.course.slug}/topic/${targetTopic?.id}`,
+      },
+      prevItem: prevItem ? { ...prevItem } : null,
+      nextItem: nextItem ? { ...nextItem } : null,
+      curriculum: {
+        course: curriculum.course,
+        isEnrolled: curriculum.isEnrolled,
+        progressPct: curriculum.progressPct,
+        stats: curriculum.stats,
+        groupedModules: curriculum.groupedModules,
+        capstone: curriculum.capstone,
+      },
+      user: curriculum.user,
+    };
+  }
+
+  /**
+   * Quiz Full Page Endpoint (Quiz only, 1 query)
+   */
+  async getQuizFull(slugOrId: string, quizId: string, user?: any) {
+    const userId = user?.id || user?.sub;
+    const curriculum = await this.getCurriculumData(slugOrId, userId);
+
+    const quizDoc = await this.prisma.quiz.findUnique({
+      where: { id: quizId },
+      include: {
+        questions: {
+          orderBy: { order: 'asc' },
+        },
+        lesson: {
+          select: {
+            id: true,
+            title: true,
+            lessonNumber: true,
+            module: { select: { id: true, moduleNumber: true, title: true } },
+          },
+        },
+      },
+    });
+
+    if (!quizDoc) {
+      throw new NotFoundException(`Quiz ${quizId} not found`);
+    }
+
+    const topicItem = curriculum.topics.find((t) => t.quiz?.id === quizId || t.id === quizDoc.lessonId);
+    const chainIndex = curriculum.linearChain.findIndex((item) => item.type === 'quiz' && item.id === quizId);
+    const prevItem = chainIndex > 0 ? curriculum.linearChain[chainIndex - 1] : null;
+    const nextItem = chainIndex >= 0 && chainIndex < curriculum.linearChain.length - 1 ? curriculum.linearChain[chainIndex + 1] : null;
+
+    // User attempts count & history
+    let attemptsCount = 0;
+    let highestScorePct = 0;
+    let isPassed = false;
+    let lastAttempt: any = null;
+
+    if (userId) {
+      const attempts = await this.prisma.quizAttempt.findMany({
+        where: { userId, quizId },
+        orderBy: { createdAt: 'desc' },
+      });
+      attemptsCount = attempts.length;
+      if (attempts.length > 0) {
+        lastAttempt = attempts[0];
+        highestScorePct = Math.max(...attempts.map((a) => a.score));
+        isPassed = attempts.some((a) => a.passed);
+      }
+    }
+
+    const maxAttempts = quizDoc.maxAttempts || 3;
+    const isUnlocked = topicItem ? topicItem.isCompleted : false;
+    const remainingAttempts = Math.max(0, maxAttempts - attemptsCount);
+
+    return {
+      success: true,
+      quiz: {
+        id: quizDoc.id,
+        title: quizDoc.title,
+        passingScore: quizDoc.passingScore || 60,
+        maxAttempts,
+        timeLimitMin: quizDoc.timeLimitMin || 15,
+        isUnlocked,
+        isPassed,
+        attemptsCount,
+        remainingAttempts,
+        attemptsExhausted: !isPassed && remainingAttempts === 0,
+        highestScorePct,
+        supportEmail: 'support@devascentacademy.me',
+        questions: isUnlocked
+          ? quizDoc.questions.map((q) => ({
+              id: q.id,
+              order: q.order,
+              question: q.question,
+              options: JSON.parse(q.optionsJson || '[]'),
+              codeSnippet: q.codeSnippet,
+              explanation: isPassed ? q.explanation : null,
+              correctOptionIndex: isPassed ? q.correctOptionIndex : undefined,
+            }))
+          : [],
+        lastAttempt: lastAttempt
+          ? {
+              score: lastAttempt.score,
+              passed: lastAttempt.passed,
+              attemptNum: lastAttempt.attemptNum,
+              answers: lastAttempt.answers,
+              completedAt: lastAttempt.completedAt,
+            }
+          : null,
+      },
+      topic: topicItem
+        ? {
+            id: topicItem.id,
+            globalSeq: topicItem.globalSeq,
+            title: topicItem.title,
+            isCompleted: topicItem.isCompleted,
+            url: topicItem.url,
+          }
+        : null,
+      prevItem: prevItem ? { ...prevItem } : null,
+      nextItem: nextItem ? { ...nextItem } : null,
+      curriculum: {
+        course: curriculum.course,
+        isEnrolled: curriculum.isEnrolled,
+        progressPct: curriculum.progressPct,
+        stats: curriculum.stats,
+        groupedModules: curriculum.groupedModules,
+        capstone: curriculum.capstone,
+      },
+      user: curriculum.user,
+    };
+  }
+
+  /**
+   * Capstone Full Page Endpoint
+   */
+  async getCapstoneFull(slugOrId: string, user?: any) {
+    const userId = user?.id || user?.sub;
+    const curriculum = await this.getCurriculumData(slugOrId, userId);
+
+    const fullCourse = await this.prisma.course.findFirst({
+      where: { OR: [{ id: slugOrId }, { slug: slugOrId }] },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        projects: true,
+        assignments: true,
+        requirements: true,
+      },
+    });
+
+    // Find the capstone-specific lesson PDF — specifically the lesson titled with "Capstone Architecture"
+    // (This ensures the PDF only shows on the Capstone page, not on every individual topic notes page)
+    const capstoneLesson = await this.prisma.lesson.findFirst({
+      where: {
+        module: { courseId: curriculum.course.id },
+        exercisePdfUrl: { not: null },
+        title: { contains: 'Capstone' },
+      },
+      orderBy: { lessonNumber: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        exercisePdfUrl: true,
+        exercisePdfTitle: true,
+        exerciseProjects: true,
+      },
+    });
+
+    let parsedProjects: any[] = [];
+    let parsedAssignments: string[] = [];
+    let parsedRequirements: string[] = [];
+
+    try { parsedProjects = JSON.parse(fullCourse?.projects || '[]'); } catch (e) {}
+    try { parsedAssignments = JSON.parse(fullCourse?.assignments || '[]'); } catch (e) {}
+    try { parsedRequirements = JSON.parse(fullCourse?.requirements || '[]'); } catch (e) {}
+
+    // If capstoneLesson has exerciseProjects, merge
+    if (capstoneLesson?.exerciseProjects) {
+      try {
+        const lessonProjects = JSON.parse(capstoneLesson.exerciseProjects);
+        if (Array.isArray(lessonProjects) && lessonProjects.length > 0) {
+          parsedProjects = lessonProjects;
+        }
+      } catch (e) {}
+    }
+
+    let certificate: any = null;
+    if (userId) {
+      certificate = await this.prisma.certificate.findFirst({
+        where: { userId, courseId: curriculum.course.id },
+      });
+    }
+
+    return {
+      success: true,
+      capstone: {
+        ...curriculum.capstone,
+        courseTitle: curriculum.course.title,
+        exercisePdfUrl: capstoneLesson?.exercisePdfUrl || null,
+        exercisePdfTitle: capstoneLesson?.exercisePdfTitle || `${curriculum.course.title} Capstone Project Guide`,
+        projects: parsedProjects,
+        assignments: parsedAssignments,
+        requirements: parsedRequirements,
+        certificate,
+      },
+      curriculum: {
+        course: curriculum.course,
+        isEnrolled: curriculum.isEnrolled,
+        progressPct: curriculum.progressPct,
+        stats: curriculum.stats,
+        groupedModules: curriculum.groupedModules,
+        capstone: curriculum.capstone,
+      },
+      user: curriculum.user,
+    };
+  }
+
+  /**
+   * Backward-compatible getLesson
+   */
+  async getLesson(courseSlug: string, lessonId: string, user?: any) {
+    return this.getTopicFull(courseSlug, lessonId, user);
   }
 
   async submitDoubt(userId: string, lessonId: string, question: string) {
@@ -846,7 +1277,13 @@ export class CoursesService {
     };
   }
 
-  async submitLessonQuiz(userId: string, lessonId: string, quizId: string, answers: { questionId: string; selectedIndex: number }[]) {
+  async submitLessonQuiz(
+    userId: string,
+    lessonId: string,
+    quizId: string,
+    answers: { questionId: string; selectedIndex: number }[],
+    startedAtIso?: string,
+  ) {
     const quiz = await this.prisma.quiz.findUnique({
       where: { id: quizId },
       include: {
@@ -888,6 +1325,13 @@ export class CoursesService {
       );
     }
 
+    // Server-side timer & grace validation
+    const startedAt = startedAtIso ? new Date(startedAtIso) : new Date(Date.now() - 60000);
+    const completedAt = new Date();
+    const timeSpentSeconds = Math.max(1, Math.round((completedAt.getTime() - startedAt.getTime()) / 1000));
+    const timeLimitMin = quiz.timeLimitMin || 15;
+    const maxAllowedSeconds = (timeLimitMin * 60) + 30; // 30s grace period for network latency
+
     let correctCount = 0;
     const feedback = quiz.questions.map((q) => {
       const submittedAnswer = answers.find((a) => a.questionId === q.id);
@@ -902,8 +1346,9 @@ export class CoursesService {
       };
     });
 
+    const passingScore = quiz.passingScore || 60;
     const scorePct = quiz.questions.length > 0 ? Math.round((correctCount / quiz.questions.length) * 100) : 100;
-    const passed = scorePct >= quiz.passingScore;
+    const passed = scorePct >= passingScore;
     const currentAttemptNum = priorAttemptsCount + 1;
 
     // Convert answers to object for json storage
@@ -929,6 +1374,9 @@ export class CoursesService {
           passed,
           answers: answersMap,
           attemptNum: currentAttemptNum,
+          startedAt,
+          completedAt,
+          timeSpentSeconds,
         },
       }),
     ]);
@@ -950,6 +1398,9 @@ export class CoursesService {
       attemptNum: currentAttemptNum,
       maxAttempts,
       remainingAttempts,
+      timeSpentSeconds,
+      timeLimitMin,
+      timeExpired: timeSpentSeconds > maxAllowedSeconds,
       attemptsExhausted: !passed && remainingAttempts === 0,
       supportEmail: 'support@devascentacademy.me',
     };

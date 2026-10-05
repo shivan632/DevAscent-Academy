@@ -42,6 +42,10 @@ model User {
   quizAttempts           QuizAttempt[]
   aiVideoProgress        AiVideoProgress[]
   refunds                Refund[]
+  couponsCreated         Coupon[]                @relation("CouponCreator")
+  doubtsAnswered         Doubt[]                 @relation("DoubtAnswerer")
+  notificationsSent      Notification[]          @relation("NotificationSender")
+  notificationReads      NotificationRead[]
 }
 
 model OtpVerification {
@@ -87,6 +91,9 @@ model Course {
   modules                Module[]
   payments               Payment[]
   aiVideos               AiVideo[]
+  coupons                Coupon[]                @relation("CourseCoupons")
+  doubts                 Doubt[]
+  notifications          Notification[]          @relation("CourseNotifications")
 }
 
 model AiVideo {
@@ -119,6 +126,7 @@ model AiVideoProgress {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, aiVideoId])
+  @@index([userId, watched])
 }
 
 model Module {
@@ -150,6 +158,8 @@ model Lesson {
   module           Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   progressRecords  LessonProgress[]
   quiz             Quiz?
+
+  @@index([moduleId, lessonNumber])
 }
 
 model Quiz {
@@ -159,6 +169,7 @@ model Quiz {
   title        String
   passingScore Int              @default(70)
   maxAttempts  Int              @default(3)
+  timeLimitMin Int?             @default(15) // Quiz timer in minutes
   createdAt    DateTime         @default(now())
   lesson       Lesson?          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   module       Module?          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
@@ -193,35 +204,46 @@ model QuizSubmission {
 }
 
 model QuizAttempt {
-  id         String   @id @default(cuid())
-  userId     String
-  quizId     String
-  score      Int      // 0-100
-  passed     Boolean  @default(false)
-  answers    Json     // { questionId: selectedIndex }
-  attemptNum Int      @default(1) // 1, 2, or 3
-  createdAt  DateTime @default(now())
-  quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String    @id @default(cuid())
+  userId           String
+  quizId           String
+  score            Int       // 0-100
+  passed           Boolean   @default(false)
+  answers          Json      // { questionId: selectedIndex }
+  attemptNum       Int       @default(1) // 1, 2, or 3
+  startedAt        DateTime  @default(now())
+  completedAt      DateTime?
+  timeSpentSeconds Int?
+  createdAt        DateTime  @default(now())
+  quiz             Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, quizId])
   @@index([userId, quizId, passed])
 }
 
 model Doubt {
-  id        String   @id @default(cuid())
-  userId    String
-  lessonId  String
-  question  String
-  answer    String?
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  userId       String
+  courseId     String?
+  lessonId     String?
+  question     String
+  answer       String?
+  status       String    @default("PENDING") // PENDING | ANSWERED
+  isUrgent     Boolean   @default(false)
+  answeredById String?
+  answeredAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  course       Course?   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson       Lesson?   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answeredBy   User?     @relation("DoubtAnswerer", fields: [answeredById], references: [id])
 
+  @@index([courseId, status])
   @@index([lessonId])
   @@index([userId])
+  @@index([createdAt])
 }
 
 model Enrollment {
@@ -252,6 +274,7 @@ model LessonProgress {
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
+  @@index([userId, isCompleted])
 }
 
 model Payment {
@@ -267,6 +290,10 @@ model Payment {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   couponCode        String?
+  couponId          String?
+  originalAmount    Int?
+  discountApplied   Int?
+  coupon            Coupon?  @relation("CouponPayments", fields: [couponId], references: [id])
   course            Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   refunds           Refund[]
@@ -351,3 +378,58 @@ model AuditLog {
   @@index([adminId, createdAt])
   @@index([action, createdAt])
 }
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  description   String?
+  discountType  String    // "PERCENT" | "FLAT"
+  discountValue Int       // PERCENT: 1-100, FLAT: paise
+  maxUses       Int       @default(1)
+  usedCount     Int       @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean   @default(true)
+  courseId      String?
+  course        Course?   @relation("CourseCoupons", fields: [courseId], references: [id])
+  isAutoApply   Boolean   @default(false)
+  createdById   String?
+  createdBy     User?     @relation("CouponCreator", fields: [createdById], references: [id])
+  payments      Payment[] @relation("CouponPayments")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([code, isActive])
+  @@index([expiresAt])
+}
+
+model Notification {
+  id             String             @id @default(cuid())
+  title          String
+  message        String
+  type           String             @default("INFO") // INFO | ALERT | ANNOUNCEMENT | SYSTEM
+  targetRole     String             @default("ALL")  // ALL | STUDENT | ADMIN
+  targetCohort   Int?
+  targetCourseId String?
+  targetCourse   Course?            @relation("CourseNotifications", fields: [targetCourseId], references: [id], onDelete: Cascade)
+  createdById    String?
+  createdBy      User?              @relation("NotificationSender", fields: [createdById], references: [id])
+  reads          NotificationRead[]
+  createdAt      DateTime           @default(now())
+
+  @@index([targetRole, createdAt])
+  @@index([targetCourseId])
+}
+
+model NotificationRead {
+  id             String       @id @default(cuid())
+  userId         String
+  notificationId String
+  readAt         DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationId])
+  @@index([userId])
+}
+
+

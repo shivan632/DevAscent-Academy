@@ -95,6 +95,7 @@ export const api = {
   // Progress & Enrollments
   getMyEnrollments: () => fetchApi('/me/enrollments'),
   getMyStats: () => fetchApi('/me/stats'),
+  getMyAnalytics: () => fetchApi('/me/analytics'),
   getCourseProgress: (courseId: string) => fetchApi(`/progress/${courseId}`),
   completeLesson: (courseId: string, lessonId: string) => fetchApi(`/progress/${courseId}/lessons/${lessonId}/complete`, { method: 'POST' }),
   submitQuiz: (courseId: string, answers: any) => fetchApi(`/progress/${courseId}/quiz`, { method: 'POST', body: JSON.stringify({ answers }) }),
@@ -116,12 +117,29 @@ export const api = {
   createOrder: (courseId: string, couponCode?: string, studentDetails?: any) =>
     fetchApi('/payments/create-order', { method: 'POST', body: JSON.stringify({ courseId, couponCode, studentDetails }) }),
   verifyPayment: (paymentData: any) => fetchApi('/payments/verify', { method: 'POST', body: JSON.stringify(paymentData) }),
+  validateCoupon: (code: string, courseId: string, amountInPaise: number) =>
+    fetchApi('/coupons/validate', { method: 'POST', body: JSON.stringify({ code, courseId, amountInPaise }) }),
 
   // Certificates
   getMyCertificates: () => fetchApi('/certificates/my'),
   getCertificate: (courseId: string) => fetchApi(`/certificates/me/${courseId}`),
   verifyCertificatePublic: (certId: string) => fetchApi(`/verify/${certId}`),
   getDownloadUrl: (certId: string) => `${getApiBaseUrl()}/certificates/${certId}/download`,
+
+  // Doubts & Q/A Forum
+  createDoubt: (data: { question: string; courseId?: string; lessonId?: string; isUrgent?: boolean }) =>
+    fetchApi('/doubts', { method: 'POST', body: JSON.stringify(data) }),
+  getMyDoubts: (params?: { courseId?: string; status?: string; page?: number; limit?: number }) =>
+    fetchApi(`/doubts/my${buildQuery(params)}`),
+  getLessonDoubts: (lessonId: string) => fetchApi(`/doubts/lesson/${lessonId}`),
+
+  // In-App Notifications
+  getNotifications: (params?: { page?: number; limit?: number }) =>
+    fetchApi(`/notifications${buildQuery(params)}`),
+  markNotificationRead: (id: string) =>
+    fetchApi(`/notifications/${id}/read`, { method: 'PATCH' }),
+  markAllNotificationsRead: () =>
+    fetchApi('/notifications/read-all', { method: 'POST' }),
 
   // Refunds
   requestRefund: (refundData: { orderId: string; reason: string; upiId?: string }) => fetchApi('/refunds/apply', { method: 'POST', body: JSON.stringify(refundData) }),
@@ -227,6 +245,36 @@ export const api = {
     // Quiz Reset
     resetStudentQuiz: (quizId: string, userId: string) =>
       fetchApi(`/admin/quizzes/${quizId}/reset/${userId}`, { method: 'POST' }),
+
+    // Coupons
+    getCoupons: (params?: { page?: number; limit?: number; status?: string; search?: string; courseId?: string }) => {
+      return fetchApi(`/admin/coupons${buildQuery(params)}`);
+    },
+    getCouponById: (id: string) => fetchApi(`/admin/coupons/${id}`),
+    createCoupon: (data: any) =>
+      fetchApi('/admin/coupons', { method: 'POST', body: JSON.stringify(data) }),
+    updateCoupon: (id: string, data: any) =>
+      fetchApi(`/admin/coupons/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    deactivateCoupon: (id: string) =>
+      fetchApi(`/admin/coupons/${id}`, { method: 'DELETE' }),
+
+    // Student Queries / Q&A Desk
+    getQueries: (params?: { page?: number; limit?: number; status?: string; search?: string; courseId?: string; isUrgent?: boolean }) => {
+      return fetchApi(`/admin/queries${buildQuery(params)}`);
+    },
+    answerQuery: (id: string, answer: string) =>
+      fetchApi(`/admin/queries/${id}/answer`, { method: 'PATCH', body: JSON.stringify({ answer }) }),
+    deleteQuery: (id: string) =>
+      fetchApi(`/admin/queries/${id}`, { method: 'DELETE' }),
+
+    // In-App Notifications Broadcast
+    createNotification: (data: any) =>
+      fetchApi('/admin/notifications', { method: 'POST', body: JSON.stringify(data) }),
+    getBroadcasts: (params?: { page?: number; limit?: number; search?: string }) => {
+      return fetchApi(`/admin/notifications${buildQuery(params)}`);
+    },
+    deleteBroadcast: (id: string) =>
+      fetchApi(`/admin/notifications/${id}`, { method: 'DELETE' }),
   },
 
   // Student AI Video endpoints

@@ -1,6 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Optimize heavy barrel libraries so Turbopack/Webpack skips parsing 1,000s of unused modules
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'highlight.js',
+      'rehype-highlight',
+      'react-markdown',
+      'canvas-confetti',
+      'bootstrap-icons',
+      'clsx',
+      'tailwind-merge',
+    ],
+  },
   images: {
     remotePatterns: [
       {

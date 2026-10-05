@@ -74,6 +74,49 @@ export class CoursesController {
     return this.coursesService.applyCohort(slug, user.id || user.sub, note);
   }
 
+  @Get(':slug/topics/:topicId/full')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getTopicFull(
+    @Param('slug') slug: string,
+    @Param('topicId') topicId: string,
+    @Req() req: Request,
+  ) {
+    const user = (req as any).user;
+    return this.coursesService.getTopicFull(slug, topicId, user);
+  }
+
+  @Get(':slug/videos/:videoId/full')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getVideoFull(
+    @Param('slug') slug: string,
+    @Param('videoId') videoId: string,
+    @Req() req: Request,
+  ) {
+    const user = (req as any).user;
+    return this.coursesService.getVideoFull(slug, videoId, user);
+  }
+
+  @Get(':slug/quizzes/:quizId/full')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getQuizFull(
+    @Param('slug') slug: string,
+    @Param('quizId') quizId: string,
+    @Req() req: Request,
+  ) {
+    const user = (req as any).user;
+    return this.coursesService.getQuizFull(slug, quizId, user);
+  }
+
+  @Get(':slug/capstone/full')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getCapstoneFull(
+    @Param('slug') slug: string,
+    @Req() req: Request,
+  ) {
+    const user = (req as any).user;
+    return this.coursesService.getCapstoneFull(slug, user);
+  }
+
   @Get(':slug/lessons/:lessonId')
   @UseGuards(OptionalJwtAuthGuard)
   async getLesson(
@@ -96,6 +139,17 @@ export class CoursesController {
     return this.coursesService.submitDoubt(user.id || user.sub, lessonId, question);
   }
 
+  @Post(':slug/topics/:topicId/complete')
+  @UseGuards(JwtAuthGuard)
+  async completeTopic(
+    @Param('slug') slug: string,
+    @Param('topicId') topicId: string,
+    @CurrentUser() user: any,
+    @Body('forceStatus') forceStatus?: boolean,
+  ) {
+    return this.coursesService.toggleLessonComplete(user.id || user.sub, topicId, forceStatus);
+  }
+
   @Post(':slug/lessons/:lessonId/complete')
   @UseGuards(JwtAuthGuard)
   async completeLesson(
@@ -107,6 +161,18 @@ export class CoursesController {
     return this.coursesService.toggleLessonComplete(user.id || user.sub, lessonId, forceStatus);
   }
 
+  @Post(':slug/quizzes/:quizId/submit')
+  @UseGuards(JwtAuthGuard)
+  async submitQuiz(
+    @Param('slug') slug: string,
+    @Param('quizId') quizId: string,
+    @CurrentUser() user: any,
+    @Body('answers') answers: { questionId: string; selectedIndex: number }[],
+    @Body('startedAt') startedAt?: string,
+  ) {
+    return this.coursesService.submitLessonQuiz(user.id || user.sub, '', quizId, answers, startedAt);
+  }
+
   @Post(':slug/lessons/:lessonId/quiz-submit')
   @UseGuards(JwtAuthGuard)
   async submitLessonQuiz(
@@ -115,7 +181,8 @@ export class CoursesController {
     @CurrentUser() user: any,
     @Body('quizId') quizId: string,
     @Body('answers') answers: { questionId: string; selectedIndex: number }[],
+    @Body('startedAt') startedAt?: string,
   ) {
-    return this.coursesService.submitLessonQuiz(user.id || user.sub, lessonId, quizId, answers);
+    return this.coursesService.submitLessonQuiz(user.id || user.sub, lessonId, quizId, answers, startedAt);
   }
 }

@@ -27,6 +27,9 @@ import {
   IndianRupee,
   ScanLine,
   ClipboardList,
+  Tag,
+  HelpCircle,
+  Bell,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -49,12 +52,15 @@ const navGroups = [
       { href: '/admin/students', label: 'Students', icon: Users },
       { href: '/admin/enrollments', label: 'Enrollments', icon: ClipboardList },
       { href: '/admin/submissions', label: 'Submissions', icon: FileCheck, badgeKey: 'pendingSubmissions' as const },
+      { href: '/admin/queries', label: 'Queries (Q&A)', icon: HelpCircle, badgeKey: 'pendingQueries' as const },
+      { href: '/admin/notifications', label: 'Broadcasts', icon: Bell },
     ],
   },
   {
     label: 'Finance',
     items: [
       { href: '/admin/payments', label: 'Payments', icon: IndianRupee },
+      { href: '/admin/coupons', label: 'Coupons', icon: Tag },
       { href: '/admin/refunds', label: 'Refund Requests', icon: CreditCard, badgeKey: 'pendingRefunds' as const },
     ],
   },
