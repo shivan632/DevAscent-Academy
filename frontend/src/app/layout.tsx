@@ -43,10 +43,34 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: 'DevAscent Academy',
+    url: 'https://www.devascentacademy.me',
+    logo: 'https://www.devascentacademy.me/logo.png',
+    description: 'Premier Indian EdTech and Virtual Internship Platform providing verifiable credentials, hands-on production codebases, and mentor support.',
+    sameAs: [
+      'https://github.com/shivan632/DevAscent-Academy',
+      'https://discord.gg/devascent',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+91-9935806722',
+      contactType: 'customer support',
+      areaServed: 'IN',
+      availableLanguage: ['English', 'Hindi'],
+    },
+  };
+
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`dark ${plusJakarta.variable} ${inter.variable} scroll-smooth antialiased`}>
       <head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
       </head>
       <body className="min-h-screen flex flex-col bg-[#090D16] text-[#F1F5F9] font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
         <ThemeProvider>

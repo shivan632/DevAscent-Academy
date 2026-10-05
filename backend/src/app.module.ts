@@ -15,13 +15,16 @@ import { CouponsModule } from './modules/coupons/coupons.module';
 import { DoubtsModule } from './modules/doubts/doubts.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
-        limit: 100,
+        limit: 120,
       },
     ]),
     PrismaModule,
@@ -37,6 +40,12 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     CouponsModule,
     DoubtsModule,
     NotificationsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
