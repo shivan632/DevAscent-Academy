@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { useAuthStore } from '../../lib/store/authStore';
@@ -24,9 +24,12 @@ import {
   GraduationCap
 } from 'lucide-react';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setUser } = useAuthStore();
+
+  const redirectParam = searchParams.get('redirect');
 
   // Step 1: Register fields
   const [name, setName] = useState('');
@@ -140,11 +143,8 @@ export default function RegisterPage() {
               const rawUser = res?.data?.user || res?.user || res?.data;
               if (rawUser) {
                 setUser(rawUser);
-                if (rawUser.role === 'ADMIN') {
-                  router.push('/admin/submissions');
-                } else {
-                  router.push('/dashboard');
-                }
+                const target = redirectParam || (rawUser.role === 'ADMIN' ? '/admin/submissions' : '/dashboard');
+                router.push(target);
               }
             } catch (err: any) {
               setError(err?.message || 'Google registration failed. Please try again.');
@@ -184,9 +184,11 @@ export default function RegisterPage() {
       }
       if (rawUser) {
         setUser(rawUser);
-        router.push('/dashboard');
+        const target = redirectParam || (rawUser.role === 'ADMIN' ? '/admin/submissions' : '/dashboard');
+        router.push(target);
       } else {
-        router.push('/login?verified=true');
+        const target = redirectParam ? `/login?verified=true&redirect=${encodeURIComponent(redirectParam)}` : '/login?verified=true';
+        router.push(target);
       }
     } catch (err: any) {
       setError(err?.message || 'Invalid or expired code. Please try again.');
@@ -455,6 +457,17 @@ export default function RegisterPage() {
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </button>
                 </form>
+
+                {/* Already have an account */}
+                <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80">
+                  <span>Already have an enrolled account? </span>
+                  <Link
+                    href={redirectParam ? `/login?redirect=${encodeURIComponent(redirectParam)}` : '/login'}
+                    className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    Sign In Now
+                  </Link>
+                </div>
               </>
             ) : (
               /* OTP Screen */
@@ -547,5 +560,13 @@ export default function RegisterPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#F8F9FF] dark:bg-[#090d16]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

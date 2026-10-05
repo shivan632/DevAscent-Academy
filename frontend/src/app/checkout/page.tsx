@@ -33,7 +33,7 @@ import { api } from '../../lib/api';
 function CheckoutForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, setUser, isAuthenticated } = useAuthStore();
+  const { user, setUser, isAuthenticated, isLoading: authLoading } = useAuthStore();
 
   const courseParam = searchParams.get('course') || 'web-development-internship';
   const priceParam = searchParams.get('price');
@@ -136,6 +136,12 @@ function CheckoutForm() {
 
   const handlePayNow = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isAuthenticated || !user) {
+      alert('You must be signed in to your account to enroll and proceed to payment.');
+      router.push(`/login?redirect=${encodeURIComponent(`/checkout?course=${courseParam}${priceParam ? `&price=${priceParam}` : ''}`)}`);
+      return;
+    }
 
     if (!fullName.trim()) {
       alert('Please provide your Full Legal Name for your certificate.');
@@ -271,7 +277,74 @@ function CheckoutForm() {
         </p>
       </div>
 
-      {paymentSuccess && successDetails ? (
+      {!authLoading && !isAuthenticated && !user ? (
+        /* Authentication Required Gate */
+        <div className="relative z-20 max-w-xl mx-auto bg-slate-900/90 backdrop-blur-2xl border border-indigo-500/40 rounded-3xl p-8 sm:p-10 text-center shadow-2xl shadow-indigo-500/10 space-y-6 overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-500 animate-pulse" />
+          
+          <div className="w-16 h-16 bg-indigo-500/15 border border-indigo-400/30 rounded-2xl flex items-center justify-center mx-auto text-indigo-400 shadow-xl shadow-indigo-500/20">
+            <Lock className="w-8 h-8 text-amber-400" />
+          </div>
+
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+              <span>AUTHENTICATION REQUIRED TO ENROLL</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">Please Sign In to Continue</h2>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+              To link your enrollment records, course curriculum, and verifiable cryptographic certificates to your student account, you must sign in or register before proceeding to payment.
+            </p>
+          </div>
+
+          {/* Selected Course Summary Preview */}
+          <div className="bg-slate-950/80 rounded-2xl p-5 text-left text-xs border border-slate-800 space-y-3 shadow-inner">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
+              <span className="font-mono text-[11px] text-slate-400">Selected Program:</span>
+              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
+                {selectedCourse.type === 'INTERNSHIP' ? '4-WK INTERNSHIP' : '6-WK ACCELERATOR'}
+              </span>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white">{selectedCourse.title}</h4>
+              <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{selectedCourse.slug}</p>
+            </div>
+            <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-xs">
+              <span className="text-slate-400 font-mono">Payable Amount:</span>
+              <span className="text-base font-extrabold text-emerald-400 font-mono">₹{initialEarlyBird}</span>
+            </div>
+          </div>
+
+          {/* CTAs */}
+          <div className="space-y-3 pt-2">
+            <Link
+              href={`/login?redirect=${encodeURIComponent(`/checkout?course=${courseParam}${priceParam ? `&price=${priceParam}` : ''}`)}`}
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-600/30 transition-all transform hover:scale-[1.01] active:scale-[0.99]"
+            >
+              <UserCheck className="w-4 h-4" />
+              <span>Sign In to Your Account</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href={`/register?redirect=${encodeURIComponent(`/checkout?course=${courseParam}${priceParam ? `&price=${priceParam}` : ''}`)}`}
+              className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs sm:text-sm font-semibold transition-all"
+            >
+              <Sparkles className="w-4 h-4 text-indigo-400" />
+              <span>New Student? Create Free Account</span>
+            </Link>
+
+            <div className="pt-2">
+              <Link
+                href="/courses"
+                className="text-xs text-slate-400 hover:text-slate-200 transition-colors inline-flex items-center gap-1"
+              >
+                <span>← Browse other courses in catalog</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : paymentSuccess && successDetails ? (
         /* Liquid Animated Success Modal */
         <div className="relative z-20 max-w-xl mx-auto bg-slate-900/80 backdrop-blur-2xl border border-emerald-500/40 rounded-3xl p-8 sm:p-10 text-center shadow-2xl shadow-emerald-500/10 space-y-6 overflow-hidden">
           {/* Subtle liquid glow top line */}

@@ -35,7 +35,7 @@ export default function CourseDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const slug = (params?.slug as string) || 'full-stack-accelerator';
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
 
   const [course, setCourse] = useState<any>(null);
   const [modules, setModules] = useState<any[]>([]);
@@ -407,10 +407,14 @@ export default function CourseDetailsPage() {
                 ) : course?.requiresApproval ? (
                   <div className="space-y-2">
                     <Link
-                      href={`/checkout?course=${slug}`}
+                      href={
+                        isAuthenticated && user
+                          ? `/checkout?course=${slug}`
+                          : `/login?redirect=${encodeURIComponent(`/checkout?course=${slug}`)}`
+                      }
                       className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/25 transition-all text-sm"
                     >
-                      <span>Reserve Seat & Checkout</span>
+                      <span>Reserve Seat &amp; Checkout</span>
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                     <button
@@ -423,7 +427,11 @@ export default function CourseDetailsPage() {
                   </div>
                 ) : (
                   <Link
-                    href={`/checkout?course=${slug}`}
+                    href={
+                      isAuthenticated && user
+                        ? `/checkout?course=${slug}`
+                        : `/login?redirect=${encodeURIComponent(`/checkout?course=${slug}`)}`
+                    }
                     className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/25 transition-all text-sm"
                   >
                     <span>Enroll in Cohort #{course?.cohortNumber || 14}</span>

@@ -33,6 +33,11 @@ export class CoursesController {
     return this.coursesService.findFeatured();
   }
 
+  @Get('platform/telemetry')
+  async getPlatformTelemetry() {
+    return this.coursesService.getPlatformTelemetry();
+  }
+
   @Get(':slug')
   @UseGuards(OptionalJwtAuthGuard)
   async getCourseBySlug(

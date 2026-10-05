@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'DevAscent Academy' }],
   openGraph: {
     title: 'DevAscent Academy — Become a Full-Stack Developer',
-    description: 'Build & Ship 4 Production Apps in 6 Weeks. ₹1,499 Early Bird Pricing with 7-Day Money-Back Guarantee.',
+    description: 'Build & Ship 4 Production Apps in 6 Weeks. ₹599 Early Bird Pricing with 7-Day Money-Back Guarantee.',
     url: 'https://www.devascentacademy.me',
     siteName: 'DevAscent Academy',
     type: 'website',

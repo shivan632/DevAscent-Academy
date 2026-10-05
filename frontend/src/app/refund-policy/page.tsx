@@ -78,7 +78,7 @@ const REFUND_FAQS = [
   },
   {
     q: 'What if I enrolled with a discount coupon or offer code?',
-    a: 'You will receive 100% of the actual net amount paid during checkout. If you paid ₹1,499, you will receive the full ₹1,499 back with zero processing deductions.',
+    a: 'You will receive 100% of the actual net amount paid during checkout (e.g. ₹599 or ₹199–₹499) back with zero processing deductions.',
   },
   {
     q: 'Can I switch to another cohort instead of taking a refund?',
@@ -174,7 +174,7 @@ export default function RefundPolicyPage() {
                 </div>
                 <div className="text-left">
                   <span className="text-xs font-bold text-white block">100% Full Refund</span>
-                  <span className="text-[10px] text-slate-400">₹1,499 returned in full</span>
+                  <span className="text-[10px] text-slate-400">Net fee returned in full</span>
                 </div>
               </div>
 
@@ -214,7 +214,7 @@ export default function RefundPolicyPage() {
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed pl-0 sm:pl-11">
-                We are confident in the engineering rigor, hands-on capstone depth, and practical mentorship of our virtual internship cohorts. If within <span className="text-emerald-400 font-bold">7 calendar days</span> of your enrollment timestamp you feel this program does not match your expectations, we will issue a full <span className="text-white font-bold">100% refund of your enrollment fee (₹1,499)</span>.
+                We are confident in the engineering rigor, hands-on capstone depth, and practical mentorship of our virtual internship cohorts. If within <span className="text-emerald-400 font-bold">7 calendar days</span> of your enrollment timestamp you feel this program does not match your expectations, we will issue a full <span className="text-white font-bold">100% refund of your enrollment fee</span>.
               </p>
             </div>
 

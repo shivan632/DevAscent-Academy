@@ -29,9 +29,11 @@ import {
 } from 'lucide-react';
 
 import { ALL_COURSES_CATALOG } from '../../lib/courseCatalogData';
+import { useAuthStore } from '../../lib/store/authStore';
 export { ALL_COURSES_CATALOG };
 
 export default function CourseDirectoryPage() {
+  const { user, isAuthenticated } = useAuthStore();
   const [courses, setCourses] = useState<any[]>(ALL_COURSES_CATALOG);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -213,7 +215,11 @@ export default function CourseDirectoryPage() {
                     </div>
 
                     <Link
-                      href={`/checkout?course=${course.slug}&price=${course.earlyBirdPriceInPaise / 100}`}
+                      href={
+                        isAuthenticated && user
+                          ? `/checkout?course=${course.slug}&price=${course.earlyBirdPriceInPaise / 100}`
+                          : `/login?redirect=${encodeURIComponent(`/checkout?course=${course.slug}&price=${course.earlyBirdPriceInPaise / 100}`)}`
+                      }
                       className="px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 transition-all transform hover:-translate-y-0.5"
                     >
                       <span>Enroll ({price})</span>
