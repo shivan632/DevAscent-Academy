@@ -70,6 +70,7 @@ function CheckoutForm() {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   
   // Submission & Processing state
+  const [agreedToTerms, setAgreedToTerms] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [successDetails, setSuccessDetails] = useState<any>(null);
