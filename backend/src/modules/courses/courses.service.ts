@@ -115,7 +115,7 @@ export class CoursesService {
         this.prisma.enrollment.count({ where: { status: 'ACTIVE' } }),
         this.prisma.certificate.count(),
         this.prisma.completionSubmission.count({ where: { status: 'APPROVED' } }),
-        this.prisma.doubt.count({ where: { isResolved: true } }),
+        this.prisma.doubt.count({ where: { status: 'ANSWERED' } }),
         this.prisma.course.findMany({
           where: { isPublished: true },
           select: {
@@ -145,7 +145,7 @@ export class CoursesService {
           orderBy: { issuedAt: 'desc' },
           select: {
             id: true,
-            studentName: true,
+            recipientName: true,
             courseTitle: true,
             sha256Hash: true,
             issuedAt: true,
