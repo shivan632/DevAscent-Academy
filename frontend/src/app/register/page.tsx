@@ -456,6 +456,19 @@ function RegisterForm() {
                     <span>{loading ? 'Creating Account...' : 'Continue to Verification'}</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </button>
+
+                  {/* Terms & Privacy Consent Disclosure */}
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed text-center px-1 pt-1">
+                    By registering, you agree to DevAscent&apos;s{' '}
+                    <Link href="/terms" className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold" target="_blank">
+                      Terms of Service
+                    </Link>{' '}
+                    and acknowledge our{' '}
+                    <Link href="/privacy" className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold" target="_blank">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </div>
                 </form>
 
                 {/* Already have an account */}

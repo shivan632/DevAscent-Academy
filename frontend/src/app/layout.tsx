@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './globals.css';
 import { ThemeProvider } from '../components/ThemeProvider';
+import CookieConsent from '../components/CookieConsent';
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: '--font-jakarta',
@@ -75,6 +76,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-[#090D16] text-[#F1F5F9] font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
         <ThemeProvider>
           {children}
+          <CookieConsent />
         </ThemeProvider>
       </body>
     </html>

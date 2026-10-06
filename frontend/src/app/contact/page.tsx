@@ -290,6 +290,12 @@ export default function ContactPage() {
                         </>
                       )}
                     </button>
+
+                    <p className="text-[11px] text-slate-500 text-center pt-1 leading-relaxed">
+                      By submitting, you agree to our{' '}
+                      <Link href="/privacy" className="text-indigo-400 hover:underline">Privacy Policy</Link>
+                      {' '}and consent to receiving a coordinator response regarding your query.
+                    </p>
                   </form>
                 )}
               </div>
