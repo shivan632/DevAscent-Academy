@@ -219,8 +219,12 @@ export class AuthService {
     // Issue JWT tokens
     const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const refreshSecret = process.env.JWT_REFRESH_SECRET;
+    if (!refreshSecret && process.env.NODE_ENV === 'production') {
+      throw new Error('FATAL: JWT_REFRESH_SECRET environment variable is missing in production.');
+    }
     const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_REFRESH_SECRET || 'devascent_refresh_jwt_secret_key_change_in_production_min_64_characters_long',
+      secret: refreshSecret || 'devascent_refresh_dev_fallback_never_use_in_production_min_64_chars',
       expiresIn: '30d',
     });
 

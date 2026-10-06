@@ -21,18 +21,28 @@ export class PaymentsService {
   ) {}
 
   private getRazorpayKeys() {
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!keySecret || !keyId) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new BadRequestException('Payment gateway configuration is missing or incomplete on this server.');
+      }
+    }
+
     return {
-      keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_DevAscentDemoKey',
-      keySecret: process.env.RAZORPAY_KEY_SECRET || 'DevAscentTestSecretKey998877',
-      webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || 'DevAscentWebhookSecret112233',
+      keyId: keyId || 'rzp_test_placeholder',
+      keySecret: keySecret || 'placeholder_secret_for_local_dev',
+      webhookSecret: webhookSecret || 'placeholder_webhook_for_local_dev',
     };
   }
 
   private extractUserIdFromToken(token?: string | null): string | null {
     if (!token) return null;
     try {
-      const decoded: any = this.jwtService.decode(token);
-      return decoded?.id || decoded?.sub || null;
+      const verified: any = this.jwtService.verify(token);
+      return verified?.id || verified?.sub || null;
     } catch {
       return null;
     }
@@ -281,9 +291,10 @@ export class PaymentsService {
       .update(`${razorpayOrderId}|${razorpayPaymentId}`)
       .digest('hex');
 
+    const allowMock = process.env.NODE_ENV !== 'production' && process.env.ENABLE_MOCK_PAYMENTS === 'true';
     const isMatch =
       razorpaySignature === expectedSignature ||
-      razorpaySignature === 'demo_mock_verified_signature_sandbox';
+      (allowMock && razorpaySignature === 'demo_mock_verified_signature_sandbox');
 
     if (!isMatch) {
       throw new BadRequestException({

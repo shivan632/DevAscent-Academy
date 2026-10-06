@@ -5,10 +5,18 @@ import { PaymentsService } from './payments.service';
 import { CouponsModule } from '../coupons/coupons.module';
 import { MailService } from '../../shared/mail.service';
 
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET environment variable is missing in production.');
+  }
+  return secret || 'devascent_dev_fallback_secret_never_use_in_production_min_64_chars';
+};
+
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'devascent_jwt_secret_key_change_in_production_min_64_characters_long',
+      secret: getJwtSecret(),
       signOptions: { expiresIn: '7d' },
     }),
     CouponsModule,

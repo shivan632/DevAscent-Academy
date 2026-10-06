@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { SubmissionsService } from './submissions.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { SubmitCompletionDto } from './dto/submit-completion.dto';
 
@@ -33,13 +35,15 @@ export class SubmissionsController {
   }
 
   @Get('admin/all')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   async getAllSubmissions(@Query('status') status?: string) {
     return this.submissionsService.getAllSubmissions(status);
   }
 
   @Patch(':id/approve')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   async approveSubmission(
     @Param('id') id: string,
     @Body('adminNote') adminNote?: string,
@@ -48,7 +52,8 @@ export class SubmissionsController {
   }
 
   @Patch(':id/reject')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   async rejectSubmission(
     @Param('id') id: string,
     @Body('reason') reason: string,

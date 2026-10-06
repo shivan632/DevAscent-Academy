@@ -36,17 +36,18 @@ async function bootstrap() {
         'https://devascentacademy.me',
       ];
 
-      // Also allow local network IPs, localhost, preview deployments, or custom domain
-      if (
+      // Secure strict matching: official domains and development origins only
+      const isAllowed =
         allowedOrigins.includes(origin) ||
-        origin.endsWith('.vercel.app') ||
-        origin.endsWith('devascentacademy.me') ||
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1') ||
-        origin.includes('10.') ||
-        origin.includes('192.168.') ||
-        process.env.NODE_ENV !== 'production'
-      ) {
+        origin === 'https://devascentacademy.me' ||
+        /^https:\/\/([a-zA-Z0-9-]+\.)?devascentacademy\.me$/.test(origin) ||
+        (process.env.NODE_ENV !== 'production' &&
+          (origin.startsWith('http://localhost:') ||
+            origin.startsWith('http://127.0.0.1:') ||
+            origin.startsWith('http://192.168.') ||
+            origin.startsWith('http://10.')));
+
+      if (isAllowed) {
         return callback(null, true);
       }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { jwtVerify, decodeJwt } from 'jose';
+import { jwtVerify } from 'jose';
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -20,14 +20,19 @@ export async function proxy(request: NextRequest) {
   try {
     let payload: any;
     try {
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret && process.env.NODE_ENV === 'production') {
+        throw new Error('JWT_SECRET missing');
+      }
       const secret = new TextEncoder().encode(
-        process.env.JWT_SECRET || process.env.NEXT_PUBLIC_JWT_SECRET || 'e8a731a36ff1728bd8fece797fc2515e1d2797351921832d9f19605f903885aae4c219b631e9fb50e7ac6bf45dd3b889dca489095d12c108582fa2f779e9c64a'
+        jwtSecret || 'devascent_dev_fallback_secret_never_use_in_production_min_64_chars'
       );
       const verified = await jwtVerify(token, secret);
       payload = verified.payload;
     } catch {
-      // Edge fallback: Decode JWT payload directly to avoid blocking valid sessions if secret env fails to load
-      payload = decodeJwt(token);
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
     }
 
     if (!payload) {
