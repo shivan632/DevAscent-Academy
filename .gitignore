@@ -40,3 +40,7 @@ Thumbs.db
 agentic-awesome-skills/
 .agents/
 .planning/
+
+# Local security documentation & brain
+brain/
+security/
