@@ -227,6 +227,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/return-policy" className="hover:text-indigo-300 transition-colors block">
+                  Return &amp; Cancellation
+                </Link>
+              </li>
+              <li>
                 <Link href="/dashboard" className="hover:text-indigo-300 transition-colors block">
                   Student Learning Portal
                 </Link>
@@ -242,6 +247,11 @@ export default function Footer() {
             </h4>
             
             <div className="space-y-2.5 text-xs sm:text-sm">
+              <Link href="/contact" className="hover:text-cyan-300 transition-colors flex items-center gap-2">
+                <LifeBuoy className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Contact &amp; Student Desk</span>
+              </Link>
+              
               <Link href="/support" className="hover:text-indigo-300 transition-colors flex items-center gap-2">
                 <HelpCircle className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                 <span>Help Desk &amp; Doubt Q&amp;A</span>
@@ -284,7 +294,13 @@ export default function Footer() {
             <span className="text-slate-400 font-medium">Made with ❤️ in India 🇮🇳</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
+            <Link href="/about" className="hover:text-slate-300 transition-colors">
+              About
+            </Link>
+            <Link href="/contact" className="hover:text-cyan-300 transition-colors font-medium">
+              Contact Us
+            </Link>
             <Link href="/privacy" className="hover:text-cyan-300 transition-colors">
               Privacy Policy
             </Link>
@@ -292,7 +308,10 @@ export default function Footer() {
               Terms &amp; Conditions
             </Link>
             <Link href="/refund-policy" className="hover:text-emerald-400 transition-colors font-medium">
-              7-Day Refund Policy
+              Refund Policy
+            </Link>
+            <Link href="/return-policy" className="hover:text-emerald-400 transition-colors font-medium">
+              Return Policy
             </Link>
             <Link href="/disclaimer" className="hover:text-amber-400 transition-colors">
               Placement Disclaimer
