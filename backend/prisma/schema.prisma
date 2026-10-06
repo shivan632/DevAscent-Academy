@@ -84,6 +84,9 @@ model Course {
   requiresApproval       Boolean                 @default(false)
   stipendDetails         String?
   type                   String                  @default("COURSE")
+  projectPdfUrl          String?
+  projectPdfTitle        String?
+  projectUploadedAt      DateTime?
   certificates           Certificate[]
   completionSubmissions  CompletionSubmission[]
   enrollments            Enrollment[]
@@ -145,13 +148,11 @@ model Lesson {
   moduleId         String
   lessonNumber     Int
   title            String
-  durationMinutes  Int              @default(15)
+  durationMinutes  Int?             @default(15)
   isFreePreview    Boolean          @default(false)
   summary          String?
-  exercisePdfTitle String?
-  exercisePdfUrl   String?
-  exerciseProjects String?          @default("[]")
-  writtenContent   String?
+  notesPdfUrl      String?
+  notesUploadedAt  DateTime?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @default(now()) @updatedAt
   doubts           Doubt[]

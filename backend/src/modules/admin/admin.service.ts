@@ -2,8 +2,23 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+
+function validateDriveUrl(url: string | null | undefined, fieldName = 'PDF URL'): string | null {
+  if (!url || !url.trim()) return null;
+  const trimmed = url.trim();
+  const GOOGLE_DRIVE_REGEX = /^https:\/\/(?:drive|docs)\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+  const match = trimmed.match(GOOGLE_DRIVE_REGEX);
+  if (!match) {
+    throw new BadRequestException(
+      `Please provide a valid Google Drive link for ${fieldName}. Format: https://drive.google.com/file/d/[ID]/preview`
+    );
+  }
+  const fileId = match[1];
+  return `https://drive.google.com/file/d/${fileId}/preview`;
+}
 
 @Injectable()
 export class AdminService {
@@ -1080,29 +1095,21 @@ export class AdminService {
     // Parse metadata safely
     const enrichedModules = course.modules.map((m) => ({
       ...m,
-      lessons: m.lessons.map((l) => {
-        let parsedProjects: any[] = [];
-        try {
-          parsedProjects = JSON.parse(l.exerciseProjects || '[]');
-        } catch (e) {}
-
-        return {
-          ...l,
-          exerciseProjects: parsedProjects,
-          quiz: l.quiz
-            ? {
-                ...l.quiz,
-                questions: l.quiz.questions.map((q) => {
-                  let options: string[] = [];
-                  try {
-                    options = JSON.parse(q.optionsJson || '[]');
-                  } catch (e) {}
-                  return { ...q, options };
-                }),
-              }
-            : null,
-        };
-      }),
+      lessons: m.lessons.map((l) => ({
+        ...l,
+        quiz: l.quiz
+          ? {
+              ...l.quiz,
+              questions: l.quiz.questions.map((q) => {
+                let options: string[] = [];
+                try {
+                  options = JSON.parse(q.optionsJson || '[]');
+                } catch (e) {}
+                return { ...q, options: q.options && q.options.length > 0 ? q.options : options };
+              }),
+            }
+          : null,
+      })),
     }));
 
     return {
@@ -1162,15 +1169,14 @@ export class AdminService {
     lessonNumber?: number;
     durationMinutes?: number;
     summary?: string;
-    writtenContent?: string;
-    exercisePdfUrl?: string;
-    exercisePdfTitle?: string;
-    exerciseProjects?: any[];
+    notesPdfUrl?: string;
     isFreePreview?: boolean;
   }) {
     const nextLessonNumber =
       dto.lessonNumber ||
       ((await this.prisma.lesson.count({ where: { moduleId } })) + 1);
+
+    const validPdfUrl = validateDriveUrl(dto.notesPdfUrl, 'Lesson Notes PDF');
 
     const lesson = await this.prisma.lesson.create({
       data: {
@@ -1179,10 +1185,8 @@ export class AdminService {
         lessonNumber: nextLessonNumber,
         durationMinutes: dto.durationMinutes || 15,
         summary: dto.summary || '',
-        writtenContent: dto.writtenContent || '',
-        exercisePdfUrl: dto.exercisePdfUrl || null,
-        exercisePdfTitle: dto.exercisePdfTitle || null,
-        exerciseProjects: dto.exerciseProjects ? JSON.stringify(dto.exerciseProjects) : '[]',
+        notesPdfUrl: validPdfUrl,
+        notesUploadedAt: validPdfUrl ? new Date() : null,
         isFreePreview: dto.isFreePreview || false,
       },
     });
@@ -1195,12 +1199,11 @@ export class AdminService {
     lessonNumber?: number;
     durationMinutes?: number;
     summary?: string;
-    writtenContent?: string;
-    exercisePdfUrl?: string;
-    exercisePdfTitle?: string;
-    exerciseProjects?: any[];
+    notesPdfUrl?: string;
     isFreePreview?: boolean;
   }) {
+    const validPdfUrl = dto.notesPdfUrl !== undefined ? validateDriveUrl(dto.notesPdfUrl, 'Lesson Notes PDF') : undefined;
+
     const lesson = await this.prisma.lesson.update({
       where: { id: lessonId },
       data: {
@@ -1208,15 +1211,38 @@ export class AdminService {
         ...(dto.lessonNumber !== undefined && { lessonNumber: dto.lessonNumber }),
         ...(dto.durationMinutes !== undefined && { durationMinutes: dto.durationMinutes }),
         ...(dto.summary !== undefined && { summary: dto.summary }),
-        ...(dto.writtenContent !== undefined && { writtenContent: dto.writtenContent }),
-        ...(dto.exercisePdfUrl !== undefined && { exercisePdfUrl: dto.exercisePdfUrl || null }),
-        ...(dto.exercisePdfTitle !== undefined && { exercisePdfTitle: dto.exercisePdfTitle || null }),
-        ...(dto.exerciseProjects !== undefined && { exerciseProjects: JSON.stringify(dto.exerciseProjects) }),
+        ...(validPdfUrl !== undefined && {
+          notesPdfUrl: validPdfUrl,
+          notesUploadedAt: validPdfUrl ? new Date() : null,
+        }),
         ...(dto.isFreePreview !== undefined && { isFreePreview: dto.isFreePreview }),
       },
     });
 
     return { success: true, lesson };
+  }
+
+  async updateCourseProject(slug: string, dto: {
+    projectPdfUrl?: string;
+    projectPdfTitle?: string;
+  }) {
+    const course = await this.prisma.course.findUnique({ where: { slug } });
+    if (!course) throw new NotFoundException('Course not found');
+
+    const validProjectPdfUrl = dto.projectPdfUrl !== undefined ? validateDriveUrl(dto.projectPdfUrl, 'Course Project PDF') : undefined;
+
+    const updated = await this.prisma.course.update({
+      where: { slug },
+      data: {
+        ...(validProjectPdfUrl !== undefined && {
+          projectPdfUrl: validProjectPdfUrl,
+          projectUploadedAt: validProjectPdfUrl ? new Date() : null,
+        }),
+        ...(dto.projectPdfTitle !== undefined && { projectPdfTitle: dto.projectPdfTitle }),
+      },
+    });
+
+    return { success: true, course: updated };
   }
 
   async deleteLesson(lessonId: string) {

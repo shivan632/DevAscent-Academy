@@ -225,6 +225,8 @@ export const api = {
       fetchApi(`/admin/courses/${slug}/lessons/${lessonId}/quiz`, { method: 'POST', body: JSON.stringify(data) }),
     updateCourseDetails: (slug: string, data: any) =>
       fetchApi(`/admin/courses/${slug}/details`, { method: 'PATCH', body: JSON.stringify(data) }),
+    updateCourseProject: (slug: string, data: { projectPdfUrl?: string; projectPdfTitle?: string }) =>
+      fetchApi(`/admin/courses/${slug}/project`, { method: 'PATCH', body: JSON.stringify(data) }),
 
     // AI Overview Videos (Studio A)
     getAiVideos: (slug: string) => fetchApi(`/admin/courses/${slug}/videos`),

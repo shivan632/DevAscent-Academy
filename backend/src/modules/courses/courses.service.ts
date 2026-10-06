@@ -562,9 +562,8 @@ export class CoursesService {
         isFreePreview: l.isFreePreview,
         isCompleted,
         quizPassed,
-        exercisePdfTitle: l.exercisePdfTitle,
-        exercisePdfUrl: l.exercisePdfUrl,
-        exerciseProjects: l.exerciseProjects,
+        notesPdfUrl: l.notesPdfUrl,
+        notesUploadedAt: l.notesUploadedAt,
         hasQuiz: !!l.quiz,
         quiz: l.quiz
           ? {
@@ -931,14 +930,12 @@ export class CoursesService {
       throw new NotFoundException(`Topic ${topicId} not found`);
     }
 
-    // Fetch written content
+    // Fetch notes PDF content
     const fullLessonDoc = await this.prisma.lesson.findUnique({
       where: { id: topicId },
       select: {
-        writtenContent: true,
-        exercisePdfUrl: true,
-        exercisePdfTitle: true,
-        exerciseProjects: true,
+        notesPdfUrl: true,
+        notesUploadedAt: true,
         doubts: {
           include: { user: { select: { id: true, name: true, avatarUrl: true } } },
           orderBy: { createdAt: 'desc' },
@@ -950,13 +947,6 @@ export class CoursesService {
     const chainIndex = curriculum.linearChain.findIndex((item) => item.type === 'topic' && item.id === topicId);
     const prevItem = chainIndex > 0 ? curriculum.linearChain[chainIndex - 1] : null;
     const nextItem = chainIndex >= 0 && chainIndex < curriculum.linearChain.length - 1 ? curriculum.linearChain[chainIndex + 1] : null;
-
-    let parsedProjects: any[] = [];
-    try {
-      parsedProjects = JSON.parse(fullLessonDoc?.exerciseProjects || '[]');
-    } catch (e) {
-      parsedProjects = [];
-    }
 
     return {
       success: true,
@@ -972,10 +962,8 @@ export class CoursesService {
         isUnlocked: topicItem.isUnlocked,
         isCompleted: topicItem.isCompleted,
         lockReason: topicItem.lockReason,
-        writtenContent: topicItem.isUnlocked ? fullLessonDoc?.writtenContent : null,
-        exercisePdfUrl: topicItem.isUnlocked ? fullLessonDoc?.exercisePdfUrl : null,
-        exercisePdfTitle: fullLessonDoc?.exercisePdfTitle || `${topicItem.title} - Resource Guide`,
-        exerciseProjects: parsedProjects,
+        notesPdfUrl: topicItem.isUnlocked ? fullLessonDoc?.notesPdfUrl : null,
+        notesUploadedAt: fullLessonDoc?.notesUploadedAt || null,
         associatedQuiz: topicItem.quiz,
         doubts: (fullLessonDoc?.doubts || []).map((d) => ({
           id: d.id,
@@ -1182,24 +1170,8 @@ export class CoursesService {
         projects: true,
         assignments: true,
         requirements: true,
-      },
-    });
-
-    // Find the capstone-specific lesson PDF — specifically the lesson titled with "Capstone Architecture"
-    // (This ensures the PDF only shows on the Capstone page, not on every individual topic notes page)
-    const capstoneLesson = await this.prisma.lesson.findFirst({
-      where: {
-        module: { courseId: curriculum.course.id },
-        exercisePdfUrl: { not: null },
-        title: { contains: 'Capstone' },
-      },
-      orderBy: { lessonNumber: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        exercisePdfUrl: true,
-        exercisePdfTitle: true,
-        exerciseProjects: true,
+        projectPdfUrl: true,
+        projectPdfTitle: true,
       },
     });
 
@@ -1210,16 +1182,6 @@ export class CoursesService {
     try { parsedProjects = JSON.parse(fullCourse?.projects || '[]'); } catch (e) {}
     try { parsedAssignments = JSON.parse(fullCourse?.assignments || '[]'); } catch (e) {}
     try { parsedRequirements = JSON.parse(fullCourse?.requirements || '[]'); } catch (e) {}
-
-    // If capstoneLesson has exerciseProjects, merge
-    if (capstoneLesson?.exerciseProjects) {
-      try {
-        const lessonProjects = JSON.parse(capstoneLesson.exerciseProjects);
-        if (Array.isArray(lessonProjects) && lessonProjects.length > 0) {
-          parsedProjects = lessonProjects;
-        }
-      } catch (e) {}
-    }
 
     let certificate: any = null;
     if (userId) {
@@ -1233,8 +1195,10 @@ export class CoursesService {
       capstone: {
         ...curriculum.capstone,
         courseTitle: curriculum.course.title,
-        exercisePdfUrl: capstoneLesson?.exercisePdfUrl || null,
-        exercisePdfTitle: capstoneLesson?.exercisePdfTitle || `${curriculum.course.title} Capstone Project Guide`,
+        projectPdfUrl: fullCourse?.projectPdfUrl || null,
+        projectPdfTitle: fullCourse?.projectPdfTitle || `${curriculum.course.title} Capstone Project Guide`,
+        exercisePdfUrl: fullCourse?.projectPdfUrl || null,
+        exercisePdfTitle: fullCourse?.projectPdfTitle || `${curriculum.course.title} Capstone Project Guide`,
         projects: parsedProjects,
         assignments: parsedAssignments,
         requirements: parsedRequirements,

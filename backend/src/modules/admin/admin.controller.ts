@@ -360,4 +360,12 @@ export class AdminController {
   ) {
     return this.adminService.updateCourseDetails(slug, dto);
   }
+
+  @Patch('courses/:slug/project')
+  async updateCourseProject(
+    @Param('slug') slug: string,
+    @Body() dto: { projectPdfUrl?: string; projectPdfTitle?: string },
+  ) {
+    return this.adminService.updateCourseProject(slug, dto);
+  }
 }

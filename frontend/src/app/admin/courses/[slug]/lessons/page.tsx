@@ -1,45 +1,26 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import useSWR from 'swr';
-import { api, fetchApi } from '@/lib/api';
-import dynamic from 'next/dynamic';
-import { getEmbedUrl, isDirectVideoUrl } from '@/lib/utils';
-import EmbeddedDocViewer from '@/components/learn/EmbeddedDocViewer';
-
-const MarkdownViewer = dynamic(() => import('@/components/MarkdownViewer'), {
-  ssr: false,
-  loading: () => <p className="text-slate-500 italic text-xs">Loading live preview...</p>,
-});
+import { api } from '@/lib/api';
 import {
-  BookOpen,
   Plus,
   Edit2,
   Trash2,
   Video,
   FileText,
   Award,
-  Download,
   ArrowLeft,
   Check,
   X,
   Loader2,
-  ExternalLink,
   Sparkles,
   Layers,
-  ChevronDown,
-  ChevronUp,
-  Play,
-  HelpCircle,
   Eye,
-  CheckCircle2,
-  AlertCircle,
-  Code2,
   Clock,
-  VideoOff,
-  Settings
+  FolderGit2
 } from 'lucide-react';
 
 interface QuestionForm {
@@ -58,9 +39,7 @@ interface LessonForm {
   lessonNumber: number;
   durationMinutes: number;
   summary: string;
-  writtenContent: string;
-  exercisePdfUrl: string;
-  exercisePdfTitle: string;
+  notesPdfUrl: string;
   isFreePreview: boolean;
 }
 
@@ -84,29 +63,32 @@ export default function AdminCurriculumStudioPage() {
   const [moduleDescription, setModuleDescription] = useState('');
   const [savingModule, setSavingModule] = useState(false);
 
-  // Lesson studio modal state (Studio B: 3 Tabs only)
+  // Course Project modal state
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
+  const [projectTitle, setProjectTitle] = useState('');
+  const [projectPdfUrl, setProjectPdfUrl] = useState('');
+  const [savingProject, setSavingProject] = useState(false);
+
+  // Lesson studio modal state (Studio B: 2 Tabs only: Notes PDF + Quiz)
   const [lessonModalOpen, setLessonModalOpen] = useState(false);
-  const [activeStudioTab, setActiveStudioTab] = useState<'notes' | 'quiz' | 'exercise'>('notes');
+  const [activeStudioTab, setActiveStudioTab] = useState<'notes' | 'quiz'>('notes');
   const [selectedModuleId, setSelectedModuleId] = useState('');
   const [lessonForm, setLessonForm] = useState<LessonForm>({
     moduleId: '',
     title: '',
     lessonNumber: 1,
-    durationMinutes: 15,
+    durationMinutes: 35,
     summary: '',
-    writtenContent: '',
-    exercisePdfUrl: '',
-    exercisePdfTitle: '',
+    notesPdfUrl: '',
     isFreePreview: false,
   });
 
-  // Quiz in lesson studio (70% pass, max 3 attempts)
+  // Quiz in lesson studio
   const [quizTitle, setQuizTitle] = useState('');
   const [quizPassingScore, setQuizPassingScore] = useState(70);
   const [quizMaxAttempts, setQuizMaxAttempts] = useState(3);
   const [quizQuestions, setQuizQuestions] = useState<QuestionForm[]>([]);
   const [savingLesson, setSavingLesson] = useState(false);
-  const [previewingPdf, setPreviewingPdf] = useState(false);
 
   // Open Add Module
   const handleOpenAddModule = () => {
@@ -163,6 +145,33 @@ export default function AdminCurriculumStudioPage() {
     }
   };
 
+  // Open Course Project Modal
+  const handleOpenCourseProject = () => {
+    setProjectTitle(course?.projectPdfTitle || `${course?.title || 'Web Development'} Capstone Project`);
+    setProjectPdfUrl(course?.projectPdfUrl || '');
+    setProjectModalOpen(true);
+  };
+
+  // Save Course Project
+  const handleSaveCourseProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (savingProject) return;
+
+    try {
+      setSavingProject(true);
+      await api.admin.updateCourseProject(courseSlug, {
+        projectPdfTitle: projectTitle.trim() || undefined,
+        projectPdfUrl: projectPdfUrl.trim() || undefined,
+      });
+      setProjectModalOpen(false);
+      mutate();
+    } catch (err: any) {
+      alert(err?.message || 'Failed to update course project');
+    } finally {
+      setSavingProject(false);
+    }
+  };
+
   // Open Add Lesson
   const handleOpenAddLesson = (moduleId: string) => {
     setSelectedModuleId(moduleId);
@@ -170,11 +179,9 @@ export default function AdminCurriculumStudioPage() {
       moduleId,
       title: '',
       lessonNumber: 1,
-      durationMinutes: 15,
+      durationMinutes: 35,
       summary: '',
-      writtenContent: `# 📖 Lesson Notes & Architecture\n\n### 🎯 By the end of this lesson, you will:\n- Understand core principles\n- Implement industry-standard patterns\n\n### 💡 Key Concepts\nWrite clear explanations here...\n\n\`\`\`typescript\n// Example code\nconsole.log("DevAscent Engineering Standards");\n\`\`\`\n\n### ⚡ Best Practices\n- Rule 1: Always type your interfaces.\n- Rule 2: Keep functions pure and decoupled.`,
-      exercisePdfUrl: '',
-      exercisePdfTitle: 'Capstone Project Guide & Submission Instructions',
+      notesPdfUrl: '',
       isFreePreview: false,
     });
     setQuizTitle('Skill Assessment Quiz');
@@ -182,19 +189,18 @@ export default function AdminCurriculumStudioPage() {
     setQuizMaxAttempts(3);
     setQuizQuestions([
       {
-        question: 'What is the primary architectural advantage of modular services?',
+        question: 'What is the primary architectural advantage of semantic layout?',
         options: [
           'Tight coupling between files',
-          'Clean separation of concerns and maintainability',
+          'Clean separation of concerns and accessibility',
           'Eliminates database transactions',
-          'Disables JWT authentication guards',
+          'Disables authentication guards',
         ],
         correctOptionIndex: 1,
-        explanation: 'Modular services separate business logic from controllers, making code maintainable and testable.',
+        explanation: 'Semantic HTML5 structure ensures accessibility, SEO readability, and maintainable DOM hierarchy.',
       },
     ]);
     setActiveStudioTab('notes');
-    setPreviewingPdf(false);
     setLessonModalOpen(true);
   };
 
@@ -206,11 +212,9 @@ export default function AdminCurriculumStudioPage() {
       moduleId,
       title: lesson.title,
       lessonNumber: lesson.lessonNumber,
-      durationMinutes: lesson.durationMinutes || 15,
+      durationMinutes: lesson.durationMinutes || 35,
       summary: lesson.summary || '',
-      writtenContent: lesson.writtenContent || '',
-      exercisePdfUrl: lesson.exercisePdfUrl || '',
-      exercisePdfTitle: lesson.exercisePdfTitle || 'Capstone Project Guide',
+      notesPdfUrl: lesson.notesPdfUrl || '',
       isFreePreview: lesson.isFreePreview || false,
     });
 
@@ -236,7 +240,6 @@ export default function AdminCurriculumStudioPage() {
     }
 
     setActiveStudioTab('notes');
-    setPreviewingPdf(Boolean(lesson.exercisePdfUrl));
     setLessonModalOpen(true);
   };
 
@@ -250,14 +253,12 @@ export default function AdminCurriculumStudioPage() {
       let lessonId = lessonForm.id;
 
       if (lessonId) {
-        // Update lesson (Studio B - Notes, Quiz, PDF)
+        // Update lesson (2 tabs: Notes PDF & Quiz)
         await api.admin.updateLesson(courseSlug, lessonId, {
           title: lessonForm.title.trim(),
           durationMinutes: Number(lessonForm.durationMinutes),
           summary: lessonForm.summary.trim() || undefined,
-          writtenContent: lessonForm.writtenContent || undefined,
-          exercisePdfUrl: lessonForm.exercisePdfUrl.trim() || undefined,
-          exercisePdfTitle: lessonForm.exercisePdfTitle.trim() || undefined,
+          notesPdfUrl: lessonForm.notesPdfUrl.trim() || undefined,
           isFreePreview: lessonForm.isFreePreview,
         });
       } else {
@@ -266,16 +267,14 @@ export default function AdminCurriculumStudioPage() {
           title: lessonForm.title.trim(),
           durationMinutes: Number(lessonForm.durationMinutes),
           summary: lessonForm.summary.trim() || undefined,
-          writtenContent: lessonForm.writtenContent || undefined,
-          exercisePdfUrl: lessonForm.exercisePdfUrl.trim() || undefined,
-          exercisePdfTitle: lessonForm.exercisePdfTitle.trim() || undefined,
+          notesPdfUrl: lessonForm.notesPdfUrl.trim() || undefined,
           isFreePreview: lessonForm.isFreePreview,
         });
         const created = res?.lesson || res?.data?.lesson;
         lessonId = created?.id;
       }
 
-      // If quiz questions exist, upsert quiz (70% pass, max 3 attempts)
+      // If quiz questions exist, upsert quiz
       if (lessonId && quizQuestions.length > 0) {
         await api.admin.upsertLessonQuiz(courseSlug, lessonId, {
           title: quizTitle.trim() || `${lessonForm.title} Quiz`,
@@ -318,8 +317,8 @@ export default function AdminCurriculumStudioPage() {
     setQuizQuestions((prev) => [
       ...prev,
       {
-        question: 'New Question text...',
-        options: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+        question: 'New Question prompt...',
+        options: ['Option A', 'Option B', 'Option C', 'Option D'],
         correctOptionIndex: 0,
         explanation: 'Explanation for why this option is correct.',
       },
@@ -381,14 +380,14 @@ export default function AdminCurriculumStudioPage() {
             <span>AI Videos Studio</span>
           </Link>
 
-          <Link
-            href={`/learn/${courseSlug}`}
-            target="_blank"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all border border-slate-700"
+          {/* Course Project Modal Trigger */}
+          <button
+            onClick={handleOpenCourseProject}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 hover:text-white transition-all border border-emerald-500/30 shadow-sm"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Preview Player ↗</span>
-          </Link>
+            <FolderGit2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Course Project ↗</span>
+          </button>
 
           <button
             onClick={handleOpenAddModule}
@@ -413,7 +412,7 @@ export default function AdminCurriculumStudioPage() {
           <div className="space-y-1">
             <h3 className="text-base font-bold text-white">No Modules Yet</h3>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              Start structuring this course by adding your first module, then upload AI video lectures, notes, and quizzes!
+              Start structuring this course by adding your first module, then attach Google Drive PDF lesson notes and quizzes!
             </p>
           </div>
           <button
@@ -483,10 +482,9 @@ export default function AdminCurriculumStudioPage() {
                   </div>
                 ) : (
                   mod.lessons.map((lesson: any, lIdx: number) => {
-                    const hasVideo = !!lesson.videoUrl;
-                    const hasNotes = !!lesson.writtenContent;
-                    const hasQuiz = !!lesson.quiz;
-                    const hasPdf = !!lesson.exercisePdfUrl;
+                    const hasNotes = Boolean(lesson.notesPdfUrl);
+                    const hasQuiz = Boolean(lesson.quiz && (lesson.quiz.questions?.length > 0));
+                    const questionCount = lesson.quiz?.questions?.length || 0;
 
                     return (
                       <div
@@ -505,7 +503,7 @@ export default function AdminCurriculumStudioPage() {
                             <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
-                                {lesson.durationMinutes || 15} mins
+                                {lesson.durationMinutes || 35} mins
                               </span>
                               {lesson.isFreePreview && (
                                 <span className="text-purple-400 font-semibold">• Free Preview</span>
@@ -514,58 +512,34 @@ export default function AdminCurriculumStudioPage() {
                           </div>
                         </div>
 
-                        {/* Content Badges */}
-                        <div className="flex items-center gap-1.5 flex-wrap shrink-0 text-[10px] font-medium">
-                          {/* Video status */}
+                        {/* Content Badges (2 badges only: Notes & Quiz) */}
+                        <div className="flex items-center gap-2 flex-wrap shrink-0 text-[10px] font-medium">
+                          {/* Notes status */}
                           <span
-                            className={`px-2 py-0.5 rounded-md flex items-center gap-1 border ${
-                              hasVideo
-                                ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
+                            className={`px-2.5 py-1 rounded-md flex items-center gap-1 border ${
+                              hasNotes
+                                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
                                 : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                             }`}
                           >
-                            <Video className="w-3 h-3" />
-                            <span>{hasVideo ? 'Video ✓' : 'Video Pending'}</span>
-                          </span>
-
-                          {/* Notes status */}
-                          <span
-                            className={`px-2 py-0.5 rounded-md flex items-center gap-1 border ${
-                              hasNotes
-                                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                                : 'bg-slate-800 text-slate-400 border-slate-700'
-                            }`}
-                          >
                             <FileText className="w-3 h-3" />
-                            <span>{hasNotes ? 'Notes ✓' : 'Default Notes'}</span>
+                            <span>{hasNotes ? 'Notes ✓' : 'Notes Pending'}</span>
                           </span>
 
                           {/* Quiz status */}
                           <span
-                            className={`px-2 py-0.5 rounded-md flex items-center gap-1 border ${
+                            className={`px-2.5 py-1 rounded-md flex items-center gap-1 border ${
                               hasQuiz
                                 ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                                : 'bg-slate-800 text-slate-400 border-slate-700'
+                                : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                             }`}
                           >
                             <Award className="w-3 h-3" />
                             <span>
                               {hasQuiz
-                                ? `Quiz (${lesson.quiz.questions?.length || 0}Q)`
-                                : 'Default Quiz'}
+                                ? `Quiz (${questionCount}Q)`
+                                : 'Quiz Missing'}
                             </span>
-                          </span>
-
-                          {/* PDF status */}
-                          <span
-                            className={`px-2 py-0.5 rounded-md flex items-center gap-1 border ${
-                              hasPdf
-                                ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
-                                : 'bg-slate-800 text-slate-400 border-slate-700'
-                            }`}
-                          >
-                            <Download className="w-3 h-3" />
-                            <span>{hasPdf ? 'PDF ✓' : 'PDF Pending'}</span>
                           </span>
                         </div>
 
@@ -660,10 +634,106 @@ export default function AdminCurriculumStudioPage() {
         </div>
       )}
 
-      {/* ─── MODAL 2: 3-IN-1 LESSON STUDIO (STUDIO B) ────────────────────────── */}
+      {/* ─── MODAL 2: COURSE PROJECT MODAL ─────────────────────────────────────── */}
+      {projectModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <FolderGit2 className="w-5 h-5 text-emerald-400" />
+                <span>Course Project PDF</span>
+              </h3>
+              <button
+                onClick={() => setProjectModalOpen(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCourseProject} className="space-y-4 text-xs">
+              <div className="space-y-1.5">
+                <label className="text-slate-300 font-semibold">Project Title *</label>
+                <input
+                  type="text"
+                  value={projectTitle}
+                  onChange={(e) => setProjectTitle(e.target.value)}
+                  placeholder="e.g. Web Development Capstone Project"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-slate-300 font-semibold">Project PDF URL *</label>
+                  {projectPdfUrl && (
+                    <a
+                      href={projectPdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Test PDF Link ↗</span>
+                    </a>
+                  )}
+                </div>
+                <input
+                  type="url"
+                  value={projectPdfUrl}
+                  onChange={(e) => setProjectPdfUrl(e.target.value)}
+                  placeholder="https://drive.google.com/file/d/1dtrV7i.../preview"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none"
+                  required
+                />
+                <p className="text-[11px] text-slate-400">
+                  ℹ️ Format: Google Drive /preview link (e.g. <code>https://drive.google.com/file/d/[ID]/preview</code>)
+                </p>
+              </div>
+
+              {projectPdfUrl && (
+                <div className="border border-slate-800 rounded-xl overflow-hidden p-2 bg-slate-950">
+                  <div className="text-[11px] text-slate-400 mb-1.5 flex items-center justify-between">
+                    <span>Live Preview Verification:</span>
+                    <span className="text-emerald-400 font-mono text-[10px]">Google Drive Preview</span>
+                  </div>
+                  <div className="h-44 rounded-lg overflow-hidden border border-slate-800">
+                    <iframe
+                      src={projectPdfUrl.replace(/\/view(\?.*)?$/, '/preview')}
+                      className="w-full h-full border-0"
+                      title="Project PDF Preview"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setProjectModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingProject || !projectTitle.trim() || !projectPdfUrl.trim()}
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold flex items-center gap-1.5 shadow-lg shadow-emerald-600/20"
+                >
+                  {savingProject ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                  <span>Save Project</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL 3: 2-TAB LESSON STUDIO (STUDIO B) ─────────────────────────── */}
       {lessonModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full my-auto flex flex-col max-h-[92vh] shadow-2xl overflow-hidden">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full my-auto flex flex-col max-h-[92vh] shadow-2xl overflow-hidden">
             
             {/* Modal Header */}
             <div className="p-4 sm:p-5 bg-slate-900 border-b border-slate-800 flex items-center justify-between shrink-0">
@@ -677,11 +747,11 @@ export default function AdminCurriculumStudioPage() {
                       Studio B
                     </span>
                     <h3 className="text-sm sm:text-base font-bold text-white">
-                      {lessonForm.id ? `Edit Lesson: ${lessonForm.title}` : 'Create New Lesson Studio'}
+                      {lessonForm.id ? `Edit Lesson: ${lessonForm.title}` : 'Create New Lesson'}
                     </h3>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    Configure Written Study Notes (Markdown), Skill Quiz (3-Attempt Assessment), and Capstone Project PDF.
+                    Configure Lesson Notes PDF and Skill Quiz (6-8 Questions).
                   </p>
                 </div>
               </div>
@@ -693,92 +763,129 @@ export default function AdminCurriculumStudioPage() {
               </button>
             </div>
 
-            {/* 3 Studio Tabs */}
+            {/* 2 Studio Tabs */}
             <div className="bg-slate-950 border-b border-slate-800 flex items-center px-4 overflow-x-auto text-xs font-semibold shrink-0">
               <button
                 type="button"
                 onClick={() => setActiveStudioTab('notes')}
-                className={`py-3 px-4 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+                className={`py-3 px-5 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
                   activeStudioTab === 'notes'
                     ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
                     : 'border-transparent text-slate-400 hover:text-slate-200'
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>1. Study Notes (Markdown)</span>
+                <span>📄 Lesson Notes PDF</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveStudioTab('quiz')}
-                className={`py-3 px-4 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+                className={`py-3 px-5 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
                   activeStudioTab === 'quiz'
                     ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
                     : 'border-transparent text-slate-400 hover:text-slate-200'
                 }`}
               >
                 <Award className="w-3.5 h-3.5" />
-                <span>2. Skill Quiz ({quizQuestions.length} Questions)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveStudioTab('exercise')}
-                className={`py-3 px-4 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
-                  activeStudioTab === 'exercise'
-                    ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-                    : 'border-transparent text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>3. Exercise File & PDF</span>
+                <span>❓ Skill Quiz ({quizQuestions.length} Questions)</span>
               </button>
             </div>
 
             {/* Studio Form Body */}
             <form onSubmit={handleSaveLesson} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 text-xs text-slate-300">
               
-              {/* Common Title & Duration Header for all tabs */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-950 rounded-xl border border-slate-800/80">
-                <div className="sm:col-span-2 space-y-1">
-                  <label className="text-slate-300 font-semibold">Lesson Title *</label>
-                  <input
-                    type="text"
-                    value={lessonForm.title}
-                    onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
-                    placeholder="e.g. Next.js 15 App Router & Server Components"
-                    className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-lg px-3 py-1.5 text-white focus:outline-none"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-slate-300 font-semibold">Est. Read Time (Mins)</label>
-                  <input
-                    type="number"
-                    value={lessonForm.durationMinutes}
-                    onChange={(e) => setLessonForm({ ...lessonForm, durationMinutes: Number(e.target.value) })}
-                    className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-lg px-3 py-1.5 text-white focus:outline-none"
-                    min={1}
-                  />
-                </div>
-              </div>
-
-              {/* TAB 1: WRITTEN NOTES (Study Material Markdown) */}
+              {/* TAB 1: LESSON NOTES PDF */}
               {activeStudioTab === 'notes' && (
                 <div className="space-y-4">
+                  {/* Common Title & Duration */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-950 rounded-xl border border-slate-800/80">
+                    <div className="sm:col-span-2 space-y-1">
+                      <label className="text-slate-300 font-semibold">Lesson Title *</label>
+                      <input
+                        type="text"
+                        value={lessonForm.title}
+                        onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
+                        placeholder="e.g. 1.1 Semantic HTML5 & Modern Layout Architecture"
+                        className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-lg px-3 py-2 text-white focus:outline-none"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-slate-300 font-semibold">Est. Read Time (Mins)</label>
+                      <input
+                        type="number"
+                        value={lessonForm.durationMinutes}
+                        onChange={(e) => setLessonForm({ ...lessonForm, durationMinutes: Number(e.target.value) })}
+                        className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-lg px-3 py-2 text-white focus:outline-none"
+                        min={1}
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-1.5">
                     <label className="text-slate-300 font-semibold">Learning Objective / Summary</label>
                     <textarea
                       value={lessonForm.summary}
                       onChange={(e) => setLessonForm({ ...lessonForm, summary: e.target.value })}
                       rows={2}
-                      placeholder="Brief 1-2 sentence overview of what students will master in this lesson..."
+                      placeholder="Structured semantic markup, landmark roles, and accessibility foundations..."
                       className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white focus:outline-none"
                     />
                   </div>
 
-                  <div className="flex items-center gap-2 pt-1 pb-2">
+                  {/* Google Drive PDF URL input */}
+                  <div className="space-y-2 p-4 bg-slate-950 rounded-xl border border-slate-800/80">
+                    <div className="flex items-center justify-between">
+                      <label className="text-slate-200 font-semibold flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-indigo-400" />
+                        <span>📄 Lesson Notes PDF URL *</span>
+                      </label>
+
+                      {lessonForm.notesPdfUrl && (
+                        <a
+                          href={lessonForm.notesPdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>🔍 Test PDF Link ↗</span>
+                        </a>
+                      )}
+                    </div>
+
+                    <input
+                      type="url"
+                      value={lessonForm.notesPdfUrl}
+                      onChange={(e) => setLessonForm({ ...lessonForm, notesPdfUrl: e.target.value })}
+                      placeholder="https://drive.google.com/file/d/xxxxx/preview"
+                      className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none"
+                    />
+
+                    <p className="text-[11px] text-slate-400">
+                      ℹ️ Format: <code>https://drive.google.com/file/d/[ID]/preview</code> (Google Drive /preview link)
+                    </p>
+
+                    {lessonForm.notesPdfUrl && (
+                      <div className="mt-3 pt-3 border-t border-slate-800/80">
+                        <div className="text-[11px] text-slate-400 mb-2 flex items-center justify-between">
+                          <span>Live In-Studio PDF Preview:</span>
+                          <span className="text-indigo-400 font-mono text-[10px]">Google Drive Preview</span>
+                        </div>
+                        <div className="h-64 rounded-xl overflow-hidden border border-slate-800 bg-black">
+                          <iframe
+                            src={lessonForm.notesPdfUrl.replace(/\/view(\?.*)?$/, '/preview')}
+                            className="w-full h-full border-0"
+                            title="Lesson PDF Preview"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1 pb-1">
                     <input
                       type="checkbox"
                       id="freePreviewCheck"
@@ -787,51 +894,13 @@ export default function AdminCurriculumStudioPage() {
                       className="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"
                     />
                     <label htmlFor="freePreviewCheck" className="text-slate-300 font-medium cursor-pointer">
-                      Mark as Free Preview (Allow un-enrolled students to read these notes)
+                      Mark as Free Preview (Allow un-enrolled students to access this lesson)
                     </label>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-white flex items-center gap-2">
-                        <Code2 className="w-4 h-4 text-indigo-400" />
-                        <span>Study Material (Markdown & Syntax Highlighting)</span>
-                      </h4>
-                      <p className="text-[11px] text-slate-400">
-                        Supports full GitHub-flavored Markdown, syntax highlighted code snippets, diagrams, and tables.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Markdown Editor */}
-                    <div className="space-y-1.5 flex flex-col">
-                      <label className="text-slate-400 font-mono text-[11px]">Markdown Source Code</label>
-                      <textarea
-                        value={lessonForm.writtenContent}
-                        onChange={(e) => setLessonForm({ ...lessonForm, writtenContent: e.target.value })}
-                        rows={15}
-                        placeholder="# Title&#10;&#10;Explain architectural patterns here...&#10;&#10;```typescript&#10;const code = 'example';&#10;```"
-                        className="w-full font-mono bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl p-3 text-white focus:outline-none resize-y text-xs leading-relaxed"
-                      />
-                    </div>
-
-                    {/* Live Preview Panel with syntax highlighting */}
-                    <div className="space-y-1.5 flex flex-col">
-                      <label className="text-emerald-400 font-mono text-[11px]">Live Formatted Preview (Highlight.js)</label>
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 overflow-y-auto max-h-[360px] text-slate-300 prose prose-invert prose-sm max-w-none">
-                        {lessonForm.writtenContent ? (
-                          <MarkdownViewer content={lessonForm.writtenContent} />
-                        ) : (
-                          <p className="text-slate-600 italic">No notes written yet. Start typing on the left!</p>
-                        )}
-                      </div>
-                    </div>
                   </div>
                 </div>
               )}
 
-              {/* TAB 2: SKILL QUIZ BUILDER (Locked 70% passing, max 3 attempts) */}
+              {/* TAB 2: SKILL QUIZ BUILDER */}
               {activeStudioTab === 'quiz' && (
                 <div className="space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-950 rounded-xl border border-slate-800">
@@ -841,7 +910,7 @@ export default function AdminCurriculumStudioPage() {
                         type="text"
                         value={quizTitle}
                         onChange={(e) => setQuizTitle(e.target.value)}
-                        placeholder="e.g. Next.js App Router Architecture Quiz"
+                        placeholder="e.g. Semantic HTML5 & Layout Assessment"
                         className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-indigo-500"
                       />
                     </div>
@@ -1002,64 +1071,6 @@ export default function AdminCurriculumStudioPage() {
                 </div>
               )}
 
-              {/* TAB 3: EXERCISE FILE & PDF */}
-              {activeStudioTab === 'exercise' && (
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-slate-300 font-semibold text-xs">Exercise PDF / Capstone Guide Title</label>
-                    <input
-                      type="text"
-                      value={lessonForm.exercisePdfTitle}
-                      onChange={(e) => setLessonForm({ ...lessonForm, exercisePdfTitle: e.target.value })}
-                      placeholder="e.g. Week 1 Capstone: Fullstack Architecture Blueprint"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white text-xs focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-slate-300 font-semibold text-xs flex items-center gap-2">
-                        <Download className="w-4 h-4 text-indigo-400" />
-                        <span>Google Drive / Cloud PDF Preview URL</span>
-                      </label>
-                      {lessonForm.exercisePdfUrl && (
-                        <button
-                          type="button"
-                          onClick={() => setPreviewingPdf(!previewingPdf)}
-                          className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>{previewingPdf ? 'Hide PDF Preview' : 'Test PDF Preview'}</span>
-                        </button>
-                      )}
-                    </div>
-                    <input
-                      type="url"
-                      value={lessonForm.exercisePdfUrl}
-                      onChange={(e) => setLessonForm({ ...lessonForm, exercisePdfUrl: e.target.value })}
-                      placeholder="https://drive.google.com/file/d/1dtrV7i90kKfAumqe0kLSfgYdYFJmevbk/preview"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none"
-                    />
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                      <span className="text-indigo-400 font-medium">Tip:</span>
-                      <span>Paste your Google Drive link (e.g. <code>https://drive.google.com/file/d/FILE_ID/preview</code>) or direct PDF link.</span>
-                    </div>
-                  </div>
-
-                  {/* Inline PDF Preview with live embed tester & permissions notice */}
-                  {previewingPdf && lessonForm.exercisePdfUrl && (
-                    <div className="pt-2">
-                      <EmbeddedDocViewer
-                        url={lessonForm.exercisePdfUrl}
-                        title={lessonForm.exercisePdfTitle || 'Live Studio PDF Preview Test'}
-                        description="Verify how students will see this Google Drive PDF preview in their learning room."
-                        accentColor="indigo"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Modal Footer Controls */}
               <div className="pt-4 border-t border-slate-800 flex items-center justify-between gap-3 shrink-0">
                 <div className="text-slate-400 text-[11px]">
@@ -1081,7 +1092,7 @@ export default function AdminCurriculumStudioPage() {
                     className="px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 transition-all"
                   >
                     {savingLesson ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                    <span>{lessonForm.id ? 'Save Lesson Changes' : 'Create Lesson'}</span>
+                    <span>{lessonForm.id ? 'Save Lesson' : 'Create Lesson'}</span>
                   </button>
                 </div>
               </div>

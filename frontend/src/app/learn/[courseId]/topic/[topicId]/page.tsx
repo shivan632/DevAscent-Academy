@@ -7,8 +7,7 @@ import dynamic from 'next/dynamic';
 import confetti from 'canvas-confetti';
 import { fetchApi, api } from '@/lib/api';
 import LearnSidebar from '@/components/learn/LearnSidebar';
-import EmbeddedDocViewer from '@/components/learn/EmbeddedDocViewer';
-import ContentFallback from '@/components/learn/ContentFallback';
+import { PdfEmbed } from '@/components/PdfEmbed';
 import {
   BookOpen,
   CheckCircle2,
@@ -29,15 +28,6 @@ import {
   Check,
 } from 'lucide-react';
 import Link from 'next/link';
-
-const MarkdownViewer = dynamic(() => import('@/components/MarkdownViewer'), {
-  ssr: false,
-  loading: () => (
-    <div className="py-8 flex justify-center text-slate-400">
-      <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-    </div>
-  ),
-});
 
 const fetcher = (url: string) => fetchApi(url).then((res) => res?.data || res);
 
@@ -264,28 +254,12 @@ export default function TopicPage() {
               )}
             </div>
 
-            {/* Rendered Markdown Notes or Empty Fallback */}
-            {topic.writtenContent && topic.writtenContent.trim() ? (
-              <MarkdownViewer content={topic.writtenContent} />
-            ) : (
-              <ContentFallback
-                type="notes"
-                topicTitle={topic.title}
-                courseSlug={courseSlug}
-                nextUrl={topic.associatedQuiz?.url || nextItem?.url}
-                nextLabel={topic.associatedQuiz ? 'Take Topic Skill Quiz →' : 'Continue to Next Topic →'}
-              />
-            )}
-
-            {/* 📥 PDF Exercise Guide / Google Drive Embedded Viewer (If Available) */}
-            {topic.exercisePdfUrl && (
-              <EmbeddedDocViewer
-                url={topic.exercisePdfUrl}
-                title={topic.exercisePdfTitle || `${topic.title} — Exercise & Blueprint Guide`}
-                description="Review the step-by-step exercise rubric and cloud reference guide."
-                accentColor="violet"
-              />
-            )}
+            {/* Embedded Google Drive Notes PDF or Empty State */}
+            <PdfEmbed
+              url={topic.notesPdfUrl}
+              title={topic.title}
+              emptyMessage="Lesson notes not uploaded yet"
+            />
           </div>
         </div>
 

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { fetchApi } from '@/lib/api';
 import LearnSidebar from '@/components/learn/LearnSidebar';
-import EmbeddedDocViewer from '@/components/learn/EmbeddedDocViewer';
+import { PdfEmbed } from '@/components/PdfEmbed';
 import {
   Award,
   CheckCircle2,
@@ -249,15 +249,12 @@ export default function CapstoneProjectPage() {
               </div>
             ) : (
               <div className="space-y-6">
-                {/* 📄 Admin-Uploaded Capstone PDF / Google Drive Embedded Viewer */}
-                {capstone?.exercisePdfUrl && (
-                  <EmbeddedDocViewer
-                    url={capstone.exercisePdfUrl}
-                    title={capstone.exercisePdfTitle || `${curriculum?.course?.title || 'Capstone'} — Official Specification & Rubric`}
-                    description="Embedded Google Drive PDF guide. Review all requirements before starting development."
-                    accentColor="amber"
-                  />
-                )}
+                {/* 📄 Course Project PDF Embed */}
+                <PdfEmbed
+                  url={capstone?.projectPdfUrl || capstone?.exercisePdfUrl}
+                  title={capstone?.projectPdfTitle || capstone?.exercisePdfTitle || `${curriculum?.course?.title || 'Capstone'} — Official Specification & Rubric`}
+                  emptyMessage="Course project PDF not uploaded yet"
+                />
 
                 {/* Project Blueprints Selection (from DB or default benchmarks) */}
                 {(() => {
