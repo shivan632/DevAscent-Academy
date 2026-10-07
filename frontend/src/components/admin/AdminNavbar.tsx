@@ -45,9 +45,10 @@ export function AdminNavbar({ onToggleSidebar }: AdminNavbarProps) {
     revalidateOnFocus: true,
   });
 
+  const emailLower = user?.email?.toLowerCase().trim();
   const isSuperAdmin =
-    user?.email === process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL ||
-    user?.email === 'shivrom.2020@gmail.com';
+    emailLower === (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '').toLowerCase().trim() ||
+    emailLower === 'shivrom.2020@gmail.com';
 
   const totalPending = (badges?.pendingSubmissions || 0) + (badges?.pendingRefunds || 0);
 

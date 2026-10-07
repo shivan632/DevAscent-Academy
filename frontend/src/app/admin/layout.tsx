@@ -30,13 +30,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const token = typeof window !== 'undefined' ? localStorage.getItem('devascent_token') : null;
       if (!isAuthenticated || !user) {
         if (!token) {
-          router.replace('/login?redirect=/admin/dashboard');
+          window.location.href = '/login?redirect=/admin/dashboard';
         }
       } else if (!isAllowed) {
-        router.replace('/dashboard');
+        window.location.href = '/dashboard';
       }
     }
-  }, [mounted, isLoading, isAuthenticated, user, isAllowed, router]);
+  }, [mounted, isLoading, isAuthenticated, user, isAllowed]);
 
   // While mounting or loading auth state, render loading placeholder consistently on server & client
   if (!mounted || isLoading) {

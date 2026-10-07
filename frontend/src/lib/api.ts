@@ -3,8 +3,8 @@ export function getApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     if (host && host !== 'localhost' && host !== '127.0.0.1') {
-      if (envUrl && (envUrl.includes('localhost:3001') || envUrl.includes('127.0.0.1:3001'))) {
-        return `${window.location.protocol}//${host}:3001/api/v1`;
+      if (!envUrl || envUrl.includes('localhost') || envUrl.includes('127.0.0.1')) {
+        return 'https://devascent-academy.onrender.com/api/v1';
       }
     }
   }

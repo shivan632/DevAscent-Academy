@@ -71,7 +71,7 @@ function LoginForm() {
     }
     if (!authLoading && user) {
       const destination = getDestination(user);
-      router.replace(destination);
+      window.location.href = destination;
     }
   }, [user, authLoading]);
 
@@ -147,8 +147,7 @@ function LoginForm() {
               if (rawUser) {
                 setUser(rawUser);
                 const destination = getDestination(rawUser);
-                router.push(destination);
-                router.refresh();
+                window.location.href = destination;
               }
             } catch (err: any) {
               setError(err?.message || 'Google sign-in failed. Please try again.');

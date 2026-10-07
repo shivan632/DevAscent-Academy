@@ -61,8 +61,14 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const emailMatch = Boolean(
+    user?.email &&
+      (user.email.toLowerCase().trim() === 'shivrom.2020@gmail.com' ||
+        user.email.toLowerCase().trim() ===
+          (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '').toLowerCase().trim())
+  );
   const isAuth = mounted && isAuthenticated;
-  const isAdmin = mounted && user?.role === 'ADMIN';
+  const isAdmin = mounted && Boolean(user && (user.role === 'ADMIN' || emailMatch));
   const currentUser = mounted ? user : null;
 
   const isActive = (path: string) => {

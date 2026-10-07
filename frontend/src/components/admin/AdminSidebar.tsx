@@ -90,9 +90,10 @@ export function AdminSidebar({ mobileOpen = false, onCloseMobile }: AdminSidebar
     revalidateOnFocus: true,
   });
 
+  const emailLower = user?.email?.toLowerCase().trim();
   const isSuperAdmin =
-    user?.email === process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL ||
-    user?.email === 'shivrom.2020@gmail.com';
+    emailLower === (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '').toLowerCase().trim() ||
+    emailLower === 'shivrom.2020@gmail.com';
 
   const handleLogout = async () => {
     await logout();
