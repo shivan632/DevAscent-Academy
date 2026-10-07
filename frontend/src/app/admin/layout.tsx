@@ -12,6 +12,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mounted, setMounted] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  const emailMatch = Boolean(
+    user?.email &&
+      (user.email.toLowerCase().trim() === 'shivrom.2020@gmail.com' ||
+        user.email.toLowerCase().trim() ===
+          (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '').toLowerCase().trim())
+  );
+  const isAllowed = Boolean(user && (user.role === 'ADMIN' || emailMatch));
+
   useEffect(() => {
     setMounted(true);
     checkAuth();
@@ -19,14 +27,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (mounted && !isLoading) {
-      const isAllowed = user && (user.role === 'ADMIN' || user.email === 'shivrom.2020@gmail.com');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('devascent_token') : null;
       if (!isAuthenticated || !user) {
-        router.replace('/login?redirect=/admin/dashboard');
+        if (!token) {
+          router.replace('/login?redirect=/admin/dashboard');
+        }
       } else if (!isAllowed) {
         router.replace('/dashboard');
       }
     }
-  }, [mounted, isLoading, isAuthenticated, user, router]);
+  }, [mounted, isLoading, isAuthenticated, user, isAllowed, router]);
 
   // While mounting or loading auth state, render loading placeholder consistently on server & client
   if (!mounted || isLoading) {
@@ -41,7 +51,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   // Not admin — show nothing while redirect happens
-  const isAllowed = user && (user.role === 'ADMIN' || user.email === 'shivrom.2020@gmail.com');
   if (!isAllowed) {
     return null;
   }

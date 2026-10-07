@@ -23,7 +23,7 @@ import {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, isLoading: authLoading, setUser } = useAuthStore();
+  const { user, isLoading: authLoading, setUser, checkAuth } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,10 +36,18 @@ function LoginForm() {
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
   // Helper to compute target destination honoring ?redirect=
   const getDestination = (rawUser: any) => {
     const redirectParam = searchParams.get('redirect');
-    const isAdmin = rawUser?.role === 'ADMIN' || rawUser?.email === 'shivrom.2020@gmail.com';
+    const emailLower = rawUser?.email?.toLowerCase().trim();
+    const isAdmin =
+      rawUser?.role === 'ADMIN' ||
+      emailLower === 'shivrom.2020@gmail.com' ||
+      emailLower === (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '').toLowerCase().trim();
     let dest = isAdmin ? '/admin/dashboard' : '/dashboard';
     if (redirectParam) {
       if (redirectParam.startsWith('/admin') && !isAdmin) {
@@ -62,7 +70,8 @@ function LoginForm() {
       }
     }
     if (!authLoading && user) {
-      router.replace(getDestination(user));
+      const destination = getDestination(user);
+      router.replace(destination);
     }
   }, [user, authLoading]);
 
@@ -98,8 +107,7 @@ function LoginForm() {
       if (rawUser) {
         setUser(rawUser);
         const destination = getDestination(rawUser);
-        router.push(destination);
-        router.refresh();
+        window.location.href = destination;
       } else {
         throw new Error('Login failed: Invalid server response');
       }
