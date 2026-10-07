@@ -238,16 +238,27 @@ function DashboardContent() {
 
   useEffect(() => {
     if (!authLoading) {
-      if (!user) {
-        router.replace('/login');
-      } else if (user.role === 'ADMIN' || user.email === 'shivrom.2020@gmail.com') {
-        router.replace('/admin/dashboard');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('devascent_token') : null;
+      if (!token && !user) {
+        window.location.href = '/login';
+      } else if (user) {
+        const emailLower = user.email?.toLowerCase().trim();
+        const isUserAdmin = user.role === 'ADMIN' || emailLower === 'shivrom.2020@gmail.com' || emailLower === (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '').toLowerCase().trim();
+        if (isUserAdmin) {
+          window.location.href = '/admin/dashboard';
+        }
       }
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading]);
 
   // While redirecting admin away from student dashboard
-  if (user && (user.role === 'ADMIN' || user.email === 'shivrom.2020@gmail.com')) {
+  const isUserAdmin = Boolean(
+    user &&
+      (user.role === 'ADMIN' ||
+        user.email?.toLowerCase().trim() === 'shivrom.2020@gmail.com' ||
+        user.email?.toLowerCase().trim() === (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '').toLowerCase().trim())
+  );
+  if (isUserAdmin) {
     return <DashboardSkeleton />;
   }
 

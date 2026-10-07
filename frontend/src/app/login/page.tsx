@@ -40,38 +40,38 @@ function LoginForm() {
     checkAuth();
   }, [checkAuth]);
 
-  // Helper to compute target destination honoring ?redirect=
+  // Direct simplified destination router: Admin -> /admin/dashboard, Student -> /dashboard
   const getDestination = (rawUser: any) => {
-    const redirectParam = searchParams.get('redirect');
     const emailLower = rawUser?.email?.toLowerCase().trim();
     const isAdmin =
       rawUser?.role === 'ADMIN' ||
       emailLower === 'shivrom.2020@gmail.com' ||
       emailLower === (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || '').toLowerCase().trim();
-    let dest = isAdmin ? '/admin/dashboard' : '/dashboard';
-    if (redirectParam) {
-      if (redirectParam.startsWith('/admin') && !isAdmin) {
-        dest = '/dashboard';
-      } else if (redirectParam.startsWith('/dashboard') && isAdmin) {
-        dest = '/admin/dashboard';
-      } else {
-        dest = redirectParam;
-      }
-    }
-    return dest;
+    return isAdmin ? '/admin/dashboard' : '/dashboard';
   };
 
-  // If already authenticated in localStorage/session, sync cookie and auto-redirect
+  // Immediate redirect if valid session already in localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedToken = localStorage.getItem('devascent_token');
+      const storedUser = localStorage.getItem('devascent_user');
+      if (storedToken && storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          if (parsed && (parsed.id || parsed.email)) {
+            window.location.href = getDestination(parsed);
+            return;
+          }
+        } catch {
+          // ignore
+        }
+      }
       if (storedToken && !document.cookie.includes('access_token=')) {
         document.cookie = `access_token=${storedToken}; path=/; max-age=604800; SameSite=Lax`;
       }
     }
     if (!authLoading && user) {
-      const destination = getDestination(user);
-      window.location.href = destination;
+      window.location.href = getDestination(user);
     }
   }, [user, authLoading]);
 

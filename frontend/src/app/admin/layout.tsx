@@ -28,15 +28,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (mounted && !isLoading) {
       const token = typeof window !== 'undefined' ? localStorage.getItem('devascent_token') : null;
-      if (!isAuthenticated || !user) {
-        if (!token) {
-          window.location.href = '/login?redirect=/admin/dashboard';
-        }
-      } else if (!isAllowed) {
+      if (!token && !user) {
+        window.location.href = '/login';
+      } else if (user && !isAllowed) {
         window.location.href = '/dashboard';
       }
     }
-  }, [mounted, isLoading, isAuthenticated, user, isAllowed]);
+  }, [mounted, isLoading, user, isAllowed]);
 
   // While mounting or loading auth state, render loading placeholder consistently on server & client
   if (!mounted || isLoading) {
