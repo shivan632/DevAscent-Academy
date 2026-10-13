@@ -1,0 +1,319 @@
+- generic [active] [ref=f1e1]:
+  - alert [ref=f1e2]
+  - generic [ref=f1e3]:
+    - link "Skip to main content" [ref=f1e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - generic [ref=f1e7]:
+          - button "Toggle Student Sidebar" [ref=f1e8]
+          - link "DevAscent Academy DevAscent Academy & Internships" [ref=f1e10] [cursor=pointer]:
+            - /url: /
+            - img "DevAscent Academy" [ref=f1e12]
+            - generic [ref=f1e13]:
+              - generic [ref=f1e14]: DevAscent
+              - generic [ref=f1e15]: Academy & Internships
+        - generic [ref=f1e16]:
+          - button "Notifications" [ref=f1e18]
+          - button "Toggle theme mode" [ref=f1e22]
+          - button "R Rao" [ref=f1e30]:
+            - generic [ref=f1e31]: R
+            - generic [ref=f1e32]: Rao
+          - button "Toggle Navigation" [ref=f1e35]
+    - main [ref=f1e37]:
+      - generic [ref=f1e41]:
+        - generic [ref=f1e42]:
+          - generic [ref=f1e43]:
+            - generic [ref=f1e44]: Active Student Workspace
+            - heading "Welcome back, Rao 👋" [level=1] [ref=f1e47]
+            - paragraph [ref=f1e48]: Continue your coursework, track capstone project reviews, and download your verifiable graduation credentials.
+          - generic [ref=f1e49]:
+            - link "Resume Learning" [ref=f1e50] [cursor=pointer]:
+              - /url: /learn
+            - link "AI Studio" [ref=f1e54] [cursor=pointer]:
+              - /url: /ai-studio
+        - generic [ref=f1e59]:
+          - generic [ref=f1e60]:
+            - generic [ref=f1e61]: Tracks
+            - generic [ref=f1e66]:
+              - paragraph [ref=f1e67]: 0 Active
+              - paragraph [ref=f1e68]: React & TypeScript Foundations
+          - generic [ref=f1e69]:
+            - generic [ref=f1e70]: Certificates
+            - generic [ref=f1e76]:
+              - paragraph [ref=f1e77]: "0"
+              - paragraph [ref=f1e78]: Verifiable SHA-256 Ledger
+          - generic [ref=f1e79]:
+            - generic [ref=f1e80]: Submissions
+            - generic [ref=f1e88]:
+              - paragraph [ref=f1e89]: "0"
+              - paragraph [ref=f1e90]: Capstone Review Queue
+          - generic [ref=f1e91]:
+            - generic [ref=f1e92]: Completion
+            - generic [ref=f1e98]:
+              - paragraph [ref=f1e99]: 0%
+              - paragraph [ref=f1e100]: Lessons in Progress
+        - generic [ref=f1e101]:
+          - generic [ref=f1e102]:
+            - generic [ref=f1e103]:
+              - generic [ref=f1e104]:
+                - text: Learning Workspace
+                - heading "My Enrolled Tracks & Ongoing Programs" [level=2] [ref=f1e105]
+              - generic [ref=f1e106]: 0 Active Tracks
+            - generic [ref=f1e107]:
+              - generic [ref=f1e111]:
+                - heading "No Active Enrollments" [level=3] [ref=f1e112]
+                - paragraph [ref=f1e113]: You have not enrolled in any programs yet. Explore our engineering cohorts and industrial internships to start learning.
+              - link "Explore Courses & Cohorts" [ref=f1e115] [cursor=pointer]:
+                - /url: /courses
+            - generic [ref=f1e119]:
+              - generic [ref=f1e120]:
+                - generic [ref=f1e121]:
+                  - generic [ref=f1e122]: Performance Telemetry
+                  - heading "Learning Mastery & Performance" [level=3] [ref=f1e126]
+                - generic [ref=f1e127]:
+                  - generic [ref=f1e128]: "Select Track:"
+                  - combobox "Select Track:" [ref=f1e130] [cursor=pointer]
+              - generic [ref=f1e131]:
+                - generic [ref=f1e132]:
+                  - generic [ref=f1e133]:
+                    - generic [ref=f1e134]: Track Mastery Index
+                    - generic [ref=f1e135]: In Progress
+                  - generic [ref=f1e140]:
+                    - generic [ref=f1e141]: 0%
+                    - generic [ref=f1e142]: Mastery
+                  - generic [ref=f1e143]:
+                    - generic [ref=f1e144]:
+                      - paragraph [ref=f1e145]: Study Time
+                      - paragraph [ref=f1e146]: 29.8h
+                    - generic [ref=f1e147]:
+                      - paragraph [ref=f1e148]: Quizzes
+                      - paragraph [ref=f1e149]: 2/12
+                    - generic [ref=f1e150]:
+                      - paragraph [ref=f1e151]: Labs
+                      - paragraph [ref=f1e152]: 4/16
+                - generic [ref=f1e153]:
+                  - generic [ref=f1e154]:
+                    - heading "Weekly Study Activity & Velocity" [level=4] [ref=f1e158]
+                    - generic [ref=f1e159]: 🔥 5-Day Active Streak
+                  - generic [ref=f1e160]:
+                    - generic [ref=f1e161]:
+                      - generic [ref=f1e162]: 3.5h
+                      - generic [ref=f1e165]: Mon
+                    - generic [ref=f1e166]:
+                      - generic [ref=f1e167]: 4.2h
+                      - generic [ref=f1e170]: Tue
+                    - generic [ref=f1e171]:
+                      - generic [ref=f1e172]: 2.8h
+                      - generic [ref=f1e175]: Wed
+                    - generic [ref=f1e176]:
+                      - generic [ref=f1e177]: 5h
+                      - generic [ref=f1e180]: Thu
+                    - generic [ref=f1e181]:
+                      - generic [ref=f1e182]: 3.8h
+                      - generic [ref=f1e185]: Fri
+                    - generic [ref=f1e186]:
+                      - generic [ref=f1e187]: 6.5h
+                      - generic [ref=f1e190]: Sat
+                    - generic [ref=f1e191]:
+                      - generic [ref=f1e192]: 4h
+                      - generic [ref=f1e195]: Sun
+                  - paragraph [ref=f1e196]:
+                    - generic [ref=f1e197]:
+                      - text: "Total logged:"
+                      - strong [ref=f1e198]: 29.8 hrs this week
+                    - generic [ref=f1e199]: +24% vs last week
+              - generic [ref=f1e200]:
+                - generic [ref=f1e201]:
+                  - heading "Core Competencies for No Enrolled Program" [level=4] [ref=f1e202]
+                  - generic [ref=f1e207]: Industry Verified
+                - generic [ref=f1e208]:
+                  - generic [ref=f1e210]:
+                    - generic [ref=f1e211]: Core Architecture & Patterns
+                    - generic [ref=f1e212]: 70%
+                  - generic [ref=f1e216]:
+                    - generic [ref=f1e217]: TypeScript & Type Safety
+                    - generic [ref=f1e218]: 65%
+                  - generic [ref=f1e222]:
+                    - generic [ref=f1e223]: API Integration & State Sync
+                    - generic [ref=f1e224]: 60%
+                  - generic [ref=f1e228]:
+                    - generic [ref=f1e229]: Production Capstone Readiness
+                    - generic [ref=f1e230]: 40%
+              - generic [ref=f1e233]:
+                - generic [ref=f1e234]:
+                  - generic [ref=f1e235]: Module Progress Breakdown
+                  - generic [ref=f1e240]: 0 / 4 Modules Completed
+                - generic [ref=f1e241]:
+                  - generic [ref=f1e242]:
+                    - generic [ref=f1e243]: "Module 1: Foundations & Architecture"
+                    - paragraph [ref=f1e248]: Core mental models, syntax, types, and structure.
+                  - generic [ref=f1e249]:
+                    - generic [ref=f1e250]: "Module 2: Async APIs & State Sync"
+                    - paragraph [ref=f1e255]: REST integration, queries, caching, and error boundaries.
+                  - generic [ref=f1e256]:
+                    - generic [ref=f1e257]: "Module 3: Global Architecture & Systems"
+                    - paragraph [ref=f1e262]: Persistent stores, auth flows, and scalable design.
+                  - generic [ref=f1e263]:
+                    - generic [ref=f1e264]: "Module 4: Graduation Capstone Project"
+                    - paragraph [ref=f1e269]: Deploy full-stack app, submit GitHub link for official certificate.
+          - generic [ref=f1e270]:
+            - generic [ref=f1e271]:
+              - generic [ref=f1e272]:
+                - heading "AI Studio Toolbox" [level=4] [ref=f1e278]
+                - generic [ref=f1e279]: Pro Copilot
+              - paragraph [ref=f1e280]:
+                - text: Instant course-aware prompts tailored for
+                - strong [ref=f1e281]: your active track
+                - text: ":"
+              - generic [ref=f1e282]:
+                - link "Explain the hardest concept in this module" [ref=f1e283] [cursor=pointer]:
+                  - /url: /ai-studio?prompt=Explain%20the%20hardest%20concept%20in%20this%20module
+                - link "Generate a 5-question practice quiz for me" [ref=f1e291] [cursor=pointer]:
+                  - /url: /ai-studio?prompt=Generate%20a%205-question%20practice%20quiz%20for%20me
+                - link "Review my code and suggest optimizations" [ref=f1e299] [cursor=pointer]:
+                  - /url: /ai-studio?prompt=Review%20my%20code%20and%20suggest%20optimizations
+                - link "Help me plan my capstone project architecture" [ref=f1e307] [cursor=pointer]:
+                  - /url: /ai-studio?prompt=Help%20me%20plan%20my%20capstone%20project%20architecture
+              - link "Launch AI Study Studio" [ref=f1e315] [cursor=pointer]:
+                - /url: /ai-studio
+            - generic [ref=f1e323]:
+              - generic [ref=f1e324]:
+                - generic [ref=f1e325]: Your Next Priority
+                - generic [ref=f1e326]: Get Started 🚀
+              - generic [ref=f1e327]:
+                - heading "Choose Your Engineering Track" [level=4] [ref=f1e328]
+                - paragraph [ref=f1e334]: Explore full-stack, backend, AI, and industrial internship programs to start building real-world projects.
+              - link "Browse All Courses" [ref=f1e335] [cursor=pointer]:
+                - /url: /courses
+            - generic [ref=f1e340]:
+              - generic [ref=f1e341]:
+                - heading "Live Instructor Desk" [level=4] [ref=f1e342]
+                - generic [ref=f1e345]: Weekly Live
+              - generic [ref=f1e347]:
+                - generic [ref=f1e348]:
+                  - generic [ref=f1e349]:
+                    - paragraph [ref=f1e350]: Cohort Q&A & Code Clinic
+                    - paragraph [ref=f1e351]: Every Saturday • 8:00 PM IST
+                  - generic [ref=f1e352]: Live Meet
+                - generic [ref=f1e353]:
+                  - generic [ref=f1e354]: Code Review SLA
+                  - generic [ref=f1e355]: Within 24–48 Hours
+              - generic [ref=f1e356]:
+                - generic [ref=f1e357]: Need immediate assistance?
+                - link "Ask Mentor Desk →" [ref=f1e358] [cursor=pointer]:
+                  - /url: /dashboard?tab=support
+    - contentinfo [ref=f1e359]:
+      - generic [ref=f1e360]:
+        - generic [ref=f1e361]:
+          - generic [ref=f1e362]:
+            - link "DevAscent Academy DevAscent Academy & Programs" [ref=f1e363] [cursor=pointer]:
+              - /url: /
+              - img "DevAscent Academy" [ref=f1e364]
+              - generic [ref=f1e365]:
+                - generic [ref=f1e366]: DevAscent
+                - generic [ref=f1e367]: Academy & Programs
+            - paragraph [ref=f1e368]: Democratizing high-caliber, code-first software engineering education for Indian developers. Bridging college theory with production-grade Full-Stack, NestJS, and Cloud systems.
+            - generic [ref=f1e369]:
+              - paragraph [ref=f1e370]:
+                - generic [ref=f1e374]: Bengaluru, Karnataka, India
+              - paragraph [ref=f1e375]:
+                - generic [ref=f1e379]: Trusted by 500+ BCA & Engineering Students
+            - generic [ref=f1e380]:
+              - generic [ref=f1e381]: Connect With Us
+              - generic [ref=f1e382]:
+                - link "LinkedIn" [ref=f1e383] [cursor=pointer]:
+                  - /url: https://linkedin.com
+                - link "GitHub" [ref=f1e386] [cursor=pointer]:
+                  - /url: https://github.com
+                - link "Twitter X" [ref=f1e389] [cursor=pointer]:
+                  - /url: https://twitter.com
+                - link "YouTube" [ref=f1e392] [cursor=pointer]:
+                  - /url: https://youtube.com
+                - link "Discord" [ref=f1e395] [cursor=pointer]:
+                  - /url: https://discord.gg/devascent
+            - generic [ref=f1e398]:
+              - generic [ref=f1e399]: 100% Verifiable Credentials
+              - generic [ref=f1e404]: Razorpay 256-Bit SSL
+          - generic [ref=f1e409]:
+            - heading "Programs" [level=4] [ref=f1e410]
+            - list [ref=f1e416]:
+              - listitem [ref=f1e417]:
+                - link "Web Development Internship" [ref=f1e418] [cursor=pointer]:
+                  - /url: /courses/web-development-internship
+              - listitem [ref=f1e419]:
+                - link "Python Programming Internship" [ref=f1e420] [cursor=pointer]:
+                  - /url: /courses/python-programming-internship
+              - listitem [ref=f1e421]:
+                - link "Java Programming Internship" [ref=f1e422] [cursor=pointer]:
+                  - /url: /courses/java-programming-internship
+              - listitem [ref=f1e423]:
+                - link "Backend & Cloud Internship" [ref=f1e424] [cursor=pointer]:
+                  - /url: /courses/backend-cloud-internship
+              - listitem [ref=f1e425]:
+                - link "Data Science Internship" [ref=f1e426] [cursor=pointer]:
+                  - /url: /courses/data-science-internship
+              - listitem [ref=f1e427]:
+                - link "Full-Stack Accelerator" [ref=f1e428] [cursor=pointer]:
+                  - /url: /courses/full-stack-accelerator
+          - generic [ref=f1e429]:
+            - heading "Verification" [level=4] [ref=f1e430]
+            - list [ref=f1e435]:
+              - listitem [ref=f1e436]:
+                - link "Public Registry Search" [ref=f1e437] [cursor=pointer]:
+                  - /url: /verify/DEVASCENT-2025-VALID
+              - listitem [ref=f1e441]:
+                - link "Sample Certificate Demo" [ref=f1e442] [cursor=pointer]:
+                  - /url: /certificate
+              - listitem [ref=f1e443]:
+                - link "SHA-256 Hash Verification" [ref=f1e444] [cursor=pointer]:
+                  - /url: /verify/DEVASCENT-2025-VALID
+              - listitem [ref=f1e445]:
+                - link "7-Day Refund Policy" [ref=f1e446] [cursor=pointer]:
+                  - /url: /refund-policy
+              - listitem [ref=f1e447]:
+                - link "Return & Cancellation" [ref=f1e448] [cursor=pointer]:
+                  - /url: /return-policy
+              - listitem [ref=f1e449]:
+                - link "Student Learning Portal" [ref=f1e450] [cursor=pointer]:
+                  - /url: /dashboard
+          - generic [ref=f1e451]:
+            - heading "Support & Desk" [level=4] [ref=f1e452]
+            - generic [ref=f1e461]:
+              - link "Contact & Student Desk" [ref=f1e462] [cursor=pointer]:
+                - /url: /contact
+              - link "Help Desk & Doubt Q&A" [ref=f1e471] [cursor=pointer]:
+                - /url: /support
+              - link "devascentacademy@gmail.com" [ref=f1e476] [cursor=pointer]:
+                - /url: mailto:devascentacademy@gmail.com
+              - link "+91 99358 06722" [ref=f1e481] [cursor=pointer]:
+                - /url: tel:+919935806722
+            - generic [ref=f1e485]:
+              - generic [ref=f1e486]: 100% Zero-Risk Guarantee
+              - paragraph [ref=f1e491]: Full 7-day refund under 20% progress. Zero questions asked. Direct UPI/Card reversal.
+              - generic [ref=f1e492]: UPI • Cards • NetBanking • RuPay
+        - generic [ref=f1e496]:
+          - generic [ref=f1e497]:
+            - paragraph [ref=f1e498]: © 2026 DevAscent Academy Pvt. Ltd. All rights reserved.
+            - generic [ref=f1e499]: •
+            - generic [ref=f1e500]: Made with ❤️ in India 🇮🇳
+          - generic [ref=f1e501]:
+            - link "About" [ref=f1e502] [cursor=pointer]:
+              - /url: /about
+            - link "Contact Us" [ref=f1e503] [cursor=pointer]:
+              - /url: /contact
+            - link "Privacy Policy" [ref=f1e504] [cursor=pointer]:
+              - /url: /privacy
+            - link "Cookie Policy" [ref=f1e505] [cursor=pointer]:
+              - /url: /cookie-policy
+            - link "Terms & Conditions" [ref=f1e506] [cursor=pointer]:
+              - /url: /terms
+            - link "Refund Policy" [ref=f1e507] [cursor=pointer]:
+              - /url: /refund-policy
+            - link "Return Policy" [ref=f1e508] [cursor=pointer]:
+              - /url: /return-policy
+            - link "Placement Disclaimer" [ref=f1e509] [cursor=pointer]:
+              - /url: /disclaimer
+            - link "Help Desk" [ref=f1e510] [cursor=pointer]:
+              - /url: /support
+            - button "Back to top" [ref=f1e511]

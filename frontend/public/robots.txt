@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /learn
+Disallow: /learn/*
+Disallow: /checkout
+Disallow: /checkout/*
+Disallow: /api/*
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/*
+Disallow: /dashboard/*
+Disallow: /checkout/*
+
+Sitemap: https://www.devascentacademy.me/sitemap.xml
