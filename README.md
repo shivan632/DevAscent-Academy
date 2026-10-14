@@ -5,7 +5,7 @@
   
   ### Empowering Next-Gen Engineers Through Production-Grade Practical Learning
   
-  [![Live Website](https://img.shields.io/badge/Live-dev--ascent--academy.vercel.app-6366F1?style=for-the-badge&logo=vercel&logoColor=white)](https://dev-ascent-academy.vercel.app)
+  [![Live Website](https://img.shields.io/badge/Live-www.devascentacademy.me-6366F1?style=for-the-badge&logo=vercel&logoColor=white)](https://www.devascentacademy.me)
   [![Backend API](https://img.shields.io/badge/API-devascent--academy.onrender.com-00C7B7?style=for-the-badge&logo=render&logoColor=white)](https://devascent-academy.onrender.com)
   [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
   [![Next.js](https://img.shields.io/badge/Next.js-14_App_Router-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
@@ -21,11 +21,13 @@
 - [🌐 Live Infrastructure & Core Links](#-live-infrastructure--core-links)
 - [⚡ Technology Stack](#-technology-stack)
 - [🎓 How It Works for Students (Step-by-Step)](#-how-it-works-for-students-step-by-step)
+- [✨ Key Platform Features & Modules](#-key-platform-features--modules)
 - [📊 System Architecture & Flowcharts](#-system-architecture--flowcharts)
   - [1. Authentication & OTP Verification Flow](#1-authentication--otp-verification-flow)
   - [2. Course Discovery & Razorpay Payment Flow](#2-course-discovery--razorpay-payment-flow)
   - [3. Interactive Learning & AI Copilot Flow](#3-interactive-learning--ai-copilot-flow)
-  - [4. Capstone Submission & Certificate Issuance Flow](#4-capstone-submission--certificate-issuance-flow)
+  - [4. Student Doubt & Instructor Q&A Flow](#4-student-doubt--instructor-qa-flow)
+  - [5. Capstone Submission & Certificate Issuance Flow](#5-capstone-submission--certificate-issuance-flow)
 - [🛡️ Tamper-Proof Certificate & Verification System](#️-tamper-proof-certificate--verification-system)
 - [💼 Admin Command Center](#-admin-command-center)
 - [🚀 Local Development & Setup](#-local-development--setup)
@@ -41,6 +43,8 @@
 ### 🌟 Core Value Propositions
 - **Hands-on Virtual Internships**: Real-world capstone projects spanning full-stack development, algorithmic systems, AI engineering, and modern cloud architectures.
 - **AI-Powered Code Mentor**: Built-in 24/7 AI learning copilot that provides instant code reviews, debugging assistance, and conceptual guidance.
+- **Doubt Resolution Hub**: Direct interactive Q&A between students and instructors with status tracking and urgency filters.
+- **Broadcast Notifications & Announcements**: Target-driven updates delivering real-time platform news, cohort notices, and direct student communications.
 - **Tamper-Proof Digital Credentials**: High-resolution luxury dark-mode PDF certificates embedded with cryptographic SHA-256 signatures and instant public verification QR codes.
 - **7-Day Transparent Guarantee**: Built-in automated refund tracking system ensuring student protection and peace of mind.
 
@@ -50,11 +54,12 @@
 
 | Service | Destination / URL | Provider |
 |---|---|---|
-| **Frontend Web App** | [https://dev-ascent-academy.vercel.app](https://dev-ascent-academy.vercel.app) | Vercel Edge CDN |
+| **Production Domain** | [https://www.devascentacademy.me](https://www.devascentacademy.me) | Vercel Custom Domain + SSL |
+| **Vercel Edge Mirror** | [https://dev-ascent-academy.vercel.app](https://dev-ascent-academy.vercel.app) | Vercel Edge CDN |
 | **Backend REST API** | [https://devascent-academy.onrender.com/api/v1](https://devascent-academy.onrender.com/api/v1) | Render Cloud Services |
-| **Serverless Database** | Neon PostgreSQL (Pooled + SSL) | Neon AWS US-East-2 |
+| **Serverless Database** | Neon PostgreSQL (Connection Pooling + SSL) | Neon AWS US-East-2 |
 | **Email Gateway** | Resend HTTP API + Gmail SMTP Dual-Stack | Resend DNS Verified Domain |
-| **Public Verification** | `https://dev-ascent-academy.vercel.app/verify/:certId` | DevAscent Public Ledger |
+| **Public Verification** | `https://www.devascentacademy.me/verify/:certId` | DevAscent Public Ledger |
 
 ---
 
@@ -111,6 +116,36 @@
 
 ---
 
+## ✨ Key Platform Features & Modules
+
+### 1. ❓ Interactive Doubt Resolution & Instructor Help Desk
+- Students can submit contextual doubt tickets attached directly to specific courses and lessons.
+- Includes **Urgency Flagging** (`isUrgent`) for critical debugging blockers.
+- Status lifecycles (`PENDING` ➔ `ANSWERED`) with real-time instructor reply dispatch and attribution.
+
+### 2. 📢 Targeted Broadcast Announcements & Notification Engine
+- Multi-tier alert broadcasting supporting `ALL`, role-specific (`STUDENT`, `ADMIN`), or cohort-specific announcements.
+- Granular course alerts linked directly to cohort syllabuses.
+- Individual student direct messaging hub with persistent read-receipt tracking (`NotificationRead`).
+
+### 3. ⏱️ Timed Quiz Engine & Multi-Attempt Evaluations
+- Interactive module and lesson-level quizzes with strict passing thresholds (e.g. 70%).
+- Integrated countdown timers (`timeLimitMin`) with automated auto-submit safeguards.
+- Multi-attempt management (`QuizAttempt`) with detailed historical logs, code snippet evaluation, and explanations.
+
+### 4. 🎟️ Flexible Coupon & Promotion Engine
+- Support for percentage (`PERCENT`) and flat-rate (`FLAT`) discounts.
+- Enforced expiration windows (`expiresAt`), total usage limits (`maxUses`), and auto-apply configurations.
+- Direct integration with Razorpay dynamic checkout orders.
+
+### 5. 🎨 Design System & Usability Architecture (WCAG AA)
+- Unified typography hierarchy conforming strictly to standard design tokens (no fragmented font sizes).
+- Semantic heading structure (`H1` ➔ `H2` ➔ `H3`) ensuring screen reader compliance and SEO crawlability.
+- Co-located interactive certificate generator providing real-time live preview of student credentials.
+- Contrast-checked luxury dark/light mode palette with accessible interactive button affordances.
+
+---
+
 ## 📊 System Architecture & Flowcharts
 
 ### 1. Authentication & OTP Verification Flow
@@ -154,7 +189,7 @@ sequenceDiagram
 
     Student->>Client: Selects Cohort & clicks "Enroll Now"
     Client->>API: POST /api/v1/payments/create-order
-    API->>Razorpay: Create Order with amountInPaise
+    API->>Razorpay: Create Order with amountInPaise (applies active coupon)
     Razorpay-->>API: Returns razorpayOrderId
     API-->>Client: Returns Order ID, Key, and Price details
     Client->>Razorpay: Opens Razorpay Checkout Modal (UPI, Cards, NetBanking)
@@ -181,15 +216,43 @@ flowchart TD
     C -->|Yes: Ask Instructor| F[❓ Submit Lesson Doubt Ticket]
     F --> G[👨‍🏫 Instructor Resolves & Replies]
     G --> B
-    C -->|No: Ready for Evaluation| H[📝 Take Module Quiz & Complete Challenges]
-    H --> I{Passed Module Quiz?}
-    I -->|No| H
+    C -->|No: Ready for Evaluation| H[📝 Take Timed Quiz & Complete Challenges]
+    H --> I{Passed Quiz Threshold?}
+    I -->|No: Retry Attempt| H
     I -->|Yes| J[🚀 Unlock Next Module / Capstone Submission]
 ```
 
 ---
 
-### 4. Capstone Submission & Certificate Issuance Flow
+### 4. Student Doubt & Instructor Q&A Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Student as 👨‍🎓 Student
+    participant Client as 🖥️ Next.js Frontend
+    participant API as ⚙️ NestJS Doubts Engine
+    participant DB as 🗄️ Neon PostgreSQL
+    actor Admin as 👨‍🏫 Instructor / Admin
+
+    Student->>Client: Submits Doubt with Course/Lesson & Urgent flag
+    Client->>API: POST /api/v1/doubts
+    API->>DB: Create Doubt (Status: PENDING)
+    API-->>Client: 201 Created (Doubt visible in Student Hub)
+    Admin->>Client: Opens Instructor Doubts Inbox
+    Client->>API: GET /api/v1/doubts (Filtered by status / course)
+    API->>DB: Fetch pending doubts with student relations
+    API-->>Client: Renders pending doubt stream
+    Admin->>Client: Types solution & clicks "Submit Resolution"
+    Client->>API: PATCH /api/v1/doubts/:id/answer
+    API->>DB: Update Doubt (Status: ANSWERED, answeredById, answeredAt)
+    API-->>Client: Doubt resolved
+    Client-->>Student: Status changes to ANSWERED with full explanation
+```
+
+---
+
+### 5. Capstone Submission & Certificate Issuance Flow
 
 ```mermaid
 sequenceDiagram
@@ -228,7 +291,7 @@ Every credential generated by DevAscent Academy features multi-layered verificat
 ║   1. Tamper-Proof Cryptographic ID: DEV-BATCH12-8B9E73               ║
 ║   2. SHA-256 Hash Digest: Stored in immutable database record         ║
 ║   3. Embedded Scannable QR Code: Points directly to public ledger     ║
-║   4. Live Public URL: https://dev-ascent-academy.vercel.app/verify/   ║
+║   4. Live Public URL: https://www.devascentacademy.me/verify/         ║
 ║   5. Gold Foil Medallion Official Seal + Verified Founder Signature   ║
 ║                                                                       ║
 ╚═══════════════════════════════════════════════════════════════════════╝
@@ -236,7 +299,7 @@ Every credential generated by DevAscent Academy features multi-layered verificat
 
 ### Public Verification Endpoint
 - Anyone (recruiters, universities, employers) can scan the QR code or visit:
-  `https://dev-ascent-academy.vercel.app/verify/:certId`
+  `https://www.devascentacademy.me/verify/:certId`
 - The system checks the database in real-time and renders a verified badge with student name, track title, issue date, grade, and credential status.
 
 ---
@@ -247,6 +310,9 @@ DevAscent Academy includes an enterprise admin portal located at `/admin`:
 
 - **📊 Dashboard & Metrics**: Real-time revenue analytics, active students, enrollment velocity, and completion rates.
 - **📖 Course & Curriculum Builder**: Create and edit courses, video modules, lessons, quizzes, and cohort limits.
+- **❓ Doubts & Help Desk**: Review pending student blockers, filter by urgency, and publish authoritative answers.
+- **📢 Announcements & Notifications**: Dispatch platform broadcasts, cohort notices, and direct student alerts.
+- **🎟️ Coupons & Discount Engine**: Manage promo codes (`PERCENT` / `FLAT`), expiration gates, and redemption limits.
 - **👥 Student Directory**: View registered users, verification statuses, and enrolled tracks.
 - **📋 Enrollments Manager**: Track student progress percentages, activation statuses, and enrolled dates.
 - **✅ Capstone Review Queue**: Review student project submissions, assign grades (`Distinction (A+)`, `A`, `B`), and approve certificates.
