@@ -30,7 +30,7 @@
   - [5. Capstone Submission & Certificate Issuance Flow](#5-capstone-submission--certificate-issuance-flow)
 - [🛡️ Tamper-Proof Certificate & Verification System](#️-tamper-proof-certificate--verification-system)
 - [💼 Admin Command Center](#-admin-command-center)
-- [🚀 Local Development & Setup](#-local-development--setup)
+- [🔒 Enterprise Security & Data Integrity Standards](#-enterprise-security--data-integrity-standards)
 - [📦 Deployment Architecture](#-deployment-architecture)
 - [👥 Leadership & Contact](#-leadership--contact)
 
@@ -321,68 +321,32 @@ DevAscent Academy includes an enterprise admin portal located at `/admin`:
 
 ---
 
-## 🚀 Local Development & Setup
+## 🔒 Enterprise Security & Data Integrity Standards
 
-### Prerequisites
-- Node.js (v18.x or v20.x recommended)
-- PostgreSQL or Neon Serverless Postgres instance
-- npm or yarn
+DevAscent Academy enforces enterprise-grade security, cryptographic verification, and zero-trust engineering across both student and administrative interfaces:
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/shivan632/DevAscent-Academy.git
-cd DevAscent-Academy
-```
+### 1. 🛡️ Zero-Trust Session & Token Architecture
+- **HttpOnly & Secure Cookie Enclave**: JWT access and refresh tokens are stored exclusively inside `HttpOnly`, `SameSite=Strict`, `Secure` cookies, eliminating vulnerabilities to cross-site scripting (XSS) token theft.
+- **Bcrypt Password Cryptography**: Passwords undergo high-iteration cryptographic salting and hashing via Bcrypt before any persistence.
+- **Session Expiry & Rotation**: Short-lived access tokens paired with secure refresh token rotation prevent replay attacks.
 
-### 2. Backend Setup
-```bash
-cd backend
-npm install
+### 2. 🔏 Cryptographic Proof of Credential Authenticity
+- **Deterministic SHA-256 Digest**: Each issued graduation certificate is stamped with an immutable SHA-256 hash derived from the recipient's identity, course ID, issue timestamp, and official graduation grade.
+- **Real-Time Ledger Lookup**: Scanning the embedded QR code performs an instant query against our verified backend ledger (`/api/v1/certificates/verify/:certId`), preventing fraudulent diploma mill replication.
+- **Official Gold Foil Seal**: High-resolution vector rendering produces printable credentials protected against unauthorized manual alteration.
 
-# Configure environment variables
-cp .env.example .env
-```
+### 3. 💳 Hardened Payment & Order Security
+- **HMAC-SHA256 Webhook Verification**: Razorpay payment confirmations require rigorous server-side cryptographic HMAC-SHA256 signature verification prior to course provisioning or enrollment activation.
+- **Idempotent Order Fulfillments**: Orders are protected with unique payment hashes to prevent race conditions or duplicate access grants.
+- **Automated Refund Guard**: Built-in 7-day refund tracking with status gates (`SUBMITTED`, `PROCESSED`, `REJECTED`) guarantees financial transparency.
 
-Configure `backend/.env` with your credentials:
-```env
-DATABASE_URL="postgresql://user:password@host/neondb?sslmode=require"
-PORT=3001
-NODE_ENV=development
-FRONTEND_URL="http://localhost:3000"
+### 4. 👥 Role-Based Access Control (RBAC) & Audit Logging
+- **Strict Role Separation**: NestJS guards enforce strict segregation between `STUDENT` and `ADMIN` privileges. Administrative endpoints are completely sealed off from student session tokens.
+- **Immutable Audit Trail**: All privileged administrative operations (course updates, manual status overrides, grade awards, refunds) are permanently recorded in the `AuditLog` table with IP addresses and user agents.
 
-JWT_SECRET="your-64-character-jwt-secret"
-JWT_REFRESH_SECRET="your-64-character-jwt-refresh-secret"
-
-RESEND_API_KEY="re_your_resend_key"
-RESEND_FROM="DevAscent Academy <noreply@devascentacademy.me>"
-EMAIL_FROM="DevAscent Academy <your-email@gmail.com>"
-
-RAZORPAY_KEY_ID="rzp_test_..."
-RAZORPAY_KEY_SECRET="..."
-```
-
-Generate Prisma client & run database migrations:
-```bash
-npx prisma generate
-npx prisma db push
-```
-
-Start the NestJS backend:
-```bash
-npm run start:dev
-```
-
-### 3. Frontend Setup
-Open a new terminal:
-```bash
-cd frontend
-npm install
-
-# Start Next.js development server
-npm run dev
-```
-
-Visit `http://localhost:3000` in your browser.
+### 5. 📧 Anti-Abuse & Rate-Limited Communication
+- **Rate-Limited OTP Gates**: Email verification codes are protected by strict attempt thresholds (`maxAttempts: 3`) and short 15-minute expiration windows.
+- **Firewall-Proof HTTPS Email API**: Direct API dispatch via Resend on HTTPS Port 443 ensures 99.9% inbox deliverability without exposure to blocked SMTP ports.
 
 ---
 
