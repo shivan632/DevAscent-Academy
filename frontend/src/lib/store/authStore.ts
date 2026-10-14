@@ -113,6 +113,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (typeof window !== 'undefined') {
       localStorage.removeItem('devascent_token');
       localStorage.removeItem('devascent_user');
+      localStorage.removeItem('devascent_enrollments_cache');
+      localStorage.removeItem('devascent_certificates_cache');
+      try {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('devascent_enrollments_cache_') || key.startsWith('devascent_certificates_cache_')) {
+            localStorage.removeItem(key);
+          }
+        });
+      } catch (e) {}
       document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
     }
     set({ user: null, isAuthenticated: false, isLoading: false });

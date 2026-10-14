@@ -332,8 +332,11 @@ function DashboardContent() {
             list = val.certificates;
           }
           setCertificates(list);
-          if (typeof window !== 'undefined' && list.length > 0) {
-            localStorage.setItem('devascent_certificates_cache', JSON.stringify(list));
+          if (typeof window !== 'undefined') {
+            if (user?.id) {
+              localStorage.setItem(`devascent_certificates_cache_${user.id}`, JSON.stringify(list));
+            }
+            localStorage.removeItem('devascent_certificates_cache');
           }
         }
 
@@ -372,8 +375,11 @@ function DashboardContent() {
             ? payload.enrollments
             : (Array.isArray(payload) ? payload : (Array.isArray(val?.enrollments) ? val.enrollments : []));
           setEnrollments(list);
-          if (typeof window !== 'undefined' && list.length > 0) {
-            localStorage.setItem('devascent_enrollments_cache', JSON.stringify(list));
+          if (typeof window !== 'undefined') {
+            if (user?.id) {
+              localStorage.setItem(`devascent_enrollments_cache_${user.id}`, JSON.stringify(list));
+            }
+            localStorage.removeItem('devascent_enrollments_cache');
           }
         }
 
@@ -493,8 +499,11 @@ function DashboardContent() {
           ? res.certificates
           : [];
         setCertificates(list);
-        if (typeof window !== 'undefined' && list.length > 0) {
-          localStorage.setItem('devascent_certificates_cache', JSON.stringify(list));
+        if (typeof window !== 'undefined') {
+          if (user?.id) {
+            localStorage.setItem(`devascent_certificates_cache_${user.id}`, JSON.stringify(list));
+          }
+          localStorage.removeItem('devascent_certificates_cache');
         }
       }).catch((err) => console.warn('Failed to refresh certificates:', err));
     } else if (activeTab === 'doubts') {

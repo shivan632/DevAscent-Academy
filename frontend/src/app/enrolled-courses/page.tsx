@@ -34,9 +34,9 @@ export default function EnrolledCoursesPage() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'courses' | 'internships' | 'completed'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // ⚡ High-speed instant SWR fetch with stale-while-revalidate & cache hydration
+  // ⚡ High-speed instant SWR fetch scoped strictly to current authenticated user
   const { data: enrollmentsData, isLoading: loadingEnrollments } = useSWR(
-    isAuthenticated ? '/enrollments/my' : null,
+    isAuthenticated && user?.id ? `/enrollments/my/${user.id}` : null,
     async () => {
       const res = await api.getMyEnrollments();
       const payload = res?.data || res;
@@ -49,25 +49,29 @@ export default function EnrolledCoursesPage() {
         : [];
       if (typeof window !== 'undefined') {
         try {
-          localStorage.setItem('devascent_enrollments_cache', JSON.stringify(list));
+          if (user?.id) {
+            localStorage.setItem(`devascent_enrollments_cache_${user.id}`, JSON.stringify(list));
+          }
+          // Remove old unscoped cache to prevent cross-account leak
+          localStorage.removeItem('devascent_enrollments_cache');
         } catch (e) {}
       }
       return list;
     },
     {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-      dedupingInterval: 60000,
+      revalidateOnFocus: true,
+      revalidateIfStale: true,
       fallbackData: (() => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && user?.id) {
           try {
-            const cached = localStorage.getItem('devascent_enrollments_cache');
-            return cached ? JSON.parse(cached) : [];
+            // Only use cache if it was saved specifically for this user
+            const cached = localStorage.getItem(`devascent_enrollments_cache_${user.id}`);
+            return cached ? JSON.parse(cached) : undefined;
           } catch (e) {
-            return [];
+            return undefined;
           }
         }
-        return [];
+        return undefined;
       })(),
     }
   );

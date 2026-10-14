@@ -145,7 +145,10 @@ export default function CompletionFormPage() {
           if (list.length > 0) {
             setAllEnrollments(list);
             try {
-              localStorage.setItem('devascent_enrollments_cache', JSON.stringify(list));
+              if (user?.id) {
+                localStorage.setItem(`devascent_enrollments_cache_${user.id}`, JSON.stringify(list));
+              }
+              localStorage.removeItem('devascent_enrollments_cache');
             } catch (e) {}
           }
         }
