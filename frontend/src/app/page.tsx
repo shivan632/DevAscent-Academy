@@ -85,7 +85,8 @@ export default function LandingPage() {
   const curriculum = [
     {
       week: 1,
-      title: 'Modern TypeScript, Next.js 15 & Architectural Foundations',
+      title: 'Foundations & Architecture',
+      subtitle: 'Modern TypeScript, Next.js 15 & Architectural Foundations',
       summary: 'Master type-safe engineering, Next.js 15 App Router, Server Components vs Client Components, and canonical design systems.',
       lessons: [
         'Type-safe frontend development with TypeScript & .tsx',
@@ -96,7 +97,8 @@ export default function LandingPage() {
     },
     {
       week: 2,
-      title: 'Enterprise NestJS Modular Backend & Prisma Relational ORM',
+      title: 'Enterprise Backend & Relational Database',
+      subtitle: 'Enterprise NestJS Modular Backend & Prisma Relational ORM',
       summary: 'Build clean, enterprise NestJS backend with controllers, services, DTO validation pipes, and Neon PostgreSQL schema.',
       lessons: [
         'NestJS dependency injection & modular architecture',
@@ -107,7 +109,8 @@ export default function LandingPage() {
     },
     {
       week: 3,
-      title: 'Hardened Authentication, Security & httpOnly JWT Tokens',
+      title: 'Microservices & Enterprise Security',
+      subtitle: 'Hardened Authentication, Security & httpOnly JWT Tokens',
       summary: 'Implement military-grade authentication with Argon2/bcrypt hashing, JWT access/refresh tokens in httpOnly cookies, and RBAC guards.',
       lessons: [
         'Secure password hashing with Argon2 / bcrypt',
@@ -118,7 +121,8 @@ export default function LandingPage() {
     },
     {
       week: 4,
-      title: 'Razorpay Fintech Engine, HMAC Webhooks & Order Pipeline',
+      title: 'Fintech & Payment Engineering',
+      subtitle: 'Razorpay Fintech Engine, HMAC Webhooks & Order Pipeline',
       summary: 'Integrate real payments with Razorpay. Handle order creation, payment signatures, webhooks, and automated refund workflows.',
       lessons: [
         'Razorpay order creation & checkout SDK initialization',
@@ -129,7 +133,8 @@ export default function LandingPage() {
     },
     {
       week: 5,
-      title: 'Verifiable Digital Credentials & SHA-256 Ledger System',
+      title: 'Cryptography & Digital Credentials',
+      subtitle: 'Verifiable Digital Credentials & SHA-256 Ledger System',
       summary: 'Generate tamper-proof PDF certificates with SHA-256 cryptographic hashes and a permanent public verification registry portal.',
       lessons: [
         'Automated server-side PDF certificate minting',
@@ -140,7 +145,8 @@ export default function LandingPage() {
     },
     {
       week: 6,
-      title: 'Dockerization, Cloud CI/CD & Capstone Production Deployment',
+      title: 'Cloud CI/CD & Production Capstones',
+      subtitle: 'Dockerization, Cloud CI/CD & Capstone Production Deployment',
       summary: 'Containerize frontend & backend with Docker Compose, configure production environment variables, and deploy live on cloud infrastructure.',
       lessons: [
         'Multi-stage Docker builds for Next.js & NestJS microservices',
@@ -183,18 +189,20 @@ export default function LandingPage() {
       <Navbar />
 
       {/* Top Urgency Banner */}
-      <div className="mt-16 sm:mt-20 bg-indigo-900 text-white py-2.5 px-4 text-xs sm:text-sm font-medium border-b border-indigo-800">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="font-bold uppercase tracking-wider text-emerald-300">Cohort #14 Status:</span>
-            <span>34 of 40 seats filled for upcoming live batch</span>
+      <div className="mt-16 sm:mt-20 bg-indigo-950/90 text-white py-3.5 px-4 sm:px-6 text-xs sm:text-sm font-medium border-b border-indigo-800/80 shadow-sm backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 sm:gap-6">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="font-bold text-emerald-400">Cohort #14 Status:</span>
+            <span className="text-slate-200">34 of 40 seats filled for upcoming live batch</span>
           </div>
-          <div className="hidden md:flex items-center gap-4 text-indigo-200">
-            <span>⚡ 70% Early-Bird Discount Active</span>
-            <span className="opacity-40">•</span>
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="hidden md:flex items-center gap-6 text-indigo-200">
+            <span className="flex items-center gap-1.5 font-semibold text-amber-300 bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
+              <span>⚡ 70% Early-Bird Discount Active</span>
+            </span>
+            <span className="opacity-30">•</span>
+            <span className="flex items-center gap-1.5 font-semibold text-emerald-300 bg-emerald-400/10 px-2.5 py-1 rounded-lg border border-emerald-400/20">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Razorpay 256-Bit SSL Secured</span>
             </span>
           </div>
@@ -318,7 +326,7 @@ export default function LandingPage() {
                     <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
                     <span className="text-xs text-slate-400 font-mono ml-2">cohort-14-stack.config.ts</span>
                   </div>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 border border-emerald-800/60 px-2 py-0.5 rounded">
+                  <span className="text-xs font-mono font-semibold text-emerald-400 bg-emerald-950/80 border border-emerald-800/60 px-2.5 py-0.5 rounded-lg">
                     LIVE PREVIEW
                   </span>
                 </div>
@@ -438,8 +446,8 @@ export default function LandingPage() {
           </div>
 
           {/* DevAscent Academy Intro Video Showcase with ::before pseudo-element glow */}
-          <div className="mt-16 sm:mt-20 max-w-5xl mx-auto">
-            <div className="text-center space-y-2 mb-8">
+          <div className="mt-10 sm:mt-12 max-w-4xl mx-auto">
+            <div className="text-center space-y-1.5 mb-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>DevAscent Academy Official Overview</span>
@@ -453,7 +461,7 @@ export default function LandingPage() {
             </div>
 
             {/* Glowing Video Frame Container */}
-            <div className="video-glow-frame bg-slate-950 p-2 sm:p-3 shadow-2xl border border-slate-800">
+            <div className="video-glow-frame bg-slate-950 p-1.5 sm:p-2.5 shadow-2xl border border-slate-800">
               <div className="relative aspect-video rounded-2xl overflow-hidden bg-black flex items-center justify-center">
                 <video
                   autoPlay
@@ -501,10 +509,10 @@ export default function LandingPage() {
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold font-mono text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 px-2.5 py-1 rounded-md shadow-sm">
+                    <span className="text-xs font-bold font-mono text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 px-2.5 py-1 rounded-lg shadow-sm">
                       {project.badge}
                     </span>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-200/70 dark:bg-slate-800 px-2.5 py-1 rounded">
+                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-200/70 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
                       {project.tag}
                     </span>
                   </div>
@@ -527,12 +535,15 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-                  <Link href={project.specsHref || '/courses'} className="group-hover:underline flex items-center gap-1">
+                <div className="pt-6 mt-6 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                  <Link
+                    href={project.specsHref || '/courses'}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/80 transition-all shadow-sm"
+                  >
                     <span>Explore Project Specs</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
-                  <span className="text-slate-400 dark:text-slate-500 font-mono">100% Code-First</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">100% Code-First</span>
                 </div>
               </div>
             ))}
@@ -569,7 +580,7 @@ export default function LandingPage() {
                 >
                   <button
                     onClick={() => setActiveWeek(isOpen ? 0 : weekItem.week)}
-                    className="w-full text-left px-6 py-5 flex items-center justify-between gap-4 focus:outline-none hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors"
+                    className="w-full text-left px-6 py-4 sm:py-5 flex items-center justify-between gap-4 focus:outline-none hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors"
                   >
                     <div className="flex items-center gap-4">
                       <div
@@ -582,8 +593,8 @@ export default function LandingPage() {
                         W{weekItem.week}
                       </div>
                       <div>
-                        <h4 className="font-bold text-base text-slate-900 dark:text-white">{weekItem.title}</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">{weekItem.summary}</p>
+                        <h3 className="font-bold text-base text-slate-900 dark:text-white">Week {weekItem.week}: {weekItem.title}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">{weekItem.subtitle}</p>
                       </div>
                     </div>
                     <ChevronDown
@@ -644,64 +655,81 @@ export default function LandingPage() {
                 Every graduate receives a tamper-proof digital certificate backed by an immutable SHA-256 cryptographic hash and a permanent public verification URL.
               </p>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-bold text-sm text-slate-900 dark:text-white">Permanent Public Registry</h5>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white">Permanent Public Registry</h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">Recruiters can verify your credential instantly via devascent.io/verify/ID.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Award className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-bold text-sm text-slate-900 dark:text-white">1-Click LinkedIn Add</h5>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white">1-Click LinkedIn Add</h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">Add verified skills and project showcases directly to your LinkedIn profile.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Lock className="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-bold text-sm text-slate-900 dark:text-white">Cryptographically Signed</h5>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white">Cryptographically Signed</h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">SHA-256 hash generated directly from your capstone code commits.</p>
                   </div>
                 </div>
               </div>
 
-              {/* Interactive Name Changer with Sample Notice */}
-              <div className="pt-2 space-y-2">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Preview Your Name on the Certificate (Sample Demo):
-                  </label>
-                  <input
-                    type="text"
-                    value={certName}
-                    onChange={(e) => setCertName(e.target.value)}
-                    placeholder="Enter your name"
-                    className="w-full max-w-sm px-4 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+              <div className="pt-2">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/80 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+                  <span>Interactive Preview → See real-time updates beside the card</span>
                 </div>
-                <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">
-                  ⚠️ Note: The preview below is a sample demonstration only. Real verifiable credentials are cryptographically issued upon course completion.
-                </p>
               </div>
             </div>
 
-            {/* Certificate Realistic Mockup Card (Sample Demo) */}
-            <div className="lg:col-span-6">
-              <div className="relative bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-8 shadow-2xl border-2 border-indigo-500/30 text-white overflow-hidden">
+            {/* Certificate Realistic Mockup Card with Co-Located Name Input (Sample Demo) */}
+            <div className="lg:col-span-6 space-y-4">
+              {/* Interactive Name Preview Control (Co-located with certificate to close feedback loop) */}
+              <div className="bg-slate-50 dark:bg-slate-900/90 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <label htmlFor="certNameInput" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Type your name to preview on this verifiable certificate:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="certNameInput"
+                    type="text"
+                    value={certName}
+                    onChange={(e) => setCertName(e.target.value)}
+                    placeholder="Enter your full name"
+                    className="flex-1 px-4 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner"
+                  />
+                  {certName !== 'Shivan Mishra' && (
+                    <button
+                      type="button"
+                      onClick={() => setCertName('Shivan Mishra')}
+                      className="px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-200/70 dark:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-2 flex items-start gap-1">
+                  <span>⚠️</span>
+                  <span>Note: The preview below is a sample demonstration only. Real verifiable credentials are cryptographically issued upon course completion.</span>
+                </p>
+              </div>
+
+              {/* Certificate Frame */}
+              <div className="relative bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 sm:p-8 shadow-2xl border-2 border-indigo-500/30 text-white overflow-hidden">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 
                 {/* Diagonal Sample Watermark */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.07] rotate-[-25deg] select-none">
-                  <span className="text-7xl font-extrabold tracking-widest text-white uppercase">
+                  <span className="text-5xl sm:text-6xl font-extrabold tracking-widest text-white uppercase">
                     SAMPLE ONLY
                   </span>
                 </div>
 
-                {/* Certificate Frame */}
-                <div className="border border-indigo-400/30 rounded-xl p-6 sm:p-8 space-y-6 relative bg-slate-900/60 backdrop-blur-sm">
+                <div className="border border-indigo-400/30 rounded-xl p-5 sm:p-7 space-y-6 relative bg-slate-900/60 backdrop-blur-sm">
                   <div className="flex items-center justify-between border-b border-indigo-500/20 pb-4">
                     <div className="flex items-center gap-2.5">
                       <img
@@ -711,13 +739,13 @@ export default function LandingPage() {
                       />
                       <span className="font-bold text-sm tracking-wider uppercase">DevAscent Academy</span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950/80 border border-amber-800/80 px-2.5 py-0.5 rounded shadow-sm">
+                    <span className="text-xs font-mono font-bold text-amber-300 bg-amber-950/80 border border-amber-800/80 px-2.5 py-0.5 rounded-lg shadow-sm">
                       SAMPLE PREVIEW ONLY
                     </span>
                   </div>
 
                   <div className="space-y-2 text-center py-2">
-                    <p className="text-xs uppercase tracking-widest text-indigo-300">Certificate of Completion (Sample)</p>
+                    <p className="text-xs font-semibold tracking-wide text-indigo-300">Certificate of Completion (Sample)</p>
                     <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-wide">
                       {certName || 'Your Name Here'}
                     </h3>
@@ -728,11 +756,11 @@ export default function LandingPage() {
 
                   <div className="grid grid-cols-2 gap-4 border-t border-indigo-500/20 pt-4 text-left text-xs font-mono">
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Sample Credential ID:</span>
+                      <span className="text-slate-400 block text-xs">Sample Credential ID:</span>
                       <span className="text-amber-300 font-semibold">SAMPLE-DEVASCENT-DEMO</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-slate-400 block text-[10px]">Verification URL:</span>
+                      <span className="text-slate-400 block text-xs">Verification URL:</span>
                       <span className="text-emerald-400 font-semibold">devascent.io/verify</span>
                     </div>
                   </div>
@@ -775,22 +803,22 @@ export default function LandingPage() {
             <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-sm">
               <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400">9.0 / 10</div>
               <div className="text-xs font-bold text-slate-900 dark:text-white mt-1">Value for Money</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">₹599 early-bird vs ₹50k+ bootcamps</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">₹599 early-bird vs ₹50k+ bootcamps</div>
             </div>
             <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-sm">
               <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">9.0 / 10</div>
               <div className="text-xs font-bold text-slate-900 dark:text-white mt-1">Financial Safety</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Zero debt, no ISAs, 7-day refund</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Zero debt, no ISAs, 7-day refund</div>
             </div>
             <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-sm">
               <div className="text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400">8.5 / 10</div>
               <div className="text-xs font-bold text-slate-900 dark:text-white mt-1">Modern Tech Stack</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Next.js 15, NestJS, Docker, Neon</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Next.js 15, NestJS, Docker, Neon</div>
             </div>
             <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-sm">
               <div className="text-2xl sm:text-3xl font-black text-amber-500 dark:text-amber-400">4 Apps</div>
               <div className="text-xs font-bold text-slate-900 dark:text-white mt-1">Production Proof</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Real cloud CI/CD &amp; GitHub source</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Real cloud CI/CD &amp; GitHub source</div>
             </div>
           </div>
 
@@ -806,7 +834,7 @@ export default function LandingPage() {
                     <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 w-1/3 bg-indigo-50/50 dark:bg-indigo-950/30 border-x border-indigo-200/60 dark:border-indigo-800/60">
                       <div className="flex items-center gap-1.5">
                         <span>DevAscent Academy</span>
-                        <span className="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-extrabold uppercase">
+                        <span className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full font-extrabold uppercase">
                           The Sweet Spot
                         </span>
                       </div>
@@ -827,15 +855,15 @@ export default function LandingPage() {
                     </td>
                     <td className="py-4 px-6 bg-indigo-50/30 dark:bg-indigo-950/20 border-x border-indigo-200/60 dark:border-indigo-800/60 font-bold text-emerald-600 dark:text-emerald-400">
                       ₹599 – ₹1,499
-                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">One-time transparent fee</span>
+                      <span className="block text-xs font-normal text-slate-500 dark:text-slate-400">One-time transparent fee</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       ₹50,000 to ₹3.5 Lakhs
-                      <span className="block text-[11px] text-rose-500 dark:text-rose-400 font-medium">(Or 15–20% Salary ISA Debt)</span>
+                      <span className="block text-xs text-rose-500 dark:text-rose-400 font-medium">(Or 15–20% Salary ISA Debt)</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       ₹0 (Free)
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Ad-funded / self-study</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Ad-funded / self-study</span>
                     </td>
                   </tr>
 
@@ -849,15 +877,15 @@ export default function LandingPage() {
                         <CheckCircle2 className="w-4 h-4 shrink-0" />
                         <span>Next.js 15, NestJS, Docker, Neon</span>
                       </div>
-                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">2026 industry enterprise stack</span>
+                      <span className="block text-xs font-normal text-slate-500 dark:text-slate-400">2026 industry enterprise stack</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       Standard MERN / Outdated MVC
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Older syllabus &amp; textbook stacks</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Older syllabus &amp; textbook stacks</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       Disjointed / Outdated Tutorials
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Often broken versions &amp; syntax</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Often broken versions &amp; syntax</span>
                     </td>
                   </tr>
 
@@ -871,21 +899,21 @@ export default function LandingPage() {
                         <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-500" />
                         <span>Zero Risk • 7-Day Full Refund</span>
                       </div>
-                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">No ISAs, no loans, no commitments</span>
+                      <span className="block text-xs font-normal text-slate-500 dark:text-slate-400">No ISAs, no loans, no commitments</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400 font-medium">
                         <XCircle className="w-4 h-4 shrink-0" />
                         <span>High Risk / Restrictive ISAs</span>
                       </div>
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Heavy debt or legal salary contracts</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Heavy debt or legal salary contracts</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
                         <CheckCircle2 className="w-4 h-4 shrink-0" />
                         <span>Zero Financial Risk</span>
                       </div>
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Completely open &amp; free</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Completely open &amp; free</span>
                     </td>
                   </tr>
 
@@ -899,18 +927,18 @@ export default function LandingPage() {
                         <CheckCircle2 className="w-4 h-4 shrink-0 text-indigo-500" />
                         <span>Weekly Live Code Reviews + Community</span>
                       </div>
-                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">Direct architecture guidance</span>
+                      <span className="block text-xs font-normal text-slate-500 dark:text-slate-400">Direct architecture guidance</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       Assigned Teaching Assistants (TAs)
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Scheduled batch ticket system</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Scheduled batch ticket system</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400 font-medium">
                         <XCircle className="w-4 h-4 shrink-0" />
                         <span>Zero Mentor Support</span>
                       </div>
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">StackOverflow &amp; comments</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">StackOverflow &amp; comments</span>
                     </td>
                   </tr>
 
@@ -924,18 +952,18 @@ export default function LandingPage() {
                         <CheckCircle2 className="w-4 h-4 shrink-0" />
                         <span>Structured 6-Week Milestones</span>
                       </div>
-                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">Step-by-step accountability system</span>
+                      <span className="block text-xs font-normal text-slate-500 dark:text-slate-400">Step-by-step accountability system</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       Rigid Timetable
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">High stress, fixed deadlines</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">High stress, fixed deadlines</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400 font-medium">
                         <XCircle className="w-4 h-4 shrink-0" />
                         <span>3% to 5% Completion Rate</span>
                       </div>
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Most drop out in tutorial hell</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Most drop out in tutorial hell</span>
                     </td>
                   </tr>
 
@@ -949,18 +977,18 @@ export default function LandingPage() {
                         <Award className="w-4 h-4 shrink-0 text-amber-500" />
                         <span>SHA-256 Public QR Ledger</span>
                       </div>
-                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">Tamper-proof online verifier (/verify/[code])</span>
+                      <span className="block text-xs font-normal text-slate-500 dark:text-slate-400">Tamper-proof online verifier (/verify/[code])</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       Internal Institute Certificate
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Standard PDF with portal login</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Standard PDF with portal login</span>
                     </td>
                     <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
                       <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
                         <XCircle className="w-4 h-4 shrink-0" />
                         <span>No Credential Verification</span>
                       </div>
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Self-claimed resume bullets</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Self-claimed resume bullets</span>
                     </td>
                   </tr>
                 </tbody>
@@ -974,9 +1002,9 @@ export default function LandingPage() {
                   ⚡
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">
                     The Bottom Line: Real Skills, Zero Debt.
-                  </h4>
+                  </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-400">
                     Get the production architecture of a ₹1 Lakh bootcamp at the honest price of ₹599.
                   </p>
@@ -1010,7 +1038,7 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-xl mx-auto">
-            <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-xl border-2 border-indigo-600 p-8 sm:p-9 space-y-6">
+            <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl border-2 border-indigo-600 p-8 sm:p-9 space-y-6">
               {/* Popular Badge */}
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white text-xs font-bold uppercase tracking-wider px-5 py-1 rounded-full shadow-md">
                 ⚡ 70% Early-Bird Cohort Offer • Cohort 14 Live
@@ -1026,7 +1054,7 @@ export default function LandingPage() {
                     SAVE 70%
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">One-time payment • No hidden subscriptions • 100% Tax &amp; GST Included</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">One-time payment • No hidden subscriptions • 100% Tax &amp; GST Included</p>
               </div>
 
               {/* Checklist */}
@@ -1192,7 +1220,7 @@ export default function LandingPage() {
         <div>
           <span className="text-xs text-slate-500 dark:text-slate-400 block leading-tight">Cohort #14 Early Bird</span>
           <span className="text-base font-extrabold text-slate-900 dark:text-white">₹599</span>
-          <span className="text-[10px] text-slate-400 line-through ml-1">₹1,999</span>
+          <span className="text-xs text-slate-400 line-through ml-1">₹1,999</span>
         </div>
         <Link
           href={

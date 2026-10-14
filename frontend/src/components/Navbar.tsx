@@ -127,7 +127,7 @@ export default function Navbar() {
                 <span className="font-bold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-tight">
                   DevAscent
                 </span>
-                <span className="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none">
+                <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 tracking-wider leading-none">
                   Academy &amp; Internships
                 </span>
               </div>
