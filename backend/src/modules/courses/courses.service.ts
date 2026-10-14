@@ -1230,6 +1230,7 @@ export class CoursesService {
 
     const lesson = await this.prisma.lesson.findUnique({
       where: { id: lessonId },
+      include: { module: true },
     });
 
     if (!lesson) {
@@ -1240,12 +1241,16 @@ export class CoursesService {
       data: {
         userId,
         lessonId,
+        courseId: lesson.module?.courseId || null,
         question: question.trim(),
         status: 'PENDING',
       },
       include: {
         user: {
-          select: { id: true, name: true, avatarUrl: true },
+          select: { id: true, name: true, email: true, phone: true, avatarUrl: true },
+        },
+        course: {
+          select: { id: true, title: true, slug: true },
         },
       },
     });

@@ -287,6 +287,17 @@ export class DoubtsService {
       ).catch(() => {});
     }
 
+    // Trigger in-app Notification for the student
+    await this.prisma.notification.create({
+      data: {
+        userId: doubt.userId,
+        targetRole: 'STUDENT',
+        type: 'INFO',
+        title: 'Your Doubt Has Been Answered!',
+        message: `Instructor replied: "${dto.answer.trim().slice(0, 100)}" to your question "${doubt.question.slice(0, 60)}"`,
+      },
+    }).catch(() => {});
+
     return updated;
   }
 

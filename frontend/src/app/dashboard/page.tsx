@@ -134,7 +134,22 @@ function DashboardContent() {
   const { user, isLoading: authLoading, logout, updateUser, checkAuth } = useAuthStore();
   const { theme, setTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'certificates' | 'submissions' | 'profile' | 'settings' | 'support'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'certificates' | 'submissions' | 'doubts' | 'notifications' | 'profile' | 'settings' | 'support'>('overview');
+
+  // Student Doubts & Queries Desk state
+  const [doubts, setDoubts] = useState<any[]>([]);
+  const [loadingDoubts, setLoadingDoubts] = useState(false);
+  const [doubtCourseId, setDoubtCourseId] = useState('');
+  const [doubtQuestion, setDoubtQuestion] = useState('');
+  const [doubtIsUrgent, setDoubtIsUrgent] = useState(false);
+  const [submittingDoubt, setSubmittingDoubt] = useState(false);
+  const [doubtMsg, setDoubtMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Student In-App Notifications state
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
   
   // Data state (clean initial state for SSR hydration safety)
   const [certificates, setCertificates] = useState<any[]>([]);
@@ -226,7 +241,7 @@ function DashboardContent() {
   // 1. Tab Deep-Linking synchronization
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['overview', 'analytics', 'certificates', 'submissions', 'profile', 'settings', 'support'].includes(tabParam)) {
+    if (tabParam && ['overview', 'analytics', 'certificates', 'submissions', 'doubts', 'notifications', 'profile', 'settings', 'support'].includes(tabParam)) {
       setActiveTab(tabParam as any);
     }
   }, [searchParams]);
@@ -286,13 +301,15 @@ function DashboardContent() {
     async function loadDashboardData() {
       setLoading(true);
       try {
-        const [certsRes, subsRes, coursesRes, profileRes, enrollRes, statsRes] = await Promise.allSettled([
+        const [certsRes, subsRes, coursesRes, profileRes, enrollRes, statsRes, doubtsRes, notifsRes] = await Promise.allSettled([
           api.getMyCertificates(),
           api.getMySubmissions(),
           api.getCourses(),
           api.getProfile(),
           api.getMyEnrollments(),
           api.getMyStats(),
+          api.getMyDoubts(),
+          api.getNotifications(),
         ]);
 
         if (profileRes.status === 'fulfilled' && profileRes.value) {
@@ -364,6 +381,20 @@ function DashboardContent() {
           const statsPayload = statsRes.value?.data !== undefined ? statsRes.value.data : statsRes.value;
           setMyStats(statsPayload);
         }
+
+        if (doubtsRes.status === 'fulfilled' && doubtsRes.value) {
+          const val = doubtsRes.value;
+          const list = Array.isArray(val?.doubts) ? val.doubts : (Array.isArray(val) ? val : []);
+          setDoubts(list);
+        }
+
+        if (notifsRes.status === 'fulfilled' && notifsRes.value) {
+          const val = notifsRes.value;
+          const list = Array.isArray(val?.notifications) ? val.notifications : (Array.isArray(val) ? val : []);
+          setNotifications(list);
+          const unread = typeof val?.unreadCount === 'number' ? val.unreadCount : list.filter((n: any) => !n.isRead).length;
+          setUnreadNotifCount(unread);
+        }
       } catch (e) {
         // Fallback gracefully
       } finally {
@@ -373,7 +404,83 @@ function DashboardContent() {
     loadDashboardData();
   }, [user?.id]);
 
-  // Re-fetch certificates on tab switch to certificates
+  const fetchMyDoubts = async () => {
+    setLoadingDoubts(true);
+    try {
+      const res = await api.getMyDoubts();
+      const list = Array.isArray(res?.doubts) ? res.doubts : (Array.isArray(res) ? res : []);
+      setDoubts(list);
+    } catch (e) {
+      console.warn('Failed to fetch doubts:', e);
+    } finally {
+      setLoadingDoubts(false);
+    }
+  };
+
+  const handleCreateDoubt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDoubtMsg(null);
+    if (!doubtQuestion.trim() || doubtQuestion.trim().length < 5) {
+      setDoubtMsg({ type: 'error', text: 'Please enter a clear question (minimum 5 characters).' });
+      return;
+    }
+    setSubmittingDoubt(true);
+    try {
+      await api.createDoubt({
+        question: doubtQuestion.trim(),
+        courseId: doubtCourseId || undefined,
+        isUrgent: doubtIsUrgent,
+      });
+      setDoubtQuestion('');
+      setDoubtIsUrgent(false);
+      setDoubtMsg({ type: 'success', text: 'Your doubt has been submitted to the mentor desk! Answers will appear below.' });
+      await fetchMyDoubts();
+    } catch (err: any) {
+      setDoubtMsg({ type: 'error', text: err?.message || 'Failed to submit doubt. Please try again.' });
+    } finally {
+      setSubmittingDoubt(false);
+    }
+  };
+
+  const fetchMyNotifications = async () => {
+    setLoadingNotifications(true);
+    try {
+      const res = await api.getNotifications();
+      const list = Array.isArray(res?.notifications) ? res.notifications : (Array.isArray(res) ? res : []);
+      setNotifications(list);
+      const unread = typeof res?.unreadCount === 'number' ? res.unreadCount : list.filter((n: any) => !n.isRead).length;
+      setUnreadNotifCount(unread);
+    } catch (e) {
+      console.warn('Failed to fetch notifications:', e);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  const handleMarkAllNotifsRead = async () => {
+    setMarkingAllRead(true);
+    try {
+      await api.markAllNotificationsRead();
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadNotifCount(0);
+    } catch (e) {
+      console.warn('Failed to mark notifications read:', e);
+    } finally {
+      setMarkingAllRead(false);
+    }
+  };
+
+  const handleMarkOneNotifRead = async (id: string) => {
+    try {
+      await api.markNotificationRead(id);
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+      setUnreadNotifCount((prev) => Math.max(0, prev - 1));
+    } catch (e) {
+      console.warn('Failed to mark notification read:', e);
+    }
+  };
+
+  // Re-fetch datasets on tab switch
   useEffect(() => {
     if (activeTab === 'certificates') {
       api.getMyCertificates().then((res) => {
@@ -390,6 +497,10 @@ function DashboardContent() {
           localStorage.setItem('devascent_certificates_cache', JSON.stringify(list));
         }
       }).catch((err) => console.warn('Failed to refresh certificates:', err));
+    } else if (activeTab === 'doubts') {
+      fetchMyDoubts();
+    } else if (activeTab === 'notifications') {
+      fetchMyNotifications();
     }
   }, [activeTab]);
 
@@ -747,6 +858,8 @@ function DashboardContent() {
               }}
               certificatesCount={safeCertificates.length}
               submissionsCount={safeSubmissions.length}
+              doubtsCount={doubts.length}
+              unreadNotificationsCount={unreadNotifCount}
               enrolledCourses={displayEnrollments}
             />
 
@@ -1815,6 +1928,389 @@ function DashboardContent() {
                       })}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* TAB: ASK DOUBT & QUERIES */}
+              {activeTab === 'doubts' && (
+                <div className="space-y-6 animate-fadeIn">
+                  {/* Header Banner */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-6 sm:p-7 rounded-3xl bg-gradient-to-r from-[#0C1022] via-[#10142D] to-[#0A0D1A] border border-violet-500/25 shadow-2xl shadow-violet-950/40 backdrop-blur-2xl relative overflow-hidden">
+                    <div className="absolute -top-12 -right-12 w-64 h-64 bg-violet-500/15 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute -bottom-12 left-1/3 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+                    <div className="space-y-2 relative z-10">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-300 text-xs font-semibold shadow-sm">
+                        <HelpCircle className="w-3.5 h-3.5 text-violet-400" />
+                        <span>Direct 1-on-1 Mentor Desk</span>
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Ask Doubt &amp; Queries
+                      </h2>
+                      <p className="text-xs sm:text-sm text-violet-200/90 max-w-xl leading-relaxed">
+                        Stuck on a concept, assignment, or bug? Ask your instructor directly. Our senior tech mentors answer your questions with detailed explanations.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={fetchMyDoubts}
+                      disabled={loadingDoubts}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition shrink-0 self-start sm:self-auto cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingDoubts ? 'animate-spin' : ''}`} />
+                      <span>Refresh Desk</span>
+                    </button>
+                  </div>
+
+                  {/* Ask Question Form */}
+                  <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-violet-500/10 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white">Ask a New Doubt</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Instructors typically reply within a few hours</p>
+                      </div>
+                    </div>
+
+                    {doubtMsg && (
+                      <div
+                        className={`p-3.5 rounded-2xl text-xs flex items-center gap-2.5 ${
+                          doubtMsg.type === 'success'
+                            ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-300'
+                        }`}
+                      >
+                        {doubtMsg.type === 'success' ? (
+                          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                        )}
+                        <span>{doubtMsg.text}</span>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleCreateDoubt} className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                            Related Course (Optional)
+                          </label>
+                          <select
+                            value={doubtCourseId}
+                            onChange={(e) => setDoubtCourseId(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                          >
+                            <option value="">Select Enrolled Course...</option>
+                            {displayEnrollments.map((enr: any) => (
+                              <option key={enr.id || enr.courseId} value={enr.courseId || enr.id}>
+                                {enr.courseTitle}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="flex items-end">
+                          <label className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 w-full cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              checked={doubtIsUrgent}
+                              onChange={(e) => setDoubtIsUrgent(e.target.checked)}
+                              className="rounded border-slate-300 text-violet-600 focus:ring-violet-500 w-4 h-4 cursor-pointer"
+                            />
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                              <Flame className="w-3.5 h-3.5 text-amber-500" />
+                              <span>Mark as Urgent / Blocker</span>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                          Your Question / Problem Description <span className="text-rose-500">*</span>
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={doubtQuestion}
+                          onChange={(e) => setDoubtQuestion(e.target.value)}
+                          placeholder="Explain what you are trying to do, error message received, or concept you want clarified..."
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                        />
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          disabled={submittingDoubt || !doubtQuestion.trim()}
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-500/25 transition disabled:opacity-50 cursor-pointer"
+                        >
+                          {submittingDoubt ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Submitting...</span>
+                            </>
+                          ) : (
+                            <>
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              <span>Submit Doubt to Mentors</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  {/* List of Previous Doubts */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>Your Query History</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                          {doubts.length}
+                        </span>
+                      </h3>
+                    </div>
+
+                    {loadingDoubts ? (
+                      <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-3 text-slate-400 text-xs">
+                        <Loader2 className="w-4 h-4 animate-spin text-violet-500" />
+                        <span>Loading queries...</span>
+                      </div>
+                    ) : doubts.length === 0 ? (
+                      <div className="p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-3">
+                        <div className="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-500 flex items-center justify-center mx-auto">
+                          <HelpCircle className="w-6 h-6" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No Doubts Submitted Yet</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                          Whenever you face any issue or doubt during lectures or capstone assignments, post it above!
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {doubts.map((d: any) => {
+                          const isAnswered = d.status === 'ANSWERED';
+                          return (
+                            <div
+                              key={d.id}
+                              className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4 transition"
+                            >
+                              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                                <div className="flex items-center gap-2">
+                                  {isAnswered ? (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      <span>Answered</span>
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                                      <Clock className="w-3 h-3" />
+                                      <span>Pending Mentor Review</span>
+                                    </span>
+                                  )}
+
+                                  {d.isUrgent && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-500 border border-rose-500/30">
+                                      <Flame className="w-3 h-3" />
+                                      <span>Urgent</span>
+                                    </span>
+                                  )}
+
+                                  {d.course?.title && (
+                                    <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                      • {d.course.title}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="text-[11px] text-slate-400">
+                                  {d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                                </div>
+                              </div>
+
+                              <div className="space-y-1">
+                                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Your Question:</p>
+                                <p className="text-sm font-medium text-slate-900 dark:text-slate-100 whitespace-pre-wrap leading-relaxed">
+                                  {d.question}
+                                </p>
+                              </div>
+
+                              {isAnswered && d.answer && (
+                                <div className="p-4 rounded-2xl bg-violet-500/5 dark:bg-violet-950/20 border border-violet-500/20 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-xs font-bold text-violet-700 dark:text-violet-300">
+                                      <Sparkles className="w-3.5 h-3.5 text-violet-500" />
+                                      <span>Mentor Response ({d.answeredBy?.name || 'Instructor'}):</span>
+                                    </div>
+                                    {d.answeredAt && (
+                                      <span className="text-[10px] text-slate-400">
+                                        {new Date(d.answeredAt).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">
+                                    {d.answer}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: ANNOUNCEMENTS & ALERTS */}
+              {activeTab === 'notifications' && (
+                <div className="space-y-6 animate-fadeIn">
+                  {/* Header Banner */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-6 sm:p-7 rounded-3xl bg-gradient-to-r from-[#0C1022] via-[#10142D] to-[#0A0D1A] border border-rose-500/25 shadow-2xl shadow-rose-950/40 backdrop-blur-2xl relative overflow-hidden">
+                    <div className="absolute -top-12 -right-12 w-64 h-64 bg-rose-500/15 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute -bottom-12 left-1/3 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
+
+                    <div className="space-y-2 relative z-10">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold shadow-sm">
+                        <Bell className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Official Academy Broadcasts</span>
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Announcements &amp; Alerts
+                      </h2>
+                      <p className="text-xs sm:text-sm text-rose-200/90 max-w-xl leading-relaxed">
+                        Stay up to date with live cohort sessions, mentor broadcasts, project deadlines, and curriculum upgrades.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 relative z-10 shrink-0 self-start sm:self-auto">
+                      <button
+                        onClick={fetchMyNotifications}
+                        disabled={loadingNotifications}
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition cursor-pointer"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${loadingNotifications ? 'animate-spin' : ''}`} />
+                        <span>Refresh</span>
+                      </button>
+
+                      {unreadNotifCount > 0 && (
+                        <button
+                          onClick={handleMarkAllNotifsRead}
+                          disabled={markingAllRead}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-600/25 transition cursor-pointer"
+                        >
+                          <CheckCheck className="w-3.5 h-3.5" />
+                          <span>Mark All Read</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Notifications List */}
+                  <div className="space-y-4">
+                    {loadingNotifications ? (
+                      <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-3 text-slate-400 text-xs">
+                        <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+                        <span>Loading announcements...</span>
+                      </div>
+                    ) : notifications.length === 0 ? (
+                      <div className="p-10 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-3">
+                        <div className="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto">
+                          <Bell className="w-6 h-6" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">No Announcements Yet</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                          When instructors broadcast cohort alerts or answer your questions, they will arrive here!
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {notifications.map((notif: any) => {
+                          const isRead = !!notif.isRead;
+                          const badgeColor =
+                            notif.type === 'ALERT'
+                              ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                              : notif.type === 'INFO'
+                              ? 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30'
+                              : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500/30';
+
+                          return (
+                            <div
+                              key={notif.id}
+                              onClick={() => !isRead && handleMarkOneNotifRead(notif.id)}
+                              className={`p-5 rounded-3xl border transition flex flex-col sm:flex-row sm:items-start justify-between gap-4 cursor-pointer ${
+                                !isRead
+                                  ? 'bg-white dark:bg-slate-900 border-rose-500/40 shadow-lg shadow-rose-500/5'
+                                  : 'bg-white/60 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800'
+                              }`}
+                            >
+                              <div className="flex items-start gap-3.5">
+                                <div
+                                  className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 mt-0.5 ${
+                                    !isRead
+                                      ? 'bg-rose-500/20 text-rose-500 dark:text-rose-400'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                  }`}
+                                >
+                                  <Bell className="w-4 h-4" />
+                                </div>
+
+                                <div className="space-y-1.5 flex-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badgeColor}`}>
+                                      {notif.type || 'ANNOUNCEMENT'}
+                                    </span>
+
+                                    {notif.announcement && (
+                                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                                        Broadcast
+                                      </span>
+                                    )}
+
+                                    {notif.targetCourse?.title && (
+                                      <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                        • {notif.targetCourse.title}
+                                      </span>
+                                    )}
+
+                                    {!isRead && (
+                                      <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                    )}
+                                  </div>
+
+                                  <h4 className={`text-sm ${!isRead ? 'font-bold text-slate-900 dark:text-white' : 'font-semibold text-slate-700 dark:text-slate-300'}`}>
+                                    {notif.title}
+                                  </h4>
+
+                                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">
+                                    {notif.message}
+                                  </p>
+
+                                  <div className="text-[10px] text-slate-400 pt-1">
+                                    {notif.createdAt ? new Date(notif.createdAt).toLocaleString() : ''}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {!isRead && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleMarkOneNotifRead(notif.id);
+                                  }}
+                                  className="text-[11px] font-semibold text-rose-500 hover:text-rose-600 shrink-0 self-end sm:self-start"
+                                >
+                                  Mark as read
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 

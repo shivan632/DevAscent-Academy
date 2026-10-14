@@ -60,7 +60,8 @@ export class NotificationsService {
       }
     }
 
-    const notification = await this.prisma.notification.create({
+    // Step 1: Save into Announcement table for Admin
+    const announcement = await this.prisma.announcement.create({
       data: {
         title: dto.title.trim(),
         message: dto.message.trim(),
@@ -76,16 +77,37 @@ export class NotificationsService {
       },
     });
 
+    // Step 2: Propagate into Notification table for Students (connected via announcementId)
+    const notification = await this.prisma.notification.create({
+      data: {
+        announcementId: announcement.id,
+        title: announcement.title,
+        message: announcement.message,
+        type: announcement.type,
+        targetRole: announcement.targetRole,
+        targetCohort: announcement.targetCohort,
+        targetCourseId: announcement.targetCourseId,
+        createdById: adminId,
+      },
+      include: {
+        announcement: true,
+        targetCourse: { select: { id: true, title: true, slug: true } },
+        createdBy: { select: { id: true, name: true, email: true } },
+      },
+    });
+
     await this.logAction({
       adminId,
-      action: 'NOTIFICATION_BROADCAST',
-      targetId: notification.id,
-      targetType: 'Notification',
+      action: 'ANNOUNCEMENT_AND_NOTIFICATION_BROADCAST',
+      targetId: announcement.id,
+      targetType: 'Announcement',
       metadata: {
-        title: notification.title,
-        type: notification.type,
-        targetRole: notification.targetRole,
-        targetCourseId: notification.targetCourseId,
+        announcementId: announcement.id,
+        notificationId: notification.id,
+        title: announcement.title,
+        type: announcement.type,
+        targetRole: announcement.targetRole,
+        targetCourseId: announcement.targetCourseId,
       },
       ipAddress,
       userAgent,
@@ -114,7 +136,11 @@ export class NotificationsService {
     const where: Prisma.NotificationWhereInput = {
       AND: [
         {
-          OR: [{ targetRole: 'ALL' }, { targetRole: userRole }],
+          OR: [
+            { targetRole: 'ALL' },
+            { targetRole: userRole },
+            ...(userId ? [{ userId }] : []),
+          ],
         },
         {
           OR: [
@@ -132,6 +158,7 @@ export class NotificationsService {
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
+          announcement: { select: { id: true, title: true, createdAt: true } },
           targetCourse: { select: { id: true, title: true, slug: true } },
           createdBy: { select: { id: true, name: true } },
         },
@@ -203,7 +230,11 @@ export class NotificationsService {
       where: {
         AND: [
           {
-            OR: [{ targetRole: 'ALL' }, { targetRole: userRole }],
+            OR: [
+              { targetRole: 'ALL' },
+              { targetRole: userRole },
+              ...(userId ? [{ userId }] : []),
+            ],
           },
           {
             OR: [
@@ -294,7 +325,15 @@ export class NotificationsService {
       throw new NotFoundException(`Notification with ID ${id} not found`);
     }
 
-    await this.prisma.notification.delete({ where: { id } });
+    if (notification.announcementId) {
+      await this.prisma.announcement.delete({
+        where: { id: notification.announcementId },
+      }).catch(async () => {
+        await this.prisma.notification.delete({ where: { id } }).catch(() => {});
+      });
+    } else {
+      await this.prisma.notification.delete({ where: { id } });
+    }
 
     await this.logAction({
       adminId,

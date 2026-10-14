@@ -20,13 +20,17 @@ import {
   BarChart3,
   Flame,
   CheckCircle2,
+  HelpCircle,
+  Bell,
 } from 'lucide-react';
 
 interface StudentSidebarProps {
   activeTab?: string;
-  onSelectTab?: (tab: 'overview' | 'analytics' | 'certificates' | 'submissions' | 'profile' | 'settings' | 'support') => void;
+  onSelectTab?: (tab: 'overview' | 'analytics' | 'certificates' | 'submissions' | 'doubts' | 'notifications' | 'profile' | 'settings' | 'support') => void;
   certificatesCount?: number;
   submissionsCount?: number;
+  doubtsCount?: number;
+  unreadNotificationsCount?: number;
   enrolledCourses?: Array<{
     id?: string;
     courseId?: string;
@@ -41,6 +45,8 @@ export default function StudentSidebar({
   onSelectTab,
   certificatesCount = 0,
   submissionsCount = 0,
+  doubtsCount = 0,
+  unreadNotificationsCount = 0,
   enrolledCourses = [],
 }: StudentSidebarProps) {
   const { user, logout } = useAuthStore();
@@ -82,6 +88,22 @@ export default function StudentSidebar({
       iconColor: 'text-amber-400',
       count: submissionsCount,
       countColor: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
+    },
+    {
+      id: 'doubts',
+      label: 'Ask Doubt & Queries',
+      icon: HelpCircle,
+      iconColor: 'text-violet-400',
+      count: doubtsCount,
+      countColor: 'bg-violet-500/15 text-violet-400 border border-violet-500/30',
+    },
+    {
+      id: 'notifications',
+      label: 'Announcements & Alerts',
+      icon: Bell,
+      iconColor: 'text-rose-400',
+      count: unreadNotificationsCount,
+      countColor: 'bg-rose-500/15 text-rose-400 border border-rose-500/30',
     },
     {
       id: 'profile',

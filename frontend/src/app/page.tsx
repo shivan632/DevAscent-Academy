@@ -27,7 +27,8 @@ import {
   Check,
   Clock,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  XCircle,
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -749,6 +750,246 @@ export default function LandingPage() {
               </div>
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* Comparative Evaluation Section: The Sweet Spot */}
+      <section id="comparison" className="py-20 bg-slate-50 dark:bg-[#070b14] border-t border-slate-200/80 dark:border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto space-y-3 mb-14">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200/80 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>Objective Industry Comparison</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Why DevAscent Academy is the <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-cyan-400">Sweet Spot</span>
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl mx-auto">
+              Skip ₹50,000+ debt-heavy bootcamps and scattered free tutorials with a 3% completion rate. Get production architecture, live code reviews, and verifiable credentials.
+            </p>
+          </div>
+
+          {/* Quick Score Metrics Bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-5xl mx-auto">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-sm">
+              <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400">9.0 / 10</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-1">Value for Money</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">₹599 early-bird vs ₹50k+ bootcamps</div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-sm">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">9.0 / 10</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-1">Financial Safety</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Zero debt, no ISAs, 7-day refund</div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-sm">
+              <div className="text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400">8.5 / 10</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-1">Modern Tech Stack</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Next.js 15, NestJS, Docker, Neon</div>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center shadow-sm">
+              <div className="text-2xl sm:text-3xl font-black text-amber-500 dark:text-amber-400">4 Apps</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-1">Production Proof</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Real cloud CI/CD &amp; GitHub source</div>
+            </div>
+          </div>
+
+          {/* Comparison Table */}
+          <div className="max-w-5xl mx-auto overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-950/60">
+                    <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 w-1/4">
+                      Evaluation Feature
+                    </th>
+                    <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 w-1/3 bg-indigo-50/50 dark:bg-indigo-950/30 border-x border-indigo-200/60 dark:border-indigo-800/60">
+                      <div className="flex items-center gap-1.5">
+                        <span>DevAscent Academy</span>
+                        <span className="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-extrabold uppercase">
+                          The Sweet Spot
+                        </span>
+                      </div>
+                    </th>
+                    <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 w-1/5">
+                      Premium Bootcamps
+                    </th>
+                    <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 w-1/5">
+                      Self-Serve YouTube / Free
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs sm:text-sm">
+                  {/* Row 1: Estimated Cost */}
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-slate-900 dark:text-white">
+                      Estimated Cost
+                    </td>
+                    <td className="py-4 px-6 bg-indigo-50/30 dark:bg-indigo-950/20 border-x border-indigo-200/60 dark:border-indigo-800/60 font-bold text-emerald-600 dark:text-emerald-400">
+                      ₹599 – ₹1,499
+                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">One-time transparent fee</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      ₹50,000 to ₹3.5 Lakhs
+                      <span className="block text-[11px] text-rose-500 dark:text-rose-400 font-medium">(Or 15–20% Salary ISA Debt)</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      ₹0 (Free)
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Ad-funded / self-study</span>
+                    </td>
+                  </tr>
+
+                  {/* Row 2: Tech Stack */}
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-slate-900 dark:text-white">
+                      Tech Stack Modernity
+                    </td>
+                    <td className="py-4 px-6 bg-indigo-50/30 dark:bg-indigo-950/20 border-x border-indigo-200/60 dark:border-indigo-800/60 font-semibold text-slate-900 dark:text-white">
+                      <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-bold">
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span>Next.js 15, NestJS, Docker, Neon</span>
+                      </div>
+                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">2026 industry enterprise stack</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      Standard MERN / Outdated MVC
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Older syllabus &amp; textbook stacks</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      Disjointed / Outdated Tutorials
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Often broken versions &amp; syntax</span>
+                    </td>
+                  </tr>
+
+                  {/* Row 3: Financial Risk */}
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-slate-900 dark:text-white">
+                      Financial Risk &amp; Guarantees
+                    </td>
+                    <td className="py-4 px-6 bg-indigo-50/30 dark:bg-indigo-950/20 border-x border-indigo-200/60 dark:border-indigo-800/60 font-semibold text-emerald-600 dark:text-emerald-400">
+                      <div className="flex items-center gap-1.5 font-bold">
+                        <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-500" />
+                        <span>Zero Risk • 7-Day Full Refund</span>
+                      </div>
+                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">No ISAs, no loans, no commitments</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400 font-medium">
+                        <XCircle className="w-4 h-4 shrink-0" />
+                        <span>High Risk / Restrictive ISAs</span>
+                      </div>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Heavy debt or legal salary contracts</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span>Zero Financial Risk</span>
+                      </div>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Completely open &amp; free</span>
+                    </td>
+                  </tr>
+
+                  {/* Row 4: Support & Mentorship */}
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-slate-900 dark:text-white">
+                      Support &amp; Code Reviews
+                    </td>
+                    <td className="py-4 px-6 bg-indigo-50/30 dark:bg-indigo-950/20 border-x border-indigo-200/60 dark:border-indigo-800/60 font-semibold text-slate-900 dark:text-white">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
+                        <CheckCircle2 className="w-4 h-4 shrink-0 text-indigo-500" />
+                        <span>Weekly Live Code Reviews + Community</span>
+                      </div>
+                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">Direct architecture guidance</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      Assigned Teaching Assistants (TAs)
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Scheduled batch ticket system</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400 font-medium">
+                        <XCircle className="w-4 h-4 shrink-0" />
+                        <span>Zero Mentor Support</span>
+                      </div>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">StackOverflow &amp; comments</span>
+                    </td>
+                  </tr>
+
+                  {/* Row 5: Completion Rate */}
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-slate-900 dark:text-white">
+                      Completion &amp; Accountability
+                    </td>
+                    <td className="py-4 px-6 bg-indigo-50/30 dark:bg-indigo-950/20 border-x border-indigo-200/60 dark:border-indigo-800/60 font-semibold text-slate-900 dark:text-white">
+                      <div className="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span>Structured 6-Week Milestones</span>
+                      </div>
+                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">Step-by-step accountability system</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      Rigid Timetable
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">High stress, fixed deadlines</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400 font-medium">
+                        <XCircle className="w-4 h-4 shrink-0" />
+                        <span>3% to 5% Completion Rate</span>
+                      </div>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Most drop out in tutorial hell</span>
+                    </td>
+                  </tr>
+
+                  {/* Row 6: Certification */}
+                  <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-slate-900 dark:text-white">
+                      Verifiable Credential
+                    </td>
+                    <td className="py-4 px-6 bg-indigo-50/30 dark:bg-indigo-950/20 border-x border-indigo-200/60 dark:border-indigo-800/60 font-semibold text-slate-900 dark:text-white">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
+                        <Award className="w-4 h-4 shrink-0 text-amber-500" />
+                        <span>SHA-256 Public QR Ledger</span>
+                      </div>
+                      <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400">Tamper-proof online verifier (/verify/[code])</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      Internal Institute Certificate
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Standard PDF with portal login</span>
+                    </td>
+                    <td className="py-4 px-6 text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                        <XCircle className="w-4 h-4 shrink-0" />
+                        <span>No Credential Verification</span>
+                      </div>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400">Self-claimed resume bullets</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Bottom Callout in Table */}
+            <div className="p-4 sm:p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 dark:from-indigo-950/40 dark:via-purple-950/40 dark:to-indigo-950/40 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm font-black text-sm">
+                  ⚡
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                    The Bottom Line: Real Skills, Zero Debt.
+                  </h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Get the production architecture of a ₹1 Lakh bootcamp at the honest price of ₹599.
+                  </p>
+                </div>
+              </div>
+              <a
+                href="#pricing"
+                className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md transition-all shrink-0"
+              >
+                <span>View Cohort Pass</span>
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         </div>
       </section>

@@ -46,6 +46,8 @@ model User {
   doubtsAnswered         Doubt[]                 @relation("DoubtAnswerer")
   notificationsSent      Notification[]          @relation("NotificationSender")
   notificationReads      NotificationRead[]
+  announcementsCreated   Announcement[]          @relation("AnnouncementCreator")
+  directNotifications    Notification[]          @relation("StudentDirectNotifications")
 }
 
 model OtpVerification {
@@ -97,6 +99,7 @@ model Course {
   coupons                Coupon[]                @relation("CourseCoupons")
   doubts                 Doubt[]
   notifications          Notification[]          @relation("CourseNotifications")
+  announcements          Announcement[]          @relation("CourseAnnouncements")
 }
 
 model AiVideo {
@@ -403,6 +406,25 @@ model Coupon {
   @@index([expiresAt])
 }
 
+model Announcement {
+  id             String         @id @default(cuid())
+  title          String
+  message        String
+  type           String         @default("ANNOUNCEMENT") // ANNOUNCEMENT | ALERT | INFO | SYSTEM
+  targetRole     String         @default("ALL")          // ALL | STUDENT | ADMIN
+  targetCohort   Int?
+  targetCourseId String?
+  targetCourse   Course?        @relation("CourseAnnouncements", fields: [targetCourseId], references: [id], onDelete: Cascade)
+  createdById    String?
+  createdBy      User?          @relation("AnnouncementCreator", fields: [createdById], references: [id])
+  notifications  Notification[] @relation("AnnouncementNotifications")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([targetRole, createdAt])
+  @@index([targetCourseId])
+}
+
 model Notification {
   id             String             @id @default(cuid())
   title          String
@@ -412,6 +434,10 @@ model Notification {
   targetCohort   Int?
   targetCourseId String?
   targetCourse   Course?            @relation("CourseNotifications", fields: [targetCourseId], references: [id], onDelete: Cascade)
+  announcementId String?
+  announcement   Announcement?      @relation("AnnouncementNotifications", fields: [announcementId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?              @relation("StudentDirectNotifications", fields: [userId], references: [id], onDelete: Cascade)
   createdById    String?
   createdBy      User?              @relation("NotificationSender", fields: [createdById], references: [id])
   reads          NotificationRead[]
@@ -419,6 +445,8 @@ model Notification {
 
   @@index([targetRole, createdAt])
   @@index([targetCourseId])
+  @@index([announcementId])
+  @@index([userId])
 }
 
 model NotificationRead {
@@ -432,5 +460,6 @@ model NotificationRead {
   @@unique([userId, notificationId])
   @@index([userId])
 }
+
 
 
