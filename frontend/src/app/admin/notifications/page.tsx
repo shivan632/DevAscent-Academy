@@ -159,12 +159,14 @@ export default function AdminNotificationsPage() {
     }
   };
 
-  const stats = data?.stats || {
+  const payload = data?.data !== undefined ? data.data : data;
+
+  const stats = payload?.stats || data?.stats || {
     totalBroadcasts: 0,
     totalReads: 0,
   };
 
-  const broadcastsList = data?.notifications || [];
+  const broadcastsList = payload?.notifications || data?.notifications || (Array.isArray(payload) ? payload : []);
 
   return (
     <div className="space-y-6">

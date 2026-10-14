@@ -139,14 +139,16 @@ export default function AdminQueriesPage() {
     }
   };
 
-  const stats = data?.stats || {
+  const payload = data?.data !== undefined ? data.data : data;
+
+  const stats = payload?.stats || data?.stats || {
     totalQueries: 0,
     pendingQueries: 0,
     answeredQueries: 0,
     urgentQueries: 0,
   };
 
-  const queriesList = data?.doubts || [];
+  const queriesList = payload?.doubts || data?.doubts || (Array.isArray(payload) ? payload : []);
 
   return (
     <div className="space-y-6">

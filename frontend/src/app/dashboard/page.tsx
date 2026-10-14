@@ -389,16 +389,35 @@ function DashboardContent() {
         }
 
         if (doubtsRes.status === 'fulfilled' && doubtsRes.value) {
-          const val = doubtsRes.value;
-          const list = Array.isArray(val?.doubts) ? val.doubts : (Array.isArray(val) ? val : []);
+          const raw = doubtsRes.value;
+          const val = raw?.data !== undefined ? raw.data : raw;
+          const list = Array.isArray(val?.doubts)
+            ? val.doubts
+            : Array.isArray(val)
+            ? val
+            : Array.isArray(raw?.doubts)
+            ? raw.doubts
+            : [];
           setDoubts(list);
         }
 
         if (notifsRes.status === 'fulfilled' && notifsRes.value) {
-          const val = notifsRes.value;
-          const list = Array.isArray(val?.notifications) ? val.notifications : (Array.isArray(val) ? val : []);
+          const raw = notifsRes.value;
+          const val = raw?.data !== undefined ? raw.data : raw;
+          const list = Array.isArray(val?.notifications)
+            ? val.notifications
+            : Array.isArray(val)
+            ? val
+            : Array.isArray(raw?.notifications)
+            ? raw.notifications
+            : [];
           setNotifications(list);
-          const unread = typeof val?.unreadCount === 'number' ? val.unreadCount : list.filter((n: any) => !n.isRead).length;
+          const unread =
+            typeof val?.unreadCount === 'number'
+              ? val.unreadCount
+              : typeof raw?.unreadCount === 'number'
+              ? raw.unreadCount
+              : list.filter((n: any) => !n.isRead).length;
           setUnreadNotifCount(unread);
         }
       } catch (e) {
@@ -414,7 +433,14 @@ function DashboardContent() {
     setLoadingDoubts(true);
     try {
       const res = await api.getMyDoubts();
-      const list = Array.isArray(res?.doubts) ? res.doubts : (Array.isArray(res) ? res : []);
+      const val = res?.data !== undefined ? res.data : res;
+      const list = Array.isArray(val?.doubts)
+        ? val.doubts
+        : Array.isArray(val)
+        ? val
+        : Array.isArray(res?.doubts)
+        ? res.doubts
+        : [];
       setDoubts(list);
     } catch (e) {
       console.warn('Failed to fetch doubts:', e);
@@ -452,9 +478,21 @@ function DashboardContent() {
     setLoadingNotifications(true);
     try {
       const res = await api.getNotifications();
-      const list = Array.isArray(res?.notifications) ? res.notifications : (Array.isArray(res) ? res : []);
+      const val = res?.data !== undefined ? res.data : res;
+      const list = Array.isArray(val?.notifications)
+        ? val.notifications
+        : Array.isArray(val)
+        ? val
+        : Array.isArray(res?.notifications)
+        ? res.notifications
+        : [];
       setNotifications(list);
-      const unread = typeof res?.unreadCount === 'number' ? res.unreadCount : list.filter((n: any) => !n.isRead).length;
+      const unread =
+        typeof val?.unreadCount === 'number'
+          ? val.unreadCount
+          : typeof res?.unreadCount === 'number'
+          ? res.unreadCount
+          : list.filter((n: any) => !n.isRead).length;
       setUnreadNotifCount(unread);
     } catch (e) {
       console.warn('Failed to fetch notifications:', e);
