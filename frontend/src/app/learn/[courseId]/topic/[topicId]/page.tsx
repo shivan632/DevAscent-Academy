@@ -235,20 +235,20 @@ export default function TopicPage() {
         </header>
 
         {/* Scrollable Lecture Notes Content Area */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 custom-scrollbar">
-          <div className="max-w-3xl mx-auto space-y-6 pb-24">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 custom-scrollbar">
+          <div className="w-full space-y-4 pb-20">
             {/* Header */}
-            <div className="space-y-2 border-b border-slate-800/80 pb-6">
+            <div className="space-y-1.5 border-b border-slate-800/80 pb-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-indigo-400">
                 <span>TOPIC {topic.globalSeq}</span>
                 <span>•</span>
                 <span className="text-slate-400">{curriculum?.course?.title}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 {topic.title}
               </h1>
               {topic.summary && (
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                   {topic.summary}
                 </p>
               )}

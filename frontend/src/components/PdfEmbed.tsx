@@ -40,7 +40,7 @@ export function PdfEmbed({
 
   return (
     <div className="space-y-3 w-full">
-      <div className="w-full h-[620px] rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl relative group">
+      <div className="w-full h-[calc(100vh-250px)] min-h-[680px] rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl relative group">
         <iframe
           src={embedSrc}
           className="w-full h-full border-0 bg-slate-950"
