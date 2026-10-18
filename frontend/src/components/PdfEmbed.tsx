@@ -34,7 +34,9 @@ export function PdfEmbed({
     embedSrc = embedSrc.replace(/\/view(\?.*)?$/, '/preview');
   }
 
-  const directViewUrl = embedSrc.replace('/preview', '/view');
+  const directViewUrl = embedSrc.includes('drive.google.com')
+    ? embedSrc.replace('/preview', '/view')
+    : embedSrc;
 
   return (
     <div className="space-y-3 w-full">
@@ -51,7 +53,7 @@ export function PdfEmbed({
       <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs">
         <span className="text-slate-400 text-[11px] flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-          <span>Interactive PDF Viewer • Zoom &amp; Scroll within frame</span>
+          <span>Interactive Document &amp; Notes Viewer • Scroll within frame</span>
         </span>
         <a
           href={directViewUrl}

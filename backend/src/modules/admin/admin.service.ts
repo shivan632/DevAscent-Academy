@@ -6,18 +6,33 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
-function validateDriveUrl(url: string | null | undefined, fieldName = 'PDF URL'): string | null {
+function validateDriveUrl(url: string | null | undefined, fieldName = 'Lesson / PDF URL'): string | null {
   if (!url || !url.trim()) return null;
   const trimmed = url.trim();
+
+  // If it's a Google Drive link, normalize to /preview format
   const GOOGLE_DRIVE_REGEX = /^https:\/\/(?:drive|docs)\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
   const match = trimmed.match(GOOGLE_DRIVE_REGEX);
-  if (!match) {
+  if (match) {
+    const fileId = match[1];
+    return `https://drive.google.com/file/d/${fileId}/preview`;
+  }
+
+  // Accept any valid HTTP or HTTPS URL (e.g. Cloudflare Pages, custom web notes, PDFs)
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      throw new BadRequestException(
+        `Please provide a valid HTTP or HTTPS link for ${fieldName}.`
+      );
+    }
+    return trimmed;
+  } catch (err: any) {
+    if (err instanceof BadRequestException) throw err;
     throw new BadRequestException(
-      `Please provide a valid Google Drive link for ${fieldName}. Format: https://drive.google.com/file/d/[ID]/preview`
+      `Please provide a valid web URL for ${fieldName}. Received: ${trimmed}`
     );
   }
-  const fileId = match[1];
-  return `https://drive.google.com/file/d/${fileId}/preview`;
 }
 
 @Injectable()

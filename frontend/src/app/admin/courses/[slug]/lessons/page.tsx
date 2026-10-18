@@ -775,7 +775,7 @@ export default function AdminCurriculumStudioPage() {
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>📄 Lesson Notes PDF</span>
+                <span>📄 Lesson Notes / URL</span>
               </button>
 
               <button
@@ -835,12 +835,12 @@ export default function AdminCurriculumStudioPage() {
                     />
                   </div>
 
-                  {/* Google Drive PDF URL input */}
+                  {/* Lesson Notes / Web URL input */}
                   <div className="space-y-2 p-4 bg-slate-950 rounded-xl border border-slate-800/80">
                     <div className="flex items-center justify-between">
                       <label className="text-slate-200 font-semibold flex items-center gap-2">
                         <FileText className="w-4 h-4 text-indigo-400" />
-                        <span>📄 Lesson Notes PDF URL *</span>
+                        <span>📄 Lesson Notes / Web URL *</span>
                       </label>
 
                       {lessonForm.notesPdfUrl && (
@@ -851,7 +851,7 @@ export default function AdminCurriculumStudioPage() {
                           className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>🔍 Test PDF Link ↗</span>
+                          <span>🔍 Test Link ↗</span>
                         </a>
                       )}
                     </div>
@@ -860,25 +860,31 @@ export default function AdminCurriculumStudioPage() {
                       type="url"
                       value={lessonForm.notesPdfUrl}
                       onChange={(e) => setLessonForm({ ...lessonForm, notesPdfUrl: e.target.value })}
-                      placeholder="https://drive.google.com/file/d/xxxxx/preview"
+                      placeholder="https://devascent-notes.pages.dev/... or https://drive.google.com/file/d/xxxxx/preview"
                       className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none"
                     />
 
                     <p className="text-[11px] text-slate-400">
-                      ℹ️ Format: <code>https://drive.google.com/file/d/[ID]/preview</code> (Google Drive /preview link)
+                      ℹ️ Format: Web notes URL (e.g. Cloudflare Pages <code>https://devascent-notes.pages.dev/...</code>) or Google Drive <code>/preview</code> link
                     </p>
 
                     {lessonForm.notesPdfUrl && (
                       <div className="mt-3 pt-3 border-t border-slate-800/80">
                         <div className="text-[11px] text-slate-400 mb-2 flex items-center justify-between">
-                          <span>Live In-Studio PDF Preview:</span>
-                          <span className="text-indigo-400 font-mono text-[10px]">Google Drive Preview</span>
+                          <span>Live In-Studio Content Preview:</span>
+                          <span className="text-indigo-400 font-mono text-[10px]">
+                            {lessonForm.notesPdfUrl.includes('drive.google.com') ? 'Google Drive Preview' : 'Web Page Preview'}
+                          </span>
                         </div>
                         <div className="h-64 rounded-xl overflow-hidden border border-slate-800 bg-black">
                           <iframe
-                            src={lessonForm.notesPdfUrl.replace(/\/view(\?.*)?$/, '/preview')}
+                            src={
+                              lessonForm.notesPdfUrl.includes('drive.google.com')
+                                ? lessonForm.notesPdfUrl.replace(/\/view(\?.*)?$/, '/preview')
+                                : lessonForm.notesPdfUrl
+                            }
                             className="w-full h-full border-0"
-                            title="Lesson PDF Preview"
+                            title="Lesson Content Preview"
                           />
                         </div>
                       </div>
