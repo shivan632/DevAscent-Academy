@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -76,17 +77,35 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  // Health check endpoint
+  // Health check endpoint with database keep-alive ping
   const httpAdapter = app.getHttpAdapter();
-  httpAdapter.get('/api/v1/health', (req: any, res: any) => {
-    res.json({
-      success: true,
-      data: {
-        status: 'ok',
-        db: 'connected',
-        timestamp: new Date().toISOString(),
-      },
-    });
+  const prisma = app.get(PrismaService);
+  httpAdapter.get('/api/v1/health', async (req: any, res: any) => {
+    try {
+      const start = Date.now();
+      await prisma.$queryRaw`SELECT 1`;
+      const latencyMs = Date.now() - start;
+      res.json({
+        success: true,
+        data: {
+          status: 'ok',
+          database: 'connected',
+          latencyMs,
+          timestamp: new Date().toISOString(),
+          uptimeSeconds: Math.round(process.uptime()),
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        success: false,
+        data: {
+          status: 'degraded',
+          database: 'disconnected',
+          error: err?.message || 'Database ping failed',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
   });
 
   const port = parseInt(process.env.PORT || '3001', 10);

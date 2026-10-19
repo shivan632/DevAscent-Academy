@@ -5,10 +5,14 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CacheService } from '../../shared/cache.service';
 
 @Injectable()
 export class CoursesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cacheService: CacheService,
+  ) {}
 
   private cache = new Map<string, { data: any; expiresAt: number }>();
 
@@ -427,37 +431,51 @@ export class CoursesService {
    * Helper: compute high-performance unified curriculum state in a single query
    */
   async getCurriculumData(slugOrId: string, userId?: string) {
-    const course = await this.prisma.course.findFirst({
-      where: {
-        OR: [{ id: slugOrId }, { slug: slugOrId }],
-      },
-      include: {
-        aiVideos: {
-          orderBy: { order: 'asc' },
+    const structureCacheKey = `course_structure:${slugOrId}`;
+    let course = await this.cacheService.get<any>(structureCacheKey);
+
+    if (!course) {
+      course = await this.prisma.course.findFirst({
+        where: {
+          OR: [{ id: slugOrId }, { slug: slugOrId }],
         },
-        modules: {
-          include: {
-            lessons: {
-              include: {
-                quiz: {
-                  include: {
-                    questions: {
-                      select: { id: true, order: true },
-                      orderBy: { order: 'asc' },
+        include: {
+          aiVideos: {
+            orderBy: { order: 'asc' },
+          },
+          modules: {
+            include: {
+              lessons: {
+                include: {
+                  quiz: {
+                    include: {
+                      questions: {
+                        select: { id: true, order: true },
+                        orderBy: { order: 'asc' },
+                      },
                     },
                   },
                 },
+                orderBy: { lessonNumber: 'asc' },
               },
-              orderBy: { lessonNumber: 'asc' },
             },
+            orderBy: { moduleNumber: 'asc' },
           },
-          orderBy: { moduleNumber: 'asc' },
         },
-      },
-    });
+      });
 
-    if (!course) {
-      throw new NotFoundException('Course not found');
+      if (!course) {
+        throw new NotFoundException('Course not found');
+      }
+
+      // Cache structure for 30 minutes in L1 memory & L2 Redis
+      await this.cacheService.set(structureCacheKey, course, 1800);
+      if (course.slug && course.slug !== slugOrId) {
+        await this.cacheService.set(`course_structure:${course.slug}`, course, 1800);
+      }
+      if (course.id && course.id !== slugOrId) {
+        await this.cacheService.set(`course_structure:${course.id}`, course, 1800);
+      }
     }
 
     let enrollment: any = null;

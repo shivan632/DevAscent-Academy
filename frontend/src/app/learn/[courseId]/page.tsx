@@ -1,75 +1,64 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { fetchApi } from '@/lib/api';
-import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { getApiBaseUrl } from '@/lib/api';
 
-export default function LearnCourseRedirectPage() {
-  const params = useParams();
-  const router = useRouter();
-  const rawSlug = (params?.courseId as string) || '';
+interface PageProps {
+  params: Promise<{ courseId: string }>;
+}
+
+export default async function LearnCourseRedirectPage({ params }: PageProps) {
+  const resolvedParams = await params;
+  const rawSlug = resolvedParams?.courseId || '';
   const courseSlug = decodeURIComponent(rawSlug).toLowerCase().trim().replace(/\s+/g, '-');
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  if (!courseSlug) {
+    redirect('/courses');
+  }
 
-  useEffect(() => {
-    if (!courseSlug) return;
+  let targetUrl: string | null = null;
+  let errorMessage: string | null = null;
 
-    let isMounted = true;
-    async function resolveTargetRoute() {
-      try {
-        setLoading(true);
-        const res = await fetchApi(`/courses/${courseSlug}/curriculum`);
-        const data = res?.data || res;
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('devascent_token')?.value;
 
-        if (!isMounted) return;
+    const res = await fetch(`${getApiBaseUrl()}/courses/${courseSlug}/curriculum`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      next: { revalidate: 30 },
+    });
 
-        const aiVideos = data?.aiVideos || [];
-        const topics = data?.topics || data?.lessons || [];
+    if (res.ok) {
+      const json = await res.json();
+      const data = json?.data || json;
+      const aiVideos = data?.aiVideos || [];
+      const topics = data?.topics || data?.lessons || [];
 
-        // 1. Check if Milestone 1 Video is not yet watched
-        const video1 = aiVideos.find((v: any) => v.order === 1);
-        if (video1 && !video1.isWatched && video1.isUnlocked) {
-          router.replace(`/learn/${courseSlug}/video/${video1.id}`);
-          return;
-        }
-
+      // 1. Check if Milestone 1 Video is not yet watched
+      const video1 = aiVideos.find((v: any) => v.order === 1);
+      if (video1 && !video1.isWatched && video1.isUnlocked) {
+        targetUrl = `/learn/${courseSlug}/video/${video1.id}`;
+      } else {
         // 2. Otherwise find the first unlocked topic that is not yet completed
         const activeTopic = topics.find((t: any) => t.isUnlocked && !t.isCompleted);
         const targetTopic = activeTopic || topics.find((t: any) => t.isUnlocked) || topics[0];
-
         if (targetTopic) {
-          router.replace(`/learn/${courseSlug}/topic/${targetTopic.id}`);
+          targetUrl = `/learn/${courseSlug}/topic/${targetTopic.id}`;
         } else if (video1) {
-          router.replace(`/learn/${courseSlug}/video/${video1.id}`);
-        } else {
-          setError('No curriculum content available in this course yet.');
-          setLoading(false);
-        }
-      } catch (err: any) {
-        if (isMounted) {
-          setError(err?.message || 'Failed to load course curriculum.');
-          setLoading(false);
+          targetUrl = `/learn/${courseSlug}/video/${video1.id}`;
         }
       }
     }
+  } catch (err: any) {
+    errorMessage = err?.message || 'Failed to resolve course content.';
+  }
 
-    resolveTargetRoute();
-    return () => {
-      isMounted = false;
-    };
-  }, [courseSlug, router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-300 gap-4">
-        <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-        <p className="text-sm font-medium animate-pulse">Entering Virtual Classroom...</p>
-      </div>
-    );
+  if (targetUrl) {
+    redirect(targetUrl);
   }
 
   return (
@@ -79,7 +68,7 @@ export default function LearnCourseRedirectPage() {
           <AlertCircle className="w-6 h-6" />
         </div>
         <h2 className="text-lg font-bold text-white">Course Notice</h2>
-        <p className="text-sm text-slate-400">{error || 'No lessons found.'}</p>
+        <p className="text-sm text-slate-400">{errorMessage || 'No lessons found in this course.'}</p>
         <div className="pt-2">
           <Link
             href="/courses"

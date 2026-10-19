@@ -38,6 +38,7 @@ interface StudentSidebarProps {
     courseTitle: string;
     progressPct?: number;
   }>;
+  customAvatarUrl?: string;
 }
 
 export default function StudentSidebar({
@@ -48,6 +49,7 @@ export default function StudentSidebar({
   doubtsCount = 0,
   unreadNotificationsCount = 0,
   enrolledCourses = [],
+  customAvatarUrl,
 }: StudentSidebarProps) {
   const { user, logout } = useAuthStore();
   const { isOpen, close } = useSidebarStore();
@@ -55,10 +57,16 @@ export default function StudentSidebar({
 
   // Hydration guard: defer client-only state reads until after mount
   const [mounted, setMounted] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
   const studentName = mounted ? (user?.name || 'Student') : 'Student';
   const studentEmail = mounted ? (user?.email || 'student@devascent.io') : 'student@devascent.io';
+  const effectiveAvatar = customAvatarUrl !== undefined ? customAvatarUrl : (mounted ? user?.avatarUrl : undefined);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [effectiveAvatar]);
 
   const menuItems = [
     {
@@ -141,8 +149,17 @@ export default function StudentSidebar({
       <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/80">
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 shrink-0 shadow-md shadow-indigo-500/20">
-            <div className="w-11 h-11 rounded-[14px] bg-slate-900 text-white flex items-center justify-center font-extrabold text-base">
-              {studentName.charAt(0).toUpperCase()}
+            <div className="w-11 h-11 rounded-[14px] bg-slate-900 text-white flex items-center justify-center font-extrabold text-base overflow-hidden">
+              {effectiveAvatar && !avatarError ? (
+                <img
+                  src={effectiveAvatar}
+                  alt={studentName}
+                  className="w-full h-full object-cover"
+                  onError={() => setAvatarError(true)}
+                />
+              ) : (
+                <span>{studentName.charAt(0).toUpperCase()}</span>
+              )}
             </div>
             <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />

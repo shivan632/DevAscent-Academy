@@ -908,6 +908,7 @@ function DashboardContent() {
               doubtsCount={doubts.length}
               unreadNotificationsCount={unreadNotifCount}
               enrolledCourses={displayEnrollments}
+              customAvatarUrl={profileAvatarUrl || user?.avatarUrl}
             />
 
             {/* Right Main Dashboard Tab Panel */}
@@ -3021,24 +3022,48 @@ function DashboardContent() {
                         </div>
 
                         {/* Modal Action Buttons */}
-                        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
-                          <button
-                            type="button"
-                            onClick={() => setShowAvatarModal(false)}
-                            className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setProfileAvatarUrl(tempAvatarUrl);
-                              setShowAvatarModal(false);
-                            }}
-                            className="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-600/30 transition-all"
-                          >
-                            Apply Photo
-                          </button>
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+                          <div>
+                            {(profileAvatarUrl || tempAvatarUrl) && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTempAvatarUrl('');
+                                  setProfileAvatarUrl('');
+                                  setShowAvatarModal(false);
+                                  updateUser({ avatarUrl: '' });
+                                  api.updateProfile({ avatarUrl: '' }).catch(() => {});
+                                }}
+                                className="text-xs font-semibold text-rose-400 hover:text-rose-300 transition-colors"
+                              >
+                                Remove Photo
+                              </button>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => setShowAvatarModal(false)}
+                              className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newUrl = tempAvatarUrl.trim();
+                                setProfileAvatarUrl(newUrl);
+                                setShowAvatarModal(false);
+                                updateUser({ avatarUrl: newUrl });
+                                api.updateProfile({ avatarUrl: newUrl }).catch((err) => {
+                                  console.warn('Silent avatar sync failed:', err);
+                                });
+                              }}
+                              className="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-600/30 transition-all"
+                            >
+                              Apply Photo
+                            </button>
+                          </div>
                         </div>
 
                       </div>

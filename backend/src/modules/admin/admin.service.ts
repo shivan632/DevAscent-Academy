@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CacheService } from '../../shared/cache.service';
 
 function validateDriveUrl(url: string | null | undefined, fieldName = 'Lesson / PDF URL'): string | null {
   if (!url || !url.trim()) return null;
@@ -34,10 +35,20 @@ function validateDriveUrl(url: string | null | undefined, fieldName = 'Lesson / 
     );
   }
 }
-
+ 
 @Injectable()
 export class AdminService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cacheService: CacheService,
+  ) {}
+
+  private async purgeCourseCache() {
+    try {
+      await this.cacheService.delPrefix('course_structure');
+      await this.cacheService.delPrefix('findAll');
+    } catch (e) {}
+  }
 
   // ─── Audit Logging Helper ───────────────────────────────────────────────────
   private async logAction(params: {
@@ -1155,6 +1166,7 @@ export class AdminService {
       },
     });
 
+    await this.purgeCourseCache();
     return { success: true, module };
   }
 
@@ -1176,6 +1188,7 @@ export class AdminService {
 
   async deleteModule(moduleId: string) {
     await this.prisma.module.delete({ where: { id: moduleId } });
+    await this.purgeCourseCache();
     return { success: true, message: 'Module deleted successfully' };
   }
 
@@ -1206,6 +1219,7 @@ export class AdminService {
       },
     });
 
+    await this.purgeCourseCache();
     return { success: true, lesson };
   }
 
@@ -1234,6 +1248,7 @@ export class AdminService {
       },
     });
 
+    await this.purgeCourseCache();
     return { success: true, lesson };
   }
 
@@ -1257,11 +1272,13 @@ export class AdminService {
       },
     });
 
+    await this.purgeCourseCache();
     return { success: true, course: updated };
   }
 
   async deleteLesson(lessonId: string) {
     await this.prisma.lesson.delete({ where: { id: lessonId } });
+    await this.purgeCourseCache();
     return { success: true, message: 'Lesson deleted successfully' };
   }
 
@@ -1326,6 +1343,7 @@ export class AdminService {
       },
     });
 
+    await this.purgeCourseCache();
     return { success: true, quiz };
   }
 
@@ -1353,6 +1371,7 @@ export class AdminService {
       },
     });
 
+    await this.purgeCourseCache();
     return { success: true, course };
   }
 

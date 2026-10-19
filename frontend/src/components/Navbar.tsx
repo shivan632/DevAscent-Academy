@@ -392,8 +392,19 @@ export default function Navbar() {
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center gap-2.5 p-1 sm:px-3 sm:py-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/60 hover:bg-slate-200/50 dark:hover:bg-slate-800/80 transition-all shadow-sm group"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center font-bold text-xs shadow-md group-hover:scale-105 transition-transform">
-                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'S'}
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center font-bold text-xs shadow-md group-hover:scale-105 transition-transform overflow-hidden">
+                    {currentUser.avatarUrl ? (
+                      <img
+                        src={currentUser.avatarUrl}
+                        alt={currentUser.name || 'User'}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'S'
+                    )}
                   </div>
                   <span className="hidden sm:inline text-xs font-semibold text-slate-800 dark:text-slate-200 max-w-[110px] truncate">
                     {currentUser.name || 'Student'}
