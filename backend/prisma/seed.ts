@@ -31,6 +31,8 @@ async function main() {
   // 2. Create Users
   const adminPasswordHash = await bcrypt.hash('Shivan@20122005', 12);
   const prakharPasswordHash = await bcrypt.hash('Prakhar@15062005', 12);
+  const tusharPasswordHash = await bcrypt.hash('Tushar@21042005', 12);
+  const prakarshPasswordHash = await bcrypt.hash('Prakarsh@03122005', 12);
   const studentPasswordHash = await bcrypt.hash('StudentPassword@123', 12);
 
   const admin = await prisma.user.create({
@@ -54,6 +56,26 @@ async function main() {
     },
   });
 
+  const tusharAdmin = await prisma.user.create({
+    data: {
+      email: 'ts200521@gmail.com',
+      passwordHash: tusharPasswordHash,
+      name: 'Tushar Singh',
+      role: 'ADMIN',
+      isEmailVerified: true,
+    },
+  });
+
+  const prakarshAdmin = await prisma.user.create({
+    data: {
+      email: 'vikramprakarsh@gmail.com',
+      passwordHash: prakarshPasswordHash,
+      name: 'Prakarsh Chauhan',
+      role: 'ADMIN',
+      isEmailVerified: true,
+    },
+  });
+
   const student = await prisma.user.create({
     data: {
       email: 'student@devascent.io',
@@ -67,7 +89,7 @@ async function main() {
     },
   });
 
-  console.log(`Created users: Admin (${admin.email}), Admin (${prakharAdmin.email}), Student (${student.email})`);
+  console.log(`Created users: Admins (${admin.email}, ${prakharAdmin.email}, ${tusharAdmin.email}, ${prakarshAdmin.email}), Student (${student.email})`);
 
   // 3. Complete Catalog of Virtual Internships & Courses
   const coursesToCreate = [
