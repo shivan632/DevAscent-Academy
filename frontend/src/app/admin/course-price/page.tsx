@@ -123,8 +123,14 @@ export default function CoursePriceManagementPage() {
   // Helper to get current edited or stored value
   const getValues = (course: any) => {
     const edited = editedPrices[course.slug];
-    const defaultReg = Math.round((course.priceInPaise || 499900) / 100);
-    const defaultOffer = Math.round((course.earlyBirdPriceInPaise || 149900) / 100);
+    const defaultReg =
+      course.priceInPaise !== undefined && course.priceInPaise !== null
+        ? Math.round(course.priceInPaise / 100)
+        : 999;
+    const defaultOffer =
+      course.earlyBirdPriceInPaise !== undefined && course.earlyBirdPriceInPaise !== null
+        ? Math.round(course.earlyBirdPriceInPaise / 100)
+        : 299;
 
     return {
       reg: edited ? edited.price : defaultReg,

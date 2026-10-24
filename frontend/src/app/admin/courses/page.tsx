@@ -41,8 +41,8 @@ export default function CoursesPage() {
   const handleOpenEdit = (course: any) => {
     setEditingCourse(course);
     setEditForm({
-      priceInRupees: Math.round((course.priceInPaise || 499900) / 100),
-      earlyBirdPriceInRupees: Math.round((course.earlyBirdPriceInPaise || 149900) / 100),
+      priceInRupees: course.priceInPaise !== undefined && course.priceInPaise !== null ? Math.round(course.priceInPaise / 100) : 999,
+      earlyBirdPriceInRupees: course.earlyBirdPriceInPaise !== undefined && course.earlyBirdPriceInPaise !== null ? Math.round(course.earlyBirdPriceInPaise / 100) : 299,
       totalSeats: course.totalSeats || 40,
       seatsRemaining: course.seatsRemaining || 10,
       isPublished: course.isPublished ?? true,
