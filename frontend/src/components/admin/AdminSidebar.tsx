@@ -59,7 +59,8 @@ const navGroups = [
   {
     label: 'Finance',
     items: [
-      { href: '/admin/payments', label: 'Payments', icon: IndianRupee },
+      { href: '/admin/course-price', label: 'Course Price', icon: IndianRupee },
+      { href: '/admin/payments', label: 'Payments', icon: CreditCard },
       { href: '/admin/coupons', label: 'Coupons', icon: Tag },
       { href: '/admin/refunds', label: 'Refund Requests', icon: CreditCard, badgeKey: 'pendingRefunds' as const },
     ],
