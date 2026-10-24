@@ -26,7 +26,7 @@ export class CoursesService {
     return item.data;
   }
 
-  private setInCache<T>(key: string, data: T, ttlMs = 60000): void {
+  private setInCache<T>(key: string, data: T, ttlMs = 5000): void {
     if (this.cache.size > 200) {
       this.cache.clear();
     }

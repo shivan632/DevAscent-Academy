@@ -42,16 +42,37 @@ export default function CourseDirectoryPage() {
     async function loadCourses() {
       try {
         const res = await api.getCourses();
-        if (res?.courses && res.courses.length > 0) {
-          const dbSlugs = new Set(res.courses.map((c: any) => c.slug));
-          const combined = [
-            ...res.courses,
-            ...ALL_COURSES_CATALOG.filter((c) => !dbSlugs.has(c.slug)),
-          ];
-          setCourses(combined);
+        const apiCourses: any[] =
+          res?.data?.courses || res?.courses || (Array.isArray(res?.data) ? res.data : []);
+
+        if (apiCourses && apiCourses.length > 0) {
+          const dbCourseMap = new Map(apiCourses.map((c: any) => [c.slug, c]));
+
+          // Merge live DB prices into ALL_COURSES_CATALOG cards
+          const merged = ALL_COURSES_CATALOG.map((catalogItem) => {
+            const dbCourse = dbCourseMap.get(catalogItem.slug);
+            if (!dbCourse) return catalogItem;
+            return {
+              ...catalogItem,
+              ...dbCourse,
+              priceInPaise: dbCourse.priceInPaise ?? catalogItem.priceInPaise,
+              earlyBirdPriceInPaise:
+                dbCourse.earlyBirdPriceInPaise ?? catalogItem.earlyBirdPriceInPaise,
+              icon: catalogItem.icon,
+              tasks: catalogItem.tasks,
+              badge: catalogItem.badge,
+              color: catalogItem.color,
+            };
+          });
+
+          // Also include any newly added DB courses not in catalog
+          const catalogSlugs = new Set(ALL_COURSES_CATALOG.map((c) => c.slug));
+          const extraCourses = apiCourses.filter((c: any) => !catalogSlugs.has(c.slug));
+
+          setCourses([...merged, ...extraCourses]);
         }
       } catch (e) {
-        // Fallback to full catalog
+        // Fallback to full catalog if API is unreachable
       }
     }
     loadCourses();

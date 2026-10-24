@@ -49,10 +49,36 @@ function CheckoutForm() {
     tasks: ['Landing Page Architecture', 'Personal Portfolio with Interactive Theme', 'Calculator / Dynamic Web App'],
   };
 
+  const [dbEarlyBirdPrice, setDbEarlyBirdPrice] = useState<number | null>(
+    priceParam ? parseInt(priceParam, 10) : null
+  );
+
+  // Fetch latest price from database dynamically to guarantee sync with Admin updates
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchLiveCoursePrice() {
+      try {
+        const res = await api.getCourseBySlug(courseParam);
+        const courseData = res?.data || res;
+        if (isMounted && courseData && typeof courseData.earlyBirdPriceInPaise === 'number') {
+          setDbEarlyBirdPrice(Math.round(courseData.earlyBirdPriceInPaise / 100));
+        }
+      } catch (err) {
+        // Fallback remains active
+      }
+    }
+    fetchLiveCoursePrice();
+    return () => {
+      isMounted = false;
+    };
+  }, [courseParam]);
+
   const courseStandard = selectedCourse.priceInPaise / 100;
-  const initialEarlyBird = priceParam
-    ? parseInt(priceParam, 10)
-    : selectedCourse.earlyBirdPriceInPaise / 100;
+  const initialEarlyBird = dbEarlyBirdPrice ?? (
+    priceParam
+      ? parseInt(priceParam, 10)
+      : selectedCourse.earlyBirdPriceInPaise / 100
+  );
 
   // Student details state
   const [fullName, setFullName] = useState(user?.name || '');
