@@ -44,3 +44,11 @@ agentic-awesome-skills/
 # Local security documentation & brain
 brain/
 security/
+DEVASCENT_STARTUP_REPORT.*
+
+# Database seed and maintenance scripts (kept locally, not pushed to git)
+backend/src/scripts/seed-*.ts
+backend/src/scripts/update-*.ts
+backend/src/scripts/audit-*.ts
+backend/src/scripts/verify-*.ts
+backend/src/scripts/list-*.ts

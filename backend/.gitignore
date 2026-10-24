@@ -18,3 +18,10 @@ dev.db
 *.db
 *.log
 scratch_test_db.js
+
+# Database seed and maintenance scripts (kept locally, not pushed to git)
+src/scripts/seed-*.ts
+src/scripts/update-*.ts
+src/scripts/audit-*.ts
+src/scripts/verify-*.ts
+src/scripts/list-*.ts
