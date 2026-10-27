@@ -52,6 +52,8 @@ export default function RootLayout({
     logo: 'https://www.devascentacademy.me/logo.png',
     description: 'Premier Indian EdTech and Virtual Internship Platform providing verifiable credentials, hands-on production codebases, and mentor support.',
     sameAs: [
+      'https://www.linkedin.com/in/devascent-academy-163a05443',
+      'https://www.instagram.com/devascentacademy',
       'https://github.com/shivan632/DevAscent-Academy',
       'https://discord.gg/devascent',
     ],

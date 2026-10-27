@@ -140,6 +140,28 @@ export default function ContactPage() {
                       <span className="text-[11px] text-slate-500 block mt-0.5">9:00 AM to 8:00 PM IST</span>
                     </div>
                   </div>
+
+                  {/* Official Social Handles */}
+                  <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row items-center gap-2">
+                    <a
+                      href="https://www.linkedin.com/in/devascent-academy-163a05443"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-indigo-500/40 hover:bg-slate-900 flex items-center justify-center gap-2 text-xs font-semibold text-slate-300 hover:text-indigo-400 transition-all"
+                    >
+                      <span>LinkedIn Profile</span>
+                      <span className="text-[10px] text-slate-500">↗</span>
+                    </a>
+                    <a
+                      href="https://www.instagram.com/devascentacademy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-pink-500/40 hover:bg-slate-900 flex items-center justify-center gap-2 text-xs font-semibold text-slate-300 hover:text-pink-400 transition-all"
+                    >
+                      <span>Instagram @devascentacademy</span>
+                      <span className="text-[10px] text-slate-500">↗</span>
+                    </a>
+                  </div>
                 </div>
               </div>
 
