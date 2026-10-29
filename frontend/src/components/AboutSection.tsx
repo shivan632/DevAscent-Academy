@@ -199,7 +199,7 @@ export default function AboutSection() {
       stage: 'STAGE 04',
       title: 'Live Capstone Defense & Verification',
       desc: 'Real 45-minute architectural defense in front of Staff Platform Engineers and Shivan Mishra before SHA-256 certificate issuance.',
-      metricLabel: 'ACCREDITATION',
+      metricLabel: 'VERIFICATION',
       metricVal: 'Cryptographic SHA-256',
       icon: ShieldCheck,
       color: 'emerald',
@@ -299,15 +299,15 @@ export default function AboutSection() {
             <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-mono">
               <span className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-semibold">
                 <Terminal className="w-4 h-4" />
-                <span>DevAscent OS</span>
+                <span>DevAscent Academy</span>
               </span>
               <span className="text-slate-400">/</span>
-              <span className="text-slate-800 dark:text-slate-200 font-medium">Systems Dossier &amp; Founder Origin</span>
+              <span className="text-slate-800 dark:text-slate-200 font-medium">Systems Architecture &amp; Founder Origin</span>
             </div>
             
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/80 text-slate-800 dark:text-slate-200 text-xs font-semibold shadow-sm backdrop-blur-md">
               <Zap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Arch: High-Throughput Mentorship Engine</span>
+              <span>Production-Grade Practical Engineering</span>
             </div>
           </div>
 
@@ -315,7 +315,7 @@ export default function AboutSection() {
           <div className="max-w-4xl mb-12 space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-mono text-xs font-bold border border-indigo-200 dark:border-indigo-800 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-pulse"></span>
-              <span>SYSTEM_MISSION: PRODUCTION_READY_2026</span>
+              <span>MISSION: BRIDGING THE COLLEGE-TO-INDUSTRY GAP</span>
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15]">
@@ -326,7 +326,7 @@ export default function AboutSection() {
             </h2>
 
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
-              Conceived by <strong className="text-slate-900 dark:text-white font-semibold">Shivan Mishra</strong> (Founder &amp; Principal Systems Architect) to dismantle the engineering syllabus deficit. We replace 20-year-old classroom theory with real distributed backends, live Redis cache locks, microservices, and cryptographic capstone proofs.
+              Conceived and architected by <strong className="text-slate-900 dark:text-white font-semibold">Shivan Mishra</strong> (Founder &amp; Principal Systems Architect) to dismantle the engineering syllabus deficit. We replace 20-year-old classroom theory with real distributed backends, live Redis cache locks, microservices, and cryptographically verifiable capstone proofs.
             </p>
           </div>
 
@@ -389,10 +389,10 @@ export default function AboutSection() {
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                   <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400 tracking-wider uppercase flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
-                    OPERATOR_KEY: SHIVAN_MISHRA
+                    LEAD ARCHITECT &amp; FOUNDER
                   </span>
                   <span className="px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono text-[10px] font-bold border border-indigo-200 dark:border-indigo-800">
-                    STAFF ARCH
+                    FOUNDER
                   </span>
                 </div>
 
@@ -420,8 +420,8 @@ export default function AboutSection() {
                   </div>
 
                   {/* Floating Secure Sig Badge */}
-                  <div className="absolute top-3 right-3 bg-slate-900/90 backdrop-blur-md px-2 py-0.5 rounded-lg border border-cyan-500/40 text-[10px] font-mono text-cyan-200 font-bold">
-                    SECURE_SIG
+                  <div className="absolute top-3 right-3 bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-cyan-500/40 text-[10px] font-mono text-cyan-200 font-bold">
+                    VERIFIED FOUNDER
                   </div>
 
                   {/* Bottom Cryptographic Status Badge */}
@@ -442,16 +442,36 @@ export default function AboutSection() {
                   </div>
                   <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">Founder &amp; Principal Systems Architect</p>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Direct head of engineering and curriculum design. Previously architected mission-critical high-frequency transaction engines, low-latency queues, and distributed consensus streaming platforms.
+                    Direct head of engineering and curriculum design. Personally architects the platform core and inspects capstone repository pull requests.
                   </p>
                 </div>
               </div>
 
-              {/* Social Links & SHA PGP Fingerprint */}
+              {/* Social Links & Verified Builder Links */}
               <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 relative z-10">
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href="https://github.com/shivan632"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 transition-all text-xs flex items-center justify-center gap-2 font-mono font-bold"
+                  >
+                    <GitBranch className="w-3.5 h-3.5 text-cyan-500" />
+                    <span>@shivan632</span>
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/devascent-academy-163a05443"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 transition-all text-xs flex items-center justify-center gap-2 font-mono font-bold"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>LinkedIn</span>
+                  </a>
+                </div>
                 <div className="bg-slate-50 dark:bg-slate-800/80 px-3.5 py-2 rounded-xl flex items-center justify-between font-mono text-[11px] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60">
-                  <span>PGP: 7F9A 41BC 88E1 2940</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">RSA 4096 / VERIFIED</span>
+                  <span>PUBLIC REGISTRY: DEVASCENT</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">SHA-256 SECURED</span>
                 </div>
               </div>
             </div>
@@ -512,35 +532,25 @@ export default function AboutSection() {
                   {/* Terminal Content */}
                   <div className="py-4 font-mono text-xs sm:text-sm leading-relaxed space-y-3">
                     {activeTab === 'manifesto' && (
-                      <>
-                        <div className="text-slate-400 flex items-start gap-3">
-                          <span className="text-slate-600 select-none text-xs">01</span>
-                          <span className="text-cyan-400">#!/usr/bin/env devascent_engine</span>
+                      <div className="space-y-4 font-sans text-xs sm:text-sm leading-relaxed">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-xs font-mono text-cyan-400">
+                          <span className="font-bold">// THE FOUNDER&apos;S MANIFESTO</span>
+                          <span className="text-slate-500">By Shivan Mishra</span>
                         </div>
-                        <div className="text-slate-400 flex items-start gap-3">
-                          <span className="text-slate-600 select-none text-xs">02</span>
-                          <span><span className="text-purple-400">export</span> TARGET_STANDARD=<span className="text-emerald-300">&quot;Production_Staff_Level&quot;</span></span>
-                        </div>
-                        <div className="text-slate-300 flex items-start gap-3 bg-slate-900/90 p-3 rounded-xl border-l-2 border-cyan-400 shadow-md">
-                          <span className="text-slate-600 select-none text-xs">03</span>
-                          <p className="text-slate-200">
-                            <span className="text-amber-300 font-bold">echo</span> <span className="text-emerald-300">&quot;Why DevAscent was born: standard college curricula teach 20-year-old C++ while production demands Next.js 15, NestJS, Redis, and idempotent Razorpay webhooks.&quot;</span>
-                          </p>
-                        </div>
-                        <div className="text-slate-400 flex items-start gap-3">
-                          <span className="text-slate-600 select-none text-xs">04</span>
-                          <span className="text-slate-300">
-                            We treat Indian software engineers with intellectual dignity. No passive video bingeing. Day one starts with Git rebases, schema indexing, idempotency keys, and handling Razorpay webhooks under simulated network partitions.
+                        <p className="text-slate-300">
+                          &ldquo;Every year across India, hundreds of thousands of engineering, BCA, and MCA students graduate after spending 3 to 4 years memorizing outdated textbook syntax. They walk out of college with degrees in hand, but without ever pushing a single pull request to GitHub, configuring an environment variable, managing a connection pool, or handling payment webhooks under real network latency.&rdquo;
+                        </p>
+                        <p className="text-slate-300">
+                          &ldquo;DevAscent Academy was founded on an uncompromising premise: treat developers with intellectual dignity. We built this platform from scratch with modern Next.js 16, NestJS, Neon PostgreSQL, and Redis to give students real, production-grade engineering experience. No toy apps. No predatory ₹50,000+ debt traps. Just real software, live code reviews, and verifiable proof of work.&rdquo;
+                        </p>
+                        <div className="pt-2 flex items-center justify-between border-t border-slate-800/80 font-mono text-xs text-slate-400">
+                          <span className="text-emerald-400 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <span>Shivan Mishra — Founder &amp; Principal Systems Architect</span>
                           </span>
+                          <span className="text-slate-500">Bengaluru, India</span>
                         </div>
-                        <div className="text-slate-400 flex items-start gap-3">
-                          <span className="text-slate-600 select-none text-xs">05</span>
-                          <span className="text-cyan-400 flex items-center gap-1">
-                            <span>&gt; shivan.execute_credo()</span>
-                            <span className="inline-block w-2 h-4 bg-cyan-400 animate-pulse ml-1"></span>
-                          </span>
-                        </div>
-                      </>
+                      </div>
                     )}
 
                     {activeTab === 'slo' && (

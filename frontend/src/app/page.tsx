@@ -29,6 +29,9 @@ import {
   Sparkles,
   HelpCircle,
   XCircle,
+  IndianRupee,
+  GitBranch,
+  ArrowRight,
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -68,7 +71,7 @@ export default function LandingPage() {
       features: ['SHA-256 immutable hash minting', 'Server-side high-res PDF generation', 'Public QR verification URL (/verify/[id])', '1-Click LinkedIn credential sharing'],
       badge: 'Production App #3',
       gradient: 'from-emerald-600 to-teal-600',
-      specsHref: '/verify/DEVASCENT-2025-VALID',
+      specsHref: '/verify',
     },
     {
       id: 4,
@@ -168,7 +171,7 @@ export default function LandingPage() {
     },
     {
       q: 'Is the certificate verifiable by recruiters and employers?',
-      a: 'Yes! Every certificate issued generates a unique SHA-256 cryptographic hash and permanent public verification URL (e.g. dev-ascent-academy.vercel.app/verify/DEVASCENT-2025-VALID). Recruiters can visit the registry or scan the QR code anytime to verify your identity, graduation date, and capstone credentials.',
+      a: 'Yes! Every certificate issued generates a unique SHA-256 cryptographic hash and permanent public verification URL on our public registry (e.g. devascentacademy.me/verify/DEV-2026-A1B2C3). Recruiters can visit the registry or scan the QR code anytime to verify your identity, graduation date, and capstone credentials.',
     },
     {
       q: 'Are the 4 capstone projects real production apps or basic tutorials?',
@@ -483,6 +486,137 @@ export default function LandingPage() {
             </div>
           </div>
 
+        </div>
+      </section>
+
+      {/* Platform Overview: Not Just a Course. A Production Engineering Ecosystem. */}
+      <section className="py-20 bg-slate-50 dark:bg-[#070b14] border-t border-slate-200 dark:border-slate-800/80 relative overflow-hidden">
+        {/* Glow Effects */}
+        <div className="absolute top-1/2 -left-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 -right-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 text-xs font-semibold shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
+              <span>PRODUCTION ENGINEERING ECOSYSTEM</span>
+            </div>
+            
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+              Not Just a Course.{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 dark:from-indigo-400 dark:via-purple-400 dark:to-cyan-400">
+                A Production Engineering Ecosystem.
+              </span>
+            </h2>
+            
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
+              DevAscent Academy is a multi-track virtual internship and practical engineering platform built to replace passive video tutorials with real production repositories, architectural pull request reviews, and verifiable proof-of-work.
+            </p>
+          </div>
+
+          {/* 3-Card Interactive Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            {/* Card 1: 12+ Specialized Tracks */}
+            <div className="group relative bg-white dark:bg-slate-900/90 rounded-2xl p-8 border border-slate-200/90 dark:border-slate-800 hover:border-indigo-500/60 dark:hover:border-indigo-500/60 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+                  <Layers className="w-6 h-6" />
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-mono">
+                    Starts from ₹199
+                  </span>
+                </div>
+
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  12+ Specialized Tracks
+                </h3>
+                
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Deep-dive virtual internships spanning Full-Stack Web Development, NestJS Backend, Python, Java, C++, AI/ML, and UI/UX. Each track contains industry-standard capstones, real Git PR workflows, and practical evaluations.
+                </p>
+              </div>
+
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-800/80 mt-6">
+                <Link
+                  href="/courses"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 group-hover:translate-x-1 transition-all"
+                >
+                  <span>Explore All 12 Tracks</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Card 2: Cryptographic SHA-256 Certificates */}
+            <div className="group relative bg-white dark:bg-slate-900/90 rounded-2xl p-8 border border-slate-200/90 dark:border-slate-800 hover:border-emerald-500/60 dark:hover:border-emerald-500/60 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-mono">
+                    Public Trust Ledger
+                  </span>
+                </div>
+
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  Cryptographic Verification
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Zero fake or easily forgeable PDF certs. Every diploma minted is cryptographically signed with an immutable SHA-256 hash and queryable on our live public registry by hiring managers and tech recruiters.
+                </p>
+              </div>
+
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-800/80 mt-6">
+                <Link
+                  href="/verify"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 group-hover:translate-x-1 transition-all"
+                >
+                  <span>Open Public Trust Registry</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Card 3: 100% Zero-Debt Transparent Pricing */}
+            <div className="group relative bg-white dark:bg-slate-900/90 rounded-2xl p-8 border border-slate-200/90 dark:border-slate-800 hover:border-amber-500/60 dark:hover:border-amber-500/60 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/80 border border-amber-200 dark:border-amber-800/80 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                  <IndianRupee className="w-6 h-6" />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-mono">
+                    7-Day Money-Back Guarantee
+                  </span>
+                </div>
+
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Zero-Debt Pricing
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                  No ₹50,000+ tuition loans, hidden subscriptions, or 15% salary debt contracts. Honest one-time pricing starting from ₹199 to ₹599, with an instant 1-click 100% refund policy within 7 days.
+                </p>
+              </div>
+
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-800/80 mt-6">
+                <a
+                  href="#pricing"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-600 dark:text-amber-400 hover:text-amber-500 group-hover:translate-x-1 transition-all"
+                >
+                  <span>View Pricing &amp; Cohort Pass</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 
@@ -1018,6 +1152,121 @@ export default function LandingPage() {
                 <ChevronRight className="w-4 h-4" />
               </a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Meet the Architect Section: Shivan Mishra */}
+      <section className="py-20 bg-white dark:bg-[#090d16] border-t border-slate-200/80 dark:border-slate-800 relative overflow-hidden">
+        {/* Ambient Glow */}
+        <div className="absolute top-1/2 -right-32 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-4xl mx-auto bg-gradient-to-b from-slate-900 to-slate-950 text-white rounded-3xl border border-slate-800 shadow-2xl p-6 sm:p-10 lg:p-12 relative overflow-hidden">
+            
+            {/* Top Tag & Identity */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-800/80">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+                  LEAD ARCHITECT &amp; FOUNDER
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+                <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+                <span>DevAscent Platform Core</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-8">
+              {/* Left Column: Visual Emblem & Socials */}
+              <div className="lg:col-span-4 flex flex-col items-center text-center space-y-4">
+                <div className="relative group">
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-400 p-1 shadow-xl shadow-indigo-500/20 flex items-center justify-center">
+                    <div className="w-full h-full bg-slate-950 rounded-full p-2.5 flex items-center justify-center overflow-hidden border border-slate-800">
+                      <img
+                        src="/logo.png"
+                        alt="Shivan Mishra - Founder DevAscent Academy"
+                        className="w-full h-full object-contain rounded-full"
+                      />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-1 right-2 bg-emerald-500 text-slate-950 p-1 rounded-full border-2 border-slate-900 shadow-sm" title="Active Core Builder">
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-white font-mono">Shivan Mishra</h3>
+                  <p className="text-xs text-indigo-400 font-mono mt-0.5 font-semibold">Founder &amp; Principal Systems Architect</p>
+                  <p className="text-[11px] text-slate-400 mt-1">Creator of DevAscent Academy</p>
+                </div>
+
+                {/* Direct Verification Links */}
+                <div className="flex items-center gap-3 pt-2">
+                  <a
+                    href="https://github.com/shivan632"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all text-xs flex items-center gap-1.5 font-mono"
+                    title="GitHub: @shivan632"
+                  >
+                    <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>GitHub</span>
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/devascent-academy-163a05443"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all text-xs flex items-center gap-1.5 font-mono"
+                    title="LinkedIn Profile"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>LinkedIn</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Right Column: Founder's Commitment & Philosophy */}
+              <div className="lg:col-span-8 space-y-5 text-left">
+                <div className="space-y-3">
+                  <span className="text-xs font-mono font-bold text-indigo-400 tracking-wider uppercase block">
+                    THE FOUNDER&apos;S PROMISE
+                  </span>
+                  <blockquote className="text-sm sm:text-base text-slate-200 leading-relaxed italic border-l-2 border-indigo-500 pl-4 font-normal">
+                    &ldquo;I built DevAscent Academy to dismantle the brutal gap between academic college syllabi and real production engineering. Having architected high-throughput backends, distributed cache locks, and event-driven microservices, I got tired of seeing ambitious students fail interviews because colleges only taught 20-year-old textbook theory. No fluff. Just real code, live code reviews, and verifiable proof-of-work.&rdquo;
+                  </blockquote>
+                </div>
+
+                {/* Direct Accountability Highlights */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-mono text-slate-300">
+                  <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+                    <span className="text-emerald-400 block font-bold text-sm">Real Code</span>
+                    <span className="text-[11px] text-slate-400 mt-0.5 block">Live GitHub PR reviews on every capstone</span>
+                  </div>
+                  <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+                    <span className="text-indigo-400 block font-bold text-sm">Real Infra</span>
+                    <span className="text-[11px] text-slate-400 mt-0.5 block">NestJS, Neon Postgres &amp; Redis stack</span>
+                  </div>
+                  <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+                    <span className="text-purple-400 block font-bold text-sm">Zero Debt</span>
+                    <span className="text-[11px] text-slate-400 mt-0.5 block">Accessible from ₹199 with 7-day refund</span>
+                  </div>
+                </div>
+
+                {/* Bottom Story CTA */}
+                <div className="pt-2">
+                  <Link
+                    href="/about"
+                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors group"
+                  >
+                    <span>Read The Founder&apos;s Manifesto &amp; Systems Origin</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
