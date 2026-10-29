@@ -111,7 +111,7 @@ export default function CertificateGeneratorPage() {
             Official Credential & Certificate Generator
           </h1>
           <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
-            Live interactive generator for DevAscent Academy accredited certificates. Backed by SHA-256 cryptographic verification.
+            Live interactive generator for DevAscent Academy verifiable certificates. Backed by SHA-256 cryptographic verification.
           </p>
         </div>
 

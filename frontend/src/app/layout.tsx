@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   title: 'DevAscent Academy — Practical Tech Education & Verifiable Certification',
   description: 'Master Full-Stack Web Development, Cloud & Microservices. Build 4 production capstone projects, get weekly live code reviews, and earn an industry-verifiable certificate.',
   keywords: ['DevAscent Academy', 'Full Stack Development', 'Next.js', 'Node.js', 'Prisma', 'PostgreSQL', 'Tech Cohort', 'Coding Bootcamp India', 'Verifiable Certificate'],
-  authors: [{ name: 'DevAscent Academy' }],
+  authors: [{ name: 'Shivan Mishra', url: 'https://github.com/shivan632' }, { name: 'DevAscent Academy' }],
   openGraph: {
     title: 'DevAscent Academy — Become a Full-Stack Developer',
     description: 'Build & Ship 4 Production Apps in 6 Weeks. ₹599 Early Bird Pricing with 7-Day Money-Back Guarantee.',
@@ -51,6 +51,16 @@ export default function RootLayout({
     url: 'https://www.devascentacademy.me',
     logo: 'https://www.devascentacademy.me/logo.png',
     description: 'Premier Indian EdTech and Virtual Internship Platform providing verifiable credentials, hands-on production codebases, and mentor support.',
+    founder: {
+      '@type': 'Person',
+      name: 'Shivan Mishra',
+      jobTitle: 'Founder & Principal Systems Architect',
+      url: 'https://www.devascentacademy.me/about',
+      sameAs: [
+        'https://github.com/shivan632',
+        'https://www.linkedin.com/in/devascent-academy-163a05443'
+      ]
+    },
     sameAs: [
       'https://www.linkedin.com/in/devascent-academy-163a05443',
       'https://www.instagram.com/devascentacademy',

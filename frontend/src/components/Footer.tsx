@@ -70,8 +70,12 @@ export default function Footer() {
               </p>
               <p className="flex items-center gap-1.5 text-indigo-400 font-semibold">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Trusted by 500+ BCA &amp; Engineering Students</span>
+                <span>Mentoring Ambitious BCA &amp; Engineering Students Across India</span>
               </p>
+            </div>
+
+            <div className="pt-2 text-xs font-mono text-indigo-400 font-semibold border-t border-slate-800/80">
+              <span>Architected by Shivan Mishra. Built for Indian Engineers.</span>
             </div>
 
             {/* Social Media Channels */}

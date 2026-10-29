@@ -643,6 +643,88 @@ export default function AboutSection() {
         </div>
       </div>
 
+      {/* Production Tech Stack Visual Badges */}
+      <div className="w-full bg-white dark:bg-slate-950 py-12 border-b border-slate-200 dark:border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-2 font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider mb-1">
+                <Cpu className="w-4 h-4 text-indigo-500" />
+                <span>Production Infrastructure &amp; Tooling</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                Built on Modern, High-Throughput Engineering
+              </h3>
+            </div>
+            <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800 w-fit">
+              ● ZERO TOY STACKS
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 flex items-center gap-3 shadow-sm hover:border-indigo-500/50 transition-all">
+              <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0 font-bold text-sm shadow-sm">
+                ▲
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">Next.js 16</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate font-mono">App Router SSR</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 flex items-center gap-3 shadow-sm hover:border-red-500/50 transition-all">
+              <div className="w-9 h-9 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center shrink-0 font-black text-sm">
+                N
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">NestJS 10</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate font-mono">Modular Core</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 flex items-center gap-3 shadow-sm hover:border-emerald-500/50 transition-all">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 font-bold text-base">
+                🐘
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">Neon Postgres</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate font-mono">Serverless SQL</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 flex items-center gap-3 shadow-sm hover:border-cyan-500/50 transition-all">
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center shrink-0 font-bold text-base">
+                ◬
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">Prisma ORM</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate font-mono">Type-Safe Client</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 flex items-center gap-3 shadow-sm hover:border-blue-500/50 transition-all">
+              <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0 font-bold text-sm">
+                ₹
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">Razorpay</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate font-mono">HMAC Webhooks</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 flex items-center gap-3 shadow-sm hover:border-purple-500/50 transition-all">
+              <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0 font-bold text-sm">
+                #
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">PDFKit &amp; QR</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate font-mono">SHA-256 Ledger</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 2. LIVE CONNECTED DATABASE CURRICULUM & TRACKS REGISTRY */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
