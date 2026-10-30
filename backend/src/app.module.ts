@@ -14,6 +14,7 @@ import { AiVideosModule } from './modules/ai-videos/ai-videos.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
 import { DoubtsModule } from './modules/doubts/doubts.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { DocumentsModule } from './modules/documents/documents.module';
 import { CacheModule } from './shared/cache.module';
 
 import { APP_GUARD } from '@nestjs/core';
@@ -42,6 +43,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     CouponsModule,
     DoubtsModule,
     NotificationsModule,
+    DocumentsModule,
   ],
   providers: [
     {

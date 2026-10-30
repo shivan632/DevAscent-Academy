@@ -125,6 +125,11 @@ export const api = {
   getCertificate: (courseId: string) => fetchApi(`/certificates/me/${courseId}`),
   verifyCertificatePublic: (certId: string) => fetchApi(`/verify/${certId}`),
   getDownloadUrl: (certId: string) => `${getApiBaseUrl()}/certificates/${certId}/download`,
+  // Academic Documents (Offer Letters & LORs)
+  getMyDocuments: () => fetchApi('/documents/my'),
+  generateOfferLetter: (courseId: string) => fetchApi(`/documents/offer-letter/${courseId}`, { method: 'POST' }),
+  getDocumentDownloadUrl: (docId: string) => `${getApiBaseUrl()}/documents/${docId}/download`,
+  verifyDocumentPublic: (docId: string) => fetchApi(`/documents/verify/${docId}`),
 
   // Doubts & Q/A Forum
   createDoubt: (data: { question: string; courseId?: string; lessonId?: string; isUrgent?: boolean }) =>

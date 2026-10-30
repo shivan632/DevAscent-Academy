@@ -48,6 +48,7 @@ model User {
   notificationReads      NotificationRead[]
   announcementsCreated   Announcement[]          @relation("AnnouncementCreator")
   directNotifications    Notification[]          @relation("StudentDirectNotifications")
+  academicDocuments      AcademicDocument[]
 }
 
 model OtpVerification {
@@ -100,6 +101,7 @@ model Course {
   doubts                 Doubt[]
   notifications          Notification[]          @relation("CourseNotifications")
   announcements          Announcement[]          @relation("CourseAnnouncements")
+  academicDocuments      AcademicDocument[]
 }
 
 model AiVideo {
@@ -459,6 +461,28 @@ model NotificationRead {
 
   @@unique([userId, notificationId])
   @@index([userId])
+}
+
+model AcademicDocument {
+  id              String   @id @default(cuid())
+  docId           String   @unique // e.g. DEV-OL-2026-7A9B or DEV-LOR-2026-4C1F
+  type            String   // "OFFER_LETTER" | "LOR"
+  userId          String
+  courseId        String
+  enrollmentId    String?
+  recipientName   String
+  courseTitle     String
+  durationWeeks   Int      @default(4)
+  sha256Hash      String   @unique
+  metadata        Json?
+  pdfUrl          String?
+  issuedAt        DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([docId])
 }
 
 

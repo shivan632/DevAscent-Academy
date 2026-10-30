@@ -1,4 +1,5 @@
 'use client';
+import AcademicDocumentsSection from '../../components/AcademicDocumentsSection';;
 
 import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
@@ -1757,7 +1758,10 @@ function DashboardContent() {
                 </div>
               )}
 
-              {/* TAB 3: CAPSTONE SUBMISSIONS */}
+                                {/* ACADEMIC LETTERS (OFFER LETTER & LOR) */}
+                  <AcademicDocumentsSection studentName={studentName} />
+
+{/* TAB 3: CAPSTONE SUBMISSIONS */}
               {activeTab === 'submissions' && (
                 <div className="space-y-6 animate-fadeIn">
                   
