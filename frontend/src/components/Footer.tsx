@@ -179,32 +179,57 @@ export default function Footer() {
           <div className="lg:col-span-2 space-y-4">
             <h3 className="text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
               <Code2 className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Programs</span>
+              <span>Programs &amp; Tracks</span>
             </h3>
-            <ul className="space-y-2.5 text-xs sm:text-sm">
+            <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/courses/web-development-internship" className="hover:text-indigo-300 transition-colors block">
-                  Web Development Internship
+                  Web Development
                 </Link>
               </li>
               <li>
                 <Link href="/courses/python-programming-internship" className="hover:text-indigo-300 transition-colors block">
-                  Python Programming Internship
+                  Python Programming
                 </Link>
               </li>
               <li>
                 <Link href="/courses/java-programming-internship" className="hover:text-indigo-300 transition-colors block">
-                  Java Programming Internship
+                  Java Programming
+                </Link>
+              </li>
+              <li>
+                <Link href="/courses/cpp-programming-internship" className="hover:text-indigo-300 transition-colors block">
+                  C++ Programming
+                </Link>
+              </li>
+              <li>
+                <Link href="/courses/android-app-development-internship" className="hover:text-indigo-300 transition-colors block">
+                  Android App Development
+                </Link>
+              </li>
+              <li>
+                <Link href="/courses/artificial-intelligence-internship" className="hover:text-indigo-300 transition-colors block">
+                  Artificial Intelligence
+                </Link>
+              </li>
+              <li>
+                <Link href="/courses/machine-learning-internship" className="hover:text-indigo-300 transition-colors block">
+                  Machine Learning
+                </Link>
+              </li>
+              <li>
+                <Link href="/courses/ui-ux-design-internship" className="hover:text-indigo-300 transition-colors block">
+                  UI/UX Design
                 </Link>
               </li>
               <li>
                 <Link href="/courses/backend-cloud-internship" className="hover:text-indigo-300 transition-colors block">
-                  Backend &amp; Cloud Internship
+                  Backend &amp; Cloud
                 </Link>
               </li>
               <li>
                 <Link href="/courses/data-science-internship" className="hover:text-indigo-300 transition-colors block">
-                  Data Science Internship
+                  Data Science
                 </Link>
               </li>
               <li>
@@ -223,18 +248,13 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li>
-                <Link href="/verify/DEVASCENT-2025-VALID" className="hover:text-indigo-300 transition-colors flex items-center gap-1 group">
+                <Link href="/verify" className="hover:text-indigo-300 transition-colors flex items-center gap-1 group">
                   <span>Public Registry Search</span>
                   <ArrowRight className="w-3 h-3 text-slate-500 group-hover:text-indigo-300 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </li>
               <li>
-                <Link href="/certificate" className="hover:text-indigo-300 transition-colors block">
-                  Sample Certificate Demo
-                </Link>
-              </li>
-              <li>
-                <Link href="/verify/DEVASCENT-2025-VALID" className="hover:text-indigo-300 transition-colors block">
+                <Link href="/verify" className="hover:text-indigo-300 transition-colors block">
                   SHA-256 Hash Verification
                 </Link>
               </li>
