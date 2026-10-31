@@ -51,7 +51,15 @@ export class PortfolioService {
    * Returns complete public portfolio proof-of-work for @username
    */
   async getPublicPortfolio(username: string) {
-    const cleanUsername = username.toLowerCase().trim();
+    let cleanUsername = username;
+    try {
+      cleanUsername = decodeURIComponent(username);
+    } catch {}
+    cleanUsername = cleanUsername
+      .replace(/^%40/i, '')
+      .replace(/^@/, '')
+      .toLowerCase()
+      .trim();
 
     const user: any = await this.prisma.user.findFirst({
       where: {

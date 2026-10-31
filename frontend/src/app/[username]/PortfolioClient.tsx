@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import { api } from '../../lib/api';
 import {
   ShieldCheck,
   Award,
@@ -32,11 +33,37 @@ interface PortfolioClientProps {
 }
 
 export default function PortfolioClient({ initialData, handle }: PortfolioClientProps) {
-  const [data] = useState<any>(initialData);
+  const [data, setData] = useState<any>(initialData);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  const cleanHandle = (handle || '').replace(/^%40/i, '').replace(/^@/, '').toLowerCase().trim();
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLivePortfolio = async () => {
+      try {
+        const res: any = await api.getPublicPortfolio(cleanHandle);
+        const payload = res?.data || res;
+        if (isMounted && payload && payload.user) {
+          setData(payload);
+        }
+      } catch (err) {
+        // Fallback remains active
+      }
+    };
+
+    fetchLivePortfolio();
+    return () => {
+      isMounted = false;
+    };
+  }, [cleanHandle]);
 
   const user = data?.user || {};
   const isPrivate = data?.isPrivate;
+
+  const rawName = user?.name || cleanHandle;
+  const cleanName = rawName.replace(/^%40/i, '').replace(/^@/, '');
+  const avatarLetter = cleanName.charAt(0).toUpperCase() || 'D';
 
   const handleCopyProfile = () => {
     if (typeof window !== 'undefined') {
@@ -71,7 +98,7 @@ export default function PortfolioClient({ initialData, handle }: PortfolioClient
             </div>
             <h2 className="text-xl font-bold text-white">Private Developer Profile</h2>
             <p className="text-xs text-slate-400">
-              @{handle} has configured their DevAscent portfolio to private mode.
+              @{cleanHandle} has configured their DevAscent portfolio to private mode.
             </p>
             <Link
               href="/courses"
@@ -111,11 +138,11 @@ export default function PortfolioClient({ initialData, handle }: PortfolioClient
                       {user.avatarUrl ? (
                         <img
                           src={user.avatarUrl}
-                          alt={user.name}
+                          alt={cleanName}
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span>{user.name?.charAt(0)?.toUpperCase() || 'D'}</span>
+                        <span>{avatarLetter}</span>
                       )}
                     </div>
                   </div>
@@ -127,10 +154,10 @@ export default function PortfolioClient({ initialData, handle }: PortfolioClient
                 <div className="space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white font-mono">
-                      {user.name}
+                      {cleanName}
                     </h1>
                     <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-                      @{user.username || handle}
+                      @{user.username || cleanHandle}
                     </span>
                   </div>
 
