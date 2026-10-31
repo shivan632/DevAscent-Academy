@@ -1,5 +1,6 @@
 'use client';
-import AcademicDocumentsSection from '../../components/AcademicDocumentsSection';;
+import AcademicDocumentsSection from '../../components/AcademicDocumentsSection';
+import ReferralEarnSection from '../../components/ReferralEarnSection';;
 
 import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
@@ -1758,7 +1759,10 @@ function DashboardContent() {
                 </div>
               )}
 
-                                {/* ACADEMIC LETTERS (OFFER LETTER & LOR) */}
+                                                  {/* STUDENT REFERRALS & CAMPUS REWARDS */}
+                  <ReferralEarnSection />
+
+                  {/* ACADEMIC LETTERS (OFFER LETTER & LOR) */}
                   <AcademicDocumentsSection studentName={studentName} />
 
 {/* TAB 3: CAPSTONE SUBMISSIONS */}

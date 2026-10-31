@@ -52,6 +52,12 @@ model User {
   announcementsCreated   Announcement[]          @relation("AnnouncementCreator")
   directNotifications    Notification[]          @relation("StudentDirectNotifications")
   academicDocuments      AcademicDocument[]
+  referralCode           String?                 @unique
+  walletBalancePaise     Int                     @default(0)
+  payoutUpiId            String?
+  referralsMade          Referral[]              @relation("ReferrerUsers")
+  referralsReceived      Referral[]              @relation("ReferredUsers")
+  payoutRequests         PayoutRequest[]
 }
 
 model OtpVerification {
@@ -490,3 +496,39 @@ model AcademicDocument {
 
 
 
+
+
+model Referral {
+  id                 String   @id @default(cuid())
+  referralCode       String
+  referrerId         String
+  referredUserId     String
+  courseId           String?
+  discountPaise      Int      @default(10000) // ₹100 discount
+  rewardPaise        Int      @default(10000) // ₹100 reward
+  status             String   @default("COMPLETED") // PENDING, COMPLETED, REFUNDED
+  createdAt          DateTime @default(now())
+
+  referrer           User     @relation("ReferrerUsers", fields: [referrerId], references: [id], onDelete: Cascade)
+  referredUser       User     @relation("ReferredUsers", fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([referralCode])
+}
+
+model PayoutRequest {
+  id           String    @id @default(cuid())
+  userId       String
+  amountPaise  Int
+  upiId        String
+  status       String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  adminNote    String?
+  txReference  String?
+  createdAt    DateTime  @default(now())
+  processedAt  DateTime?
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}

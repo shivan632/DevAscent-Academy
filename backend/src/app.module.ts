@@ -16,6 +16,7 @@ import { DoubtsModule } from './modules/doubts/doubts.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { PortfolioModule } from './modules/portfolio/portfolio.module';
+import { ReferralsModule } from './modules/referrals/referrals.module';
 import { CacheModule } from './shared/cache.module';
 
 import { APP_GUARD } from '@nestjs/core';
@@ -46,6 +47,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     NotificationsModule,
     DocumentsModule,
     PortfolioModule,
+    ReferralsModule,
   ],
   providers: [
     {

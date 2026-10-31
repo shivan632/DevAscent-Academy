@@ -134,6 +134,10 @@ export const api = {
   getPublicPortfolio: (username: string) => fetchApi(`/portfolio/public/${username}`),
   getMyPortfolioHandle: () => fetchApi('/portfolio/my-handle'),
   updatePortfolioProfile: (data: any) => fetchApi('/portfolio/update-settings', { method: 'PATCH', body: JSON.stringify(data) }),
+  // Student Referrals & Campus Flywheel
+  getMyReferralSummary: () => fetchApi('/referrals/my-summary'),
+  validateReferralCode: (code: string) => fetchApi('/referrals/validate', { method: 'POST', body: JSON.stringify({ code }) }),
+  requestReferralPayout: (upiId: string, amountPaise?: number) => fetchApi('/referrals/request-payout', { method: 'POST', body: JSON.stringify({ upiId, amountPaise }) }),
 
   // Doubts & Q/A Forum
   createDoubt: (data: { question: string; courseId?: string; lessonId?: string; isUrgent?: boolean }) =>
