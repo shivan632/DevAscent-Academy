@@ -36,6 +36,10 @@ export default function AdminDocumentsPage() {
 
   const { data: coursesData } = useSWR('/admin/courses', () => api.admin.getCourseStats());
   const coursesList: any[] = coursesData?.courses || coursesData?.data?.courses || [];
+  // LOR is awarded exclusively for completed Internship tracks
+  const internshipPrograms = coursesList.filter(
+    (c) => c.type === 'INTERNSHIP' || c.isPaidInternship || /internship/i.test(c.title)
+  );
 
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'LOR' | 'OFFER_LETTER'>('ALL');
   const [search, setSearch] = useState('');
@@ -78,7 +82,7 @@ export default function AdminDocumentsPage() {
   const handleIssueLor = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedStudentId || !selectedCourseId) {
-      setErrorMsg('Please select both a student and a course.');
+      setErrorMsg('Please select both a student and an internship program.');
       return;
     }
 
@@ -248,7 +252,7 @@ export default function AdminDocumentsPage() {
                   <th className="px-6 py-3.5">Document ID</th>
                   <th className="px-4 py-3.5">Type</th>
                   <th className="px-4 py-3.5">Recipient Student</th>
-                  <th className="px-4 py-3.5">Course & Cohort</th>
+                  <th className="px-4 py-3.5">Internship Program & Cohort</th>
                   <th className="px-4 py-3.5">Issued Date</th>
                   <th className="px-4 py-3.5">Integrity Hash</th>
                   <th className="px-6 py-3.5 text-right">Actions</th>
@@ -401,22 +405,33 @@ export default function AdminDocumentsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/70 mb-1.5">
-                  Associated Course *
-                </label>
-                <select
-                  value={selectedCourseId}
-                  onChange={(e) => setSelectedCourseId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-black/30 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500/50"
-                  required
-                >
-                  <option value="">Choose course...</option>
-                  {coursesList.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.title} (Cohort #{c.cohortNumber || 1})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-white/70">
+                    Associated Internship Program *
+                  </label>
+                  <span className="text-[10px] text-purple-400 font-mono">
+                    Internship Only
+                  </span>
+                </div>
+                {internshipPrograms.length === 0 ? (
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
+                    No active internship programs found. LOR is awarded exclusively for completed internship programs. (Create or configure an Internship program under Courses & Programs).
+                  </div>
+                ) : (
+                  <select
+                    value={selectedCourseId}
+                    onChange={(e) => setSelectedCourseId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-black/30 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500/50"
+                    required
+                  >
+                    <option value="">Choose internship track...</option>
+                    {internshipPrograms.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title} (Cohort #{c.cohortNumber || 1})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div>
