@@ -486,3 +486,4 @@ export default function AdminReferralsPage() {
     </div>
   );
 }
+
