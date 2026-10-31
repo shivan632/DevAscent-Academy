@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { api } from '../lib/api';
+import { useAuthStore } from '../lib/store/authStore';
 import {
   Users,
   Copy,
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function ReferralEarnSection() {
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -36,12 +38,15 @@ export default function ReferralEarnSection() {
     try {
       setLoading(true);
       const res = await api.getMyReferralSummary();
-      if (res) {
-        setData(res);
-        if (res.payoutUpiId) setUpiId(res.payoutUpiId);
-        if (res.referralCode) {
+      const summaryData = res?.data || res;
+      if (summaryData) {
+        setData(summaryData);
+        if (summaryData.payoutUpiId) setUpiId(summaryData.payoutUpiId);
+        
+        const code = summaryData.referralCode || (user as any)?.referralCode;
+        if (code) {
           const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.devascentacademy.me';
-          setComputedShareLink(`${origin}/courses?ref=${res.referralCode}`);
+          setComputedShareLink(`${origin}/courses?ref=${code}`);
         }
       }
     } catch (err) {
@@ -55,7 +60,11 @@ export default function ReferralEarnSection() {
     loadReferralData();
   }, []);
 
-  const activeLink = computedShareLink || data?.referralLink || '';
+  const activeCode = data?.referralCode || (user as any)?.referralCode || '';
+  const activeLink =
+    computedShareLink ||
+    data?.referralLink ||
+    (activeCode ? `${typeof window !== 'undefined' ? window.location.origin : 'https://www.devascentacademy.me'}/courses?ref=${activeCode}` : '');
 
   const handleCopyLink = () => {
     if (activeLink) {
@@ -66,22 +75,28 @@ export default function ReferralEarnSection() {
   };
 
   const handleCopyCode = () => {
-    if (data?.referralCode) {
-      navigator.clipboard.writeText(data.referralCode);
+    if (activeCode) {
+      navigator.clipboard.writeText(activeCode);
       setCopiedCode(true);
       setTimeout(() => setCopiedCode(false), 2000);
     }
   };
 
   const handleWhatsAppShare = () => {
-    if (!data?.referralCode || !activeLink) return;
-    const msg = `Hey! Use my referral code *${data.referralCode}* to get an instant ₹100 discount on DevAscent courses and tech cohorts:\n\n${activeLink}`;
+    if (!activeCode && !activeLink) {
+      alert('Generating your referral invite link, please try in 2 seconds.');
+      return;
+    }
+    const msg = `Hey! Use my referral code *${activeCode}* to get an instant ₹100 discount on DevAscent courses and tech cohorts:\n\n${activeLink}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const handleTelegramShare = () => {
-    if (!data?.referralCode || !activeLink) return;
-    const text = `Get ₹100 instant discount on DevAscent courses using my code ${data.referralCode}!`;
+    if (!activeCode && !activeLink) {
+      alert('Generating your referral invite link, please try in 2 seconds.');
+      return;
+    }
+    const text = `Get ₹100 instant discount on DevAscent courses using my code ${activeCode}!`;
     window.open(`https://t.me/share/url?url=${encodeURIComponent(activeLink)}&text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -90,7 +105,7 @@ export default function ReferralEarnSection() {
       try {
         await navigator.share({
           title: 'DevAscent ₹100 Student Discount',
-          text: `Use my invite code ${data?.referralCode} to save ₹100 on DevAscent cohorts:`,
+          text: `Use my invite code ${activeCode} to save ₹100 on DevAscent cohorts:`,
           url: activeLink,
         });
       } catch {}
@@ -126,7 +141,7 @@ export default function ReferralEarnSection() {
     }
   };
 
-  if (loading) {
+  if (loading && !data && !activeCode) {
     return (
       <div className="p-8 text-center bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-slate-800 text-xs text-slate-400">
         Loading referral rewards and wallet...
@@ -202,12 +217,13 @@ export default function ReferralEarnSection() {
                 Your Unique Invite Code
               </span>
               <h4 className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white mt-1">
-                {data?.referralCode}
+                {activeCode || 'GENERATING...'}
               </h4>
             </div>
             <button
               onClick={handleCopyCode}
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
+              disabled={!activeCode}
+              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer disabled:opacity-50"
             >
               {copiedCode ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
               <span>{copiedCode ? 'Copied' : 'Copy Code'}</span>
@@ -222,11 +238,13 @@ export default function ReferralEarnSection() {
                 type="text"
                 readOnly
                 value={activeLink}
+                placeholder="Generating referral link..."
                 className="bg-transparent border-0 text-xs font-mono text-indigo-300 flex-1 outline-none truncate select-all"
               />
               <button
                 onClick={handleCopyLink}
-                className="p-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 transition-colors cursor-pointer"
+                disabled={!activeLink}
+                className="p-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 transition-colors cursor-pointer disabled:opacity-40"
                 title="Copy Link"
               >
                 {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -241,7 +259,8 @@ export default function ReferralEarnSection() {
               <button
                 type="button"
                 onClick={handleWhatsAppShare}
-                className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer"
+                disabled={!activeCode && !activeLink}
+                className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer disabled:opacity-40"
               >
                 <MessageCircle className="w-4 h-4 text-emerald-400" />
                 <span>WhatsApp</span>
@@ -250,7 +269,8 @@ export default function ReferralEarnSection() {
               <button
                 type="button"
                 onClick={handleTelegramShare}
-                className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-xs font-bold transition-all cursor-pointer"
+                disabled={!activeCode && !activeLink}
+                className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-xs font-bold transition-all cursor-pointer disabled:opacity-40"
               >
                 <Send className="w-4 h-4 text-sky-400" />
                 <span>Telegram</span>
@@ -259,7 +279,8 @@ export default function ReferralEarnSection() {
               <button
                 type="button"
                 onClick={handleNativeShare}
-                className="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-bold transition-all cursor-pointer"
+                disabled={!activeLink}
+                className="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-bold transition-all cursor-pointer disabled:opacity-40"
               >
                 <Share2 className="w-4 h-4 text-indigo-300" />
                 <span>Share Link</span>
@@ -274,7 +295,7 @@ export default function ReferralEarnSection() {
               <span>How Referral Payout Works:</span>
             </div>
             <p className="text-[11px] leading-relaxed text-slate-300">
-              When a peer registers using your link or enters code <strong className="text-white font-mono">{data?.referralCode}</strong> at checkout, they save ₹100 immediately. Once their cohort enrollment completes, ₹100 is credited to your student wallet for UPI withdrawal.
+              When a peer registers using your link or enters code <strong className="text-white font-mono">{activeCode || 'your code'}</strong> at checkout, they save ₹100 immediately. Once their cohort enrollment completes, ₹100 is credited to your student wallet for UPI withdrawal.
             </p>
           </div>
         </div>
