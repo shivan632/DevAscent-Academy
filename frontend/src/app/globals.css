@@ -300,6 +300,22 @@ html.dark .hero-grid-pattern {
     linear-gradient(to bottom, rgba(99, 102, 241, 0.15) 1px, transparent 1px);
 }
 
+/* Custom slim scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
+
 
 
 

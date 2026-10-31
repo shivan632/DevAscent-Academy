@@ -74,7 +74,7 @@ export class ReferralsService {
 
     return {
       referralCode,
-      referralLink: `https://www.devascentacademy.me/courses?ref=${referralCode}`,
+      referralLink: `${(process.env.FRONTEND_URL || process.env.APP_URL || 'https://www.devascentacademy.me').replace(/\/$/, '')}/courses?ref=${referralCode}`,
       walletBalancePaise: user.walletBalancePaise,
       payoutUpiId: user.payoutUpiId,
       totalEarnedPaise,

@@ -136,7 +136,7 @@ function DashboardContent() {
   const { user, isLoading: authLoading, logout, updateUser, checkAuth } = useAuthStore();
   const { theme, setTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'certificates' | 'submissions' | 'doubts' | 'notifications' | 'profile' | 'settings' | 'support'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'certificates' | 'documents' | 'referrals' | 'submissions' | 'doubts' | 'notifications' | 'profile' | 'settings' | 'support'>('overview');
 
   // Student Doubts & Queries Desk state
   const [doubts, setDoubts] = useState<any[]>([]);
@@ -176,6 +176,7 @@ function DashboardContent() {
 
   // Profile Form state
   const [profileName, setProfileName] = useState('');
+  const [profileUsername, setProfileUsername] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
   const [profileDegree, setProfileDegree] = useState('');
   const [profileCollege, setProfileCollege] = useState('');
@@ -243,7 +244,7 @@ function DashboardContent() {
   // 1. Tab Deep-Linking synchronization
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['overview', 'analytics', 'certificates', 'submissions', 'doubts', 'notifications', 'profile', 'settings', 'support'].includes(tabParam)) {
+    if (tabParam && ['overview', 'analytics', 'certificates', 'documents', 'referrals', 'submissions', 'doubts', 'notifications', 'profile', 'settings', 'support'].includes(tabParam)) {
       setActiveTab(tabParam as any);
     }
   }, [searchParams]);
@@ -283,6 +284,7 @@ function DashboardContent() {
   useEffect(() => {
     if (user) {
       setProfileName(user.name || '');
+      setProfileUsername((user as any).username || '');
       setProfilePhone(user.phone || '');
       setProfileDegree(user.degree || '');
       setProfileCollege(user.college || '');
@@ -789,8 +791,24 @@ function DashboardContent() {
     setProfileSaving(true);
     setProfileMsg(null);
     try {
+      const cleanUsername = profileUsername.toLowerCase().trim().replace(/^@/, '');
+      if (!cleanUsername) {
+        setProfileMsg({ type: 'error', text: 'Username is a required field.' });
+        setProfileSaving(false);
+        return;
+      }
+      if (!/^[a-z0-9_-]{3,30}$/.test(cleanUsername)) {
+        setProfileMsg({
+          type: 'error',
+          text: 'Username must be 3-30 characters long and can only contain letters, numbers, hyphens, and underscores.',
+        });
+        setProfileSaving(false);
+        return;
+      }
+
       const payload = {
         name: profileName.trim(),
+        username: cleanUsername,
         phone: profilePhone.trim() || undefined,
         degree: profileDegree.trim() || undefined,
         college: profileCollege.trim() || undefined,
@@ -1759,11 +1777,19 @@ function DashboardContent() {
                 </div>
               )}
 
-                                                  {/* STUDENT REFERRALS & CAMPUS REWARDS */}
-                  <ReferralEarnSection />
-
-                  {/* ACADEMIC LETTERS (OFFER LETTER & LOR) */}
+              {/* TAB: ACADEMIC LETTERS & LOR */}
+              {activeTab === 'documents' && (
+                <div className="space-y-6 animate-fadeIn">
                   <AcademicDocumentsSection studentName={studentName} />
+                </div>
+              )}
+
+              {/* TAB: REFER & EARN ₹100 CASH PER FRIEND */}
+              {activeTab === 'referrals' && (
+                <div className="space-y-6 animate-fadeIn">
+                  <ReferralEarnSection />
+                </div>
+              )}
 
 {/* TAB 3: CAPSTONE SUBMISSIONS */}
               {activeTab === 'submissions' && (
@@ -2610,6 +2636,28 @@ function DashboardContent() {
                               className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-950 font-semibold transition-all"
                             />
                           </div>
+                        </div>
+
+                        {/* Student Username / Handle */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span>DevAscent Username *</span>
+                            <span className="text-[10px] text-purple-400 font-semibold lowercase">portfolio handle</span>
+                          </label>
+                          <div className="relative flex items-center">
+                            <span className="absolute left-3.5 text-xs font-mono font-bold text-purple-400">@</span>
+                            <input
+                              type="text"
+                              value={profileUsername}
+                              onChange={(e) => setProfileUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                              required
+                              placeholder="e.g. shivan"
+                              className="w-full pl-8 pr-4 py-2.5 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-slate-950 font-semibold transition-all"
+                            />
+                          </div>
+                          <p className="text-[10px] text-slate-400 mt-1">
+                            Public portfolio: <strong className="text-purple-400 font-mono">/@{profileUsername || 'username'}</strong>
+                          </p>
                         </div>
 
                         {/* Registered Email */}

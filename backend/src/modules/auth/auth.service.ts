@@ -100,6 +100,7 @@ export class AuthService {
         id: true,
         email: true,
         name: true,
+        username: true,
         role: true,
       },
     });
@@ -197,6 +198,7 @@ export class AuthService {
         id: true,
         email: true,
         name: true,
+        username: true,
         role: true,
         degree: true,
         college: true,
@@ -470,6 +472,7 @@ export class AuthService {
         id: true,
         email: true,
         name: true,
+        username: true,
         role: true,
         phone: true,
         degree: true,
@@ -515,6 +518,27 @@ export class AuthService {
     const dataToUpdate: any = {};
 
     if (dto.name !== undefined) dataToUpdate.name = dto.name.trim();
+    if (dto.username !== undefined) {
+      const rawUsername = (dto.username || '').toLowerCase().trim().replace(/^@/, '');
+      if (!rawUsername) {
+        throw new BadRequestException('Username is required.');
+      }
+      if (!/^[a-z0-9_-]{3,30}$/.test(rawUsername)) {
+        throw new BadRequestException(
+          'Username must be 3-30 characters long and can only contain letters, numbers, hyphens, and underscores.',
+        );
+      }
+      const existing = await this.prisma.user.findFirst({
+        where: {
+          username: rawUsername,
+          NOT: { id: userId },
+        },
+      });
+      if (existing) {
+        throw new BadRequestException(`Username "@${rawUsername}" is already taken. Please choose another.`);
+      }
+      dataToUpdate.username = rawUsername;
+    }
     if (dto.phone !== undefined) dataToUpdate.phone = dto.phone ? dto.phone.trim() : null;
     if (dto.degree !== undefined) dataToUpdate.degree = dto.degree ? dto.degree.trim() : null;
     if (dto.college !== undefined) dataToUpdate.college = dto.college ? dto.college.trim() : null;
@@ -533,6 +557,7 @@ export class AuthService {
         id: true,
         email: true,
         name: true,
+        username: true,
         role: true,
         phone: true,
         degree: true,

@@ -39,6 +39,15 @@ export default function CourseDirectoryPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const ref = new URLSearchParams(window.location.search).get('ref');
+      if (ref) {
+        localStorage.setItem('devascent_referral_code', ref.toUpperCase().trim());
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     async function loadCourses() {
       try {
         const res = await api.getCourses();

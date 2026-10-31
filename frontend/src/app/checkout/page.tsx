@@ -87,7 +87,7 @@ function CheckoutForm() {
   const [university, setUniversity] = useState(user?.college || user?.degree || '');
   
   // Coupon & Price State
-  const initialCoupon = searchParams.get('coupon') || '';
+  const initialCoupon = searchParams.get('coupon') || searchParams.get('ref') || '';
   const [couponCode, setCouponCode] = useState(initialCoupon);
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponDiscount, setCouponDiscount] = useState(0);
@@ -110,6 +110,16 @@ function CheckoutForm() {
       if (!university) setUniversity(user.college || user.degree || '');
     }
   }, [user]);
+
+  // Check stored referral code if none in URL
+  useEffect(() => {
+    if (!couponCode && typeof window !== 'undefined') {
+      const storedRef = localStorage.getItem('devascent_referral_code');
+      if (storedRef) {
+        setCouponCode(storedRef);
+      }
+    }
+  }, [couponCode]);
 
   // Recalculate prices
   const basePrice = initialEarlyBird;

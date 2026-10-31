@@ -23,11 +23,13 @@ import {
   HelpCircle,
   Bell,
   ExternalLink,
+  FileBadge,
+  Gift,
 } from 'lucide-react';
 
 interface StudentSidebarProps {
   activeTab?: string;
-  onSelectTab?: (tab: 'overview' | 'analytics' | 'certificates' | 'submissions' | 'doubts' | 'notifications' | 'profile' | 'settings' | 'support') => void;
+  onSelectTab?: (tab: 'overview' | 'analytics' | 'certificates' | 'documents' | 'referrals' | 'submissions' | 'doubts' | 'notifications' | 'profile' | 'settings' | 'support') => void;
   certificatesCount?: number;
   submissionsCount?: number;
   doubtsCount?: number;
@@ -91,6 +93,18 @@ export default function StudentSidebar({
       countColor: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
     },
     {
+      id: 'documents',
+      label: 'Internship Letters & LOR',
+      icon: FileBadge,
+      iconColor: 'text-purple-400',
+    },
+    {
+      id: 'referrals',
+      label: 'Refer & Earn ₹100',
+      icon: Gift,
+      iconColor: 'text-amber-400',
+    },
+    {
       id: 'submissions',
       label: 'Capstone Submissions',
       icon: FolderGit2,
@@ -144,7 +158,7 @@ export default function StudentSidebar({
   const primarySlug = mounted && enrolledCourses.length > 0 ? (enrolledCourses[0]?.courseSlug || '') : '';
 
   const sidebarContent = (
-    <div className="bg-white/95 dark:bg-[#0A0D16]/90 backdrop-blur-2xl rounded-3xl border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 shadow-xl shadow-black/5 dark:shadow-black/40 space-y-5">
+    <div className="bg-white/95 dark:bg-[#0A0D16]/90 backdrop-blur-2xl rounded-3xl border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 shadow-xl shadow-black/5 dark:shadow-black/40 space-y-5 max-h-[calc(100vh-8.5rem)] overflow-y-auto overscroll-contain custom-scrollbar">
       
       {/* Profile Card Header */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/80">
