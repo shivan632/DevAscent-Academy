@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   HelpCircle,
   Bell,
+  ExternalLink,
 } from 'lucide-react';
 
 interface StudentSidebarProps {
@@ -172,6 +173,17 @@ export default function StudentSidebar({
             <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
               {studentEmail}
             </p>
+            {mounted && (user as any)?.username && (
+              <Link
+                href={`/@${(user as any).username}`}
+                target="_blank"
+                className="inline-flex items-center gap-1 text-[11px] font-mono text-purple-600 dark:text-purple-400 hover:underline"
+                title="View your public portfolio"
+              >
+                <span>@{(user as any).username}</span>
+                <ExternalLink className="w-2.5 h-2.5" />
+              </Link>
+            )}
             <div className="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-md border border-indigo-500/30 uppercase tracking-wider">
               <Sparkles className="w-2.5 h-2.5 text-indigo-400" />
               <span>VERIFIED STUDENT</span>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import useSWR from 'swr';
 import { api } from '../../lib/api';
 import {
@@ -21,6 +22,8 @@ import {
   Save,
   Check,
   Loader2,
+  ExternalLink,
+  Sparkles,
 } from 'lucide-react';
 
 interface StudentDetailDrawerProps {
@@ -55,6 +58,29 @@ export function StudentDetailDrawer({
   const [enrolling, setEnrolling] = useState(false);
   const [verifyingEmail, setVerifyingEmail] = useState(false);
   const [resettingQuizId, setResettingQuizId] = useState<string | null>(null);
+  const [issuingLorCourseId, setIssuingLorCourseId] = useState<string | null>(null);
+  const [lorSuccessMsg, setLorSuccessMsg] = useState<string | null>(null);
+
+  const handleQuickIssueLor = async (courseId: string) => {
+    if (!studentId || !courseId) return;
+    try {
+      setIssuingLorCourseId(courseId);
+      setLorSuccessMsg(null);
+      const res = await api.admin.issueLor({
+        userId: studentId,
+        courseId,
+        grade: 'Distinction (A+)',
+      });
+      const docId = res?.docId || res?.data?.docId || 'DEV-LOR';
+      setLorSuccessMsg(`Official LOR issued: ${docId}`);
+      setTimeout(() => setLorSuccessMsg(null), 4000);
+      await mutate();
+    } catch (err: any) {
+      alert(err?.message || 'Failed to issue LOR');
+    } finally {
+      setIssuingLorCourseId(null);
+    }
+  };
 
   const handleResetQuiz = async (quizId: string) => {
     if (!studentId || !quizId) return;
@@ -160,7 +186,20 @@ export function StudentDetailDrawer({
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-base font-bold text-white">{student.name}</h3>
-                    <p className="text-white/50 flex items-center gap-1.5 mt-0.5">
+                    {student.username && (
+                      <div className="mt-0.5">
+                        <Link
+                          href={`/@${student.username}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-violet-500/15 border border-violet-500/30 text-[11px] font-mono text-violet-300 hover:bg-violet-500/25 transition-colors"
+                          title="View Student Public Portfolio"
+                        >
+                          <span>@{student.username}</span>
+                          <ExternalLink className="w-3 h-3 text-violet-400" />
+                        </Link>
+                      </div>
+                    )}
+                    <p className="text-white/50 flex items-center gap-1.5 mt-1">
                       <Mail className="w-3.5 h-3.5 text-white/30" />
                       {student.email}
                     </p>
@@ -283,13 +322,20 @@ export function StudentDetailDrawer({
                   </span>
                 </div>
 
+                {lorSuccessMsg && (
+                  <div className="p-2.5 rounded-xl bg-purple-500/15 border border-purple-500/30 text-xs text-purple-300 flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>{lorSuccessMsg}</span>
+                  </div>
+                )}
+
                 {student.enrollments?.length === 0 ? (
                   <p className="text-white/30 italic">No courses enrolled yet.</p>
                 ) : (
                   student.enrollments?.map((enr: any) => (
                     <div
                       key={enr.id}
-                      className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-2"
+                      className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-2.5"
                     >
                       <div className="flex items-start justify-between">
                         <div className="space-y-0.5">
@@ -324,6 +370,24 @@ export function StudentDetailDrawer({
                             style={{ width: `${enr.progressPct || 0}%` }}
                           />
                         </div>
+                      </div>
+
+                      {/* LOR Quick Issue */}
+                      <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                        <span className="text-[10px] text-white/40">Recommendation:</span>
+                        <button
+                          type="button"
+                          disabled={issuingLorCourseId === (enr.courseId || enr.course?.id)}
+                          onClick={() => handleQuickIssueLor(enr.courseId || enr.course?.id)}
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-[10px] font-bold transition-all disabled:opacity-40 cursor-pointer"
+                        >
+                          <Sparkles className="w-3 h-3 text-purple-400" />
+                          <span>
+                            {issuingLorCourseId === (enr.courseId || enr.course?.id)
+                              ? 'Issuing LOR…'
+                              : 'Issue Official LOR'}
+                          </span>
+                        </button>
                       </div>
                     </div>
                   ))

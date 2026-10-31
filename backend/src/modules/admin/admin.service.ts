@@ -1006,6 +1006,7 @@ export class AdminService {
       select: {
         name: true,
         email: true,
+        username: true,
         degree: true,
         college: true,
         city: true,

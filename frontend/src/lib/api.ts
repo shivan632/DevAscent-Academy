@@ -256,6 +256,12 @@ export const api = {
     },
     issueCertificate: (data: { userId: string; courseId: string; grade?: string }) =>
       fetchApi('/admin/certificates/issue', { method: 'POST', body: JSON.stringify(data) }),
+    issueLor: (data: { userId: string; courseId: string; grade?: string }) =>
+      fetchApi('/admin/academic-documents/lor/issue', { method: 'POST', body: JSON.stringify(data) }),
+    getAcademicDocuments: () => fetchApi('/admin/academic-documents'),
+    getReferralPayouts: () => fetchApi('/referrals/admin/payouts'),
+    processReferralPayout: (payoutId: string, data: { action: 'APPROVE' | 'REJECT'; txReference?: string; adminNote?: string }) =>
+      fetchApi(`/referrals/admin/payouts/${payoutId}/process`, { method: 'POST', body: JSON.stringify(data) }),
 
     // Quiz Reset
     resetStudentQuiz: (quizId: string, userId: string) =>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import useSWR from 'swr';
 import { api } from '../../../lib/api';
 import { SkeletonLoader } from '../../../components/admin/SkeletonLoader';
@@ -329,9 +330,23 @@ export default function StudentsPage() {
                             {student.name ? student.name[0].toUpperCase() : 'S'}
                           </div>
                           <div>
-                            <p className="font-bold text-white group-hover:text-indigo-300 transition-colors">
-                              {student.name}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-white group-hover:text-indigo-300 transition-colors">
+                                {student.name}
+                              </p>
+                              {student.username && (
+                                <span
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(`/@${student.username}`, '_blank');
+                                  }}
+                                  className="px-1.5 py-0.5 rounded bg-violet-500/10 border border-violet-500/20 text-[10px] text-violet-300 font-mono hover:bg-violet-500/20"
+                                  title="View Public Portfolio"
+                                >
+                                  @{student.username}
+                                </span>
+                              )}
+                            </div>
                             <p className="text-[11px] text-white/40">{student.email}</p>
                             {student.phone && (
                               <p className="text-[10px] text-white/30">{student.phone}</p>
@@ -446,7 +461,14 @@ export default function StudentsPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-bold text-white text-sm">{student.name}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-bold text-white text-sm">{student.name}</p>
+                        {student.username && (
+                          <span className="px-1.5 py-0.2 rounded bg-violet-500/10 text-[9px] text-violet-300 font-mono">
+                            @{student.username}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-white/40">{student.email}</p>
                     </div>
                     <span

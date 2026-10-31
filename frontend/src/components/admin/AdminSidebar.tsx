@@ -30,6 +30,8 @@ import {
   Tag,
   HelpCircle,
   Bell,
+  Gift,
+  FileBadge,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -61,6 +63,7 @@ const navGroups = [
     items: [
       { href: '/admin/course-price', label: 'Course Price', icon: IndianRupee },
       { href: '/admin/payments', label: 'Payments', icon: CreditCard },
+      { href: '/admin/referrals', label: 'Referral Payouts', icon: Gift },
       { href: '/admin/coupons', label: 'Coupons', icon: Tag },
       { href: '/admin/refunds', label: 'Refund Requests', icon: CreditCard, badgeKey: 'pendingRefunds' as const },
     ],
@@ -69,6 +72,7 @@ const navGroups = [
     label: 'Credentials',
     items: [
       { href: '/admin/certificates', label: 'Certificates', icon: BadgeCheck },
+      { href: '/admin/documents', label: 'Letters & LOR', icon: FileBadge },
       { href: '/admin/certificates/verify', label: 'Verify Certificate', icon: ScanLine },
     ],
   },

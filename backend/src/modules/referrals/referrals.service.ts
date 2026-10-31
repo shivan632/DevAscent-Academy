@@ -211,7 +211,7 @@ export class ReferralsService {
     return this.prisma.payoutRequest.findMany({
       include: {
         user: {
-          select: { name: true, email: true, phone: true },
+          select: { name: true, email: true, phone: true, username: true },
         },
       },
       orderBy: { createdAt: 'desc' },

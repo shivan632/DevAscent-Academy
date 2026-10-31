@@ -10,19 +10,21 @@ import {
 import { Response } from 'express';
 import { DocumentsService } from './documents.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
-@Controller('documents')
+@Controller()
 export class DocumentsController {
   constructor(private documentsService: DocumentsService) {}
 
-  @Get('my')
+  @Get('documents/my')
   @UseGuards(JwtAuthGuard)
   async getMyDocuments(@CurrentUser() user: any) {
     return this.documentsService.getMyDocuments(user.id || user.sub);
   }
 
-  @Post('offer-letter/:courseId')
+  @Post('documents/offer-letter/:courseId')
   @UseGuards(JwtAuthGuard)
   async generateOfferLetter(
     @CurrentUser() user: any,
@@ -31,7 +33,7 @@ export class DocumentsController {
     return this.documentsService.getOrCreateOfferLetter(user.id || user.sub, courseId);
   }
 
-  @Get(':docId/download')
+  @Get('documents/:docId/download')
   async downloadDocument(
     @Param('docId') docId: string,
     @Res() res: Response,
@@ -56,9 +58,25 @@ export class DocumentsController {
     }
   }
 
-  @Get('verify/:docId')
+  @Get('documents/verify/:docId')
   async verifyDocument(@Param('docId') docId: string) {
     return this.documentsService.verifyDocument(docId);
   }
-}
 
+  // --- Admin Document Endpoints ---
+  @Get('admin/academic-documents')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async getAdminAcademicDocuments() {
+    return this.documentsService.getAllDocumentsAdmin();
+  }
+
+  @Post('admin/academic-documents/lor/issue')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async issueLorAdmin(
+    @Body() dto: { userId: string; courseId: string; grade?: string },
+  ) {
+    return this.documentsService.getOrCreateLor(dto.userId, dto.courseId, dto.grade || 'Distinction (A+)');
+  }
+}

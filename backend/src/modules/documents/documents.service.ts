@@ -255,5 +255,13 @@ export class DocumentsService {
       signatory: 'Shivan Mishra, Founder & Principal Systems Architect',
     };
   }
+  async getAllDocumentsAdmin() {
+    return this.prisma.academicDocument.findMany({
+      include: {
+        user: { select: { id: true, name: true, email: true, username: true, college: true, degree: true } },
+        course: { select: { id: true, title: true, cohortNumber: true } },
+      },
+      orderBy: { issuedAt: 'desc' },
+    });
+  }
 }
-
