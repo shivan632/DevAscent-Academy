@@ -26,6 +26,9 @@ model User {
   graduationYear         String?
   linkedinUrl            String?
   portfolioUrl           String?
+  username               String?                 @unique
+  skills                 String                  @default("[]")
+  portfolioPublic        Boolean                 @default(true)
   adminNote              String?
   lastLoginAt            DateTime?
   status                 String                  @default("ACTIVE")

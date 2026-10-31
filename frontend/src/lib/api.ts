@@ -130,6 +130,10 @@ export const api = {
   generateOfferLetter: (courseId: string) => fetchApi(`/documents/offer-letter/${courseId}`, { method: 'POST' }),
   getDocumentDownloadUrl: (docId: string) => `${getApiBaseUrl()}/documents/${docId}/download`,
   verifyDocumentPublic: (docId: string) => fetchApi(`/documents/verify/${docId}`),
+  // Public Portfolio
+  getPublicPortfolio: (username: string) => fetchApi(`/portfolio/public/${username}`),
+  getMyPortfolioHandle: () => fetchApi('/portfolio/my-handle'),
+  updatePortfolioProfile: (data: any) => fetchApi('/portfolio/update-settings', { method: 'PATCH', body: JSON.stringify(data) }),
 
   // Doubts & Q/A Forum
   createDoubt: (data: { question: string; courseId?: string; lessonId?: string; isUrgent?: boolean }) =>
