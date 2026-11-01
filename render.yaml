@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     rootDir: backend
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npx prisma db push --accept-data-loss && npm run build
     startCommand: node dist/main
     healthCheckPath: /api/v1/health
     envVars:

@@ -523,11 +523,28 @@ export class AuthService {
       if (!rawUsername) {
         throw new BadRequestException('Username is required.');
       }
-      if (!/^[a-z0-9_-]{3,30}$/.test(rawUsername)) {
+      if (!/^[a-z0-9][a-z0-9_-]{1,22}[a-z0-9]$/.test(rawUsername)) {
         throw new BadRequestException(
-          'Username must be 3-30 characters long and can only contain letters, numbers, hyphens, and underscores.',
+          'Username must be between 3 and 24 characters, start and end with a letter/number, and only contain lowercase letters, numbers, hyphens, and underscores.',
         );
       }
+
+      const RESERVED_USERNAMES = new Set([
+        'admin', 'administrator', 'root', 'system', 'superuser',
+        'shivan', 'shivanmishra', 'devascent', 'devascentacademy', 'official',
+        'api', 'auth', 'login', 'register', 'signin', 'signup', 'logout',
+        'dashboard', 'profile', 'settings', 'account', 'security',
+        'courses', 'course', 'internships', 'internship', 'tracks',
+        'checkout', 'payment', 'payments', 'refund', 'refunds',
+        'verify', 'certificate', 'certificates', 'documents', 'lor',
+        'support', 'help', 'contact', 'about', 'about-us', 'privacy',
+        'terms', 'disclaimer', 'sitemap', 'robots', 'u', 'user'
+      ]);
+
+      if (RESERVED_USERNAMES.has(rawUsername)) {
+        throw new BadRequestException(`"${rawUsername}" is a reserved system keyword and cannot be used as a username`);
+      }
+
       const existing = await this.prisma.user.findFirst({
         where: {
           username: rawUsername,
@@ -539,6 +556,7 @@ export class AuthService {
       }
       dataToUpdate.username = rawUsername;
     }
+    if (dto.headline !== undefined) dataToUpdate.headline = dto.headline ? dto.headline.trim() : null;
     if (dto.phone !== undefined) dataToUpdate.phone = dto.phone ? dto.phone.trim() : null;
     if (dto.degree !== undefined) dataToUpdate.degree = dto.degree ? dto.degree.trim() : null;
     if (dto.college !== undefined) dataToUpdate.college = dto.college ? dto.college.trim() : null;
@@ -548,7 +566,15 @@ export class AuthService {
     if (dto.graduationYear !== undefined) dataToUpdate.graduationYear = dto.graduationYear ? dto.graduationYear.trim() : null;
     if (dto.githubUrl !== undefined) dataToUpdate.githubUrl = dto.githubUrl ? dto.githubUrl.trim() : null;
     if (dto.linkedinUrl !== undefined) dataToUpdate.linkedinUrl = dto.linkedinUrl ? dto.linkedinUrl.trim() : null;
+    if (dto.leetcodeUrl !== undefined) dataToUpdate.leetcodeUrl = dto.leetcodeUrl ? dto.leetcodeUrl.trim() : null;
+    if (dto.twitterUrl !== undefined) dataToUpdate.twitterUrl = dto.twitterUrl ? dto.twitterUrl.trim() : null;
     if (dto.portfolioUrl !== undefined) dataToUpdate.portfolioUrl = dto.portfolioUrl ? dto.portfolioUrl.trim() : null;
+    if (dto.resumeUrl !== undefined) dataToUpdate.resumeUrl = dto.resumeUrl ? dto.resumeUrl.trim() : null;
+    if (dto.skills !== undefined) {
+      dataToUpdate.skills = typeof dto.skills === 'string' ? dto.skills : JSON.stringify(dto.skills);
+    }
+    if (dto.achievements !== undefined) dataToUpdate.achievements = dto.achievements;
+    if (dto.customProjects !== undefined) dataToUpdate.customProjects = dto.customProjects;
 
     const updatedUser: any = await (this.prisma.user as any).update({
       where: { id: userId },
@@ -558,6 +584,7 @@ export class AuthService {
         email: true,
         name: true,
         username: true,
+        headline: true,
         role: true,
         phone: true,
         degree: true,
@@ -568,7 +595,13 @@ export class AuthService {
         graduationYear: true,
         githubUrl: true,
         linkedinUrl: true,
+        leetcodeUrl: true,
+        twitterUrl: true,
         portfolioUrl: true,
+        resumeUrl: true,
+        skills: true,
+        achievements: true,
+        customProjects: true,
         isEmailVerified: true,
         createdAt: true,
         updatedAt: true,

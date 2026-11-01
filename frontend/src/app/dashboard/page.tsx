@@ -81,7 +81,12 @@ import {
   Trash2,
   Fingerprint,
   Smartphone,
+  Plus,
 } from 'lucide-react';
+
+const TwitterIcon = ({ className }: { className?: string }) => (
+  <svg className={className || "w-3.5 h-3.5 fill-current"} viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+);
 
 function DashboardSkeleton() {
   return (
@@ -177,6 +182,7 @@ function DashboardContent() {
   // Profile Form state
   const [profileName, setProfileName] = useState('');
   const [profileUsername, setProfileUsername] = useState('');
+  const [profileHeadline, setProfileHeadline] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
   const [profileDegree, setProfileDegree] = useState('');
   const [profileCollege, setProfileCollege] = useState('');
@@ -185,12 +191,23 @@ function DashboardContent() {
   const [profileAvatarUrl, setProfileAvatarUrl] = useState('');
   const [profileGithub, setProfileGithub] = useState('');
   const [profileLinkedin, setProfileLinkedin] = useState('');
+  const [profileLeetcode, setProfileLeetcode] = useState('');
+  const [profileTwitter, setProfileTwitter] = useState('');
   const [profilePortfolio, setProfilePortfolio] = useState('');
+  const [profileResumeUrl, setProfileResumeUrl] = useState('');
   const [profileBio, setProfileBio] = useState('');
+  const [profileAchievements, setProfileAchievements] = useState<any[]>([]);
+  const [profileProjects, setProfileProjects] = useState<any[]>([]);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [tempAvatarUrl, setTempAvatarUrl] = useState('');
+
+  // Modals for adding Achievements & Projects
+  const [showAddAchModal, setShowAddAchModal] = useState(false);
+  const [newAch, setNewAch] = useState({ title: '', issuer: '', date: '', description: '', proofUrl: '' });
+  const [showAddProjModal, setShowAddProjModal] = useState(false);
+  const [newProj, setNewProj] = useState({ title: '', description: '', liveDemoUrl: '', githubRepoUrl: '', techStack: '' });
 
   const PRESET_AVATARS = [
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
@@ -285,6 +302,7 @@ function DashboardContent() {
     if (user) {
       setProfileName(user.name || '');
       setProfileUsername((user as any).username || '');
+      setProfileHeadline((user as any).headline || '');
       setProfilePhone(user.phone || '');
       setProfileDegree(user.degree || '');
       setProfileCollege(user.college || '');
@@ -293,8 +311,25 @@ function DashboardContent() {
       setProfileAvatarUrl(user.avatarUrl || '');
       setProfileGithub(user.githubUrl || '');
       setProfileLinkedin(user.linkedinUrl || '');
+      setProfileLeetcode((user as any).leetcodeUrl || '');
+      setProfileTwitter((user as any).twitterUrl || '');
       setProfilePortfolio(user.portfolioUrl || '');
+      setProfileResumeUrl((user as any).resumeUrl || '');
       setProfileBio(user.bio || '');
+
+      try {
+        const achs = (user as any).achievements;
+        setProfileAchievements(Array.isArray(achs) ? achs : JSON.parse(achs || '[]'));
+      } catch {
+        setProfileAchievements([]);
+      }
+
+      try {
+        const projs = (user as any).customProjects;
+        setProfileProjects(Array.isArray(projs) ? projs : JSON.parse(projs || '[]'));
+      } catch {
+        setProfileProjects([]);
+      }
     }
   }, [user]);
 
@@ -809,6 +844,7 @@ function DashboardContent() {
       const payload = {
         name: profileName.trim(),
         username: cleanUsername,
+        headline: profileHeadline.trim() || undefined,
         phone: profilePhone.trim() || undefined,
         degree: profileDegree.trim() || undefined,
         college: profileCollege.trim() || undefined,
@@ -817,8 +853,13 @@ function DashboardContent() {
         avatarUrl: profileAvatarUrl.trim() || undefined,
         githubUrl: profileGithub.trim() || undefined,
         linkedinUrl: profileLinkedin.trim() || undefined,
+        leetcodeUrl: profileLeetcode.trim() || undefined,
+        twitterUrl: profileTwitter.trim() || undefined,
         portfolioUrl: profilePortfolio.trim() || undefined,
+        resumeUrl: profileResumeUrl.trim() || undefined,
         bio: profileBio.trim() || undefined,
+        achievements: profileAchievements,
+        customProjects: profileProjects,
       };
 
       const res = await api.updateProfile(payload);
@@ -2655,9 +2696,38 @@ function DashboardContent() {
                               className="w-full pl-8 pr-4 py-2.5 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-slate-950 font-semibold transition-all"
                             />
                           </div>
-                          <p className="text-[10px] text-slate-400 mt-1">
-                            Public portfolio: <strong className="text-purple-400 font-mono">/@{profileUsername || 'username'}</strong>
-                          </p>
+                          <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1">
+                            <span>
+                              Public portfolio: <strong className="text-purple-400 font-mono">/@{profileUsername || 'username'}</strong>
+                            </span>
+                            {profileUsername && (
+                              <a
+                                href={`/@${profileUsername}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1 hover:underline"
+                              >
+                                <span>Preview Portfolio</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Professional Headline */}
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span>Professional Headline / Bio Subtitle</span>
+                            <span className="text-[10px] text-slate-400 font-normal">e.g. 1st Year B.Tech CSE @ DTU | Aspiring Systems Engineer</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={profileHeadline}
+                            onChange={(e) => setProfileHeadline(e.target.value)}
+                            placeholder="e.g. 1st Year CSE Scholar | Full-Stack & Cloud Architecture Enthusiast"
+                            maxLength={150}
+                            className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-950 font-semibold transition-all"
+                          />
                         </div>
 
                         {/* Registered Email */}
@@ -2911,6 +2981,90 @@ function DashboardContent() {
                             className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-950 font-mono text-[11px] transition-all"
                           />
                         </div>
+
+                        {/* LeetCode Profile */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <Code2 className="w-3.5 h-3.5 text-amber-500" />
+                              <span>LeetCode Profile</span>
+                            </span>
+                            {profileLeetcode && (
+                              <a
+                                href={profileLeetcode.startsWith('http') ? profileLeetcode : `https://${profileLeetcode}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] text-amber-500 hover:underline flex items-center gap-0.5"
+                              >
+                                <span>Test</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
+                          </label>
+                          <input
+                            type="url"
+                            value={profileLeetcode}
+                            onChange={(e) => setProfileLeetcode(e.target.value)}
+                            placeholder="https://leetcode.com/u/shivan"
+                            className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white dark:focus:bg-slate-950 font-mono text-[11px] transition-all"
+                          />
+                        </div>
+
+                        {/* Twitter / X */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <TwitterIcon className="w-3.5 h-3.5 text-sky-400" />
+                              <span>Twitter / X Profile</span>
+                            </span>
+                            {profileTwitter && (
+                              <a
+                                href={profileTwitter.startsWith('http') ? profileTwitter : `https://${profileTwitter}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] text-sky-400 hover:underline flex items-center gap-0.5"
+                              >
+                                <span>Test</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
+                          </label>
+                          <input
+                            type="url"
+                            value={profileTwitter}
+                            onChange={(e) => setProfileTwitter(e.target.value)}
+                            placeholder="https://x.com/shivan"
+                            className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-950 font-mono text-[11px] transition-all"
+                          />
+                        </div>
+
+                        {/* Resume / CV Link */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <Download className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Resume / CV PDF Link</span>
+                            </span>
+                            {profileResumeUrl && (
+                              <a
+                                href={profileResumeUrl.startsWith('http') ? profileResumeUrl : `https://${profileResumeUrl}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] text-emerald-400 hover:underline flex items-center gap-0.5"
+                              >
+                                <span>View</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
+                          </label>
+                          <input
+                            type="url"
+                            value={profileResumeUrl}
+                            onChange={(e) => setProfileResumeUrl(e.target.value)}
+                            placeholder="https://drive.google.com/.../view"
+                            className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-950 font-mono text-[11px] transition-all"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -2976,7 +3130,165 @@ function DashboardContent() {
                       </div>
                     </div>
 
-                    {/* SECTION 5: SAVE ACTIONS & FOOTER */}
+                    {/* SECTION 5: HONORS, HACKATHONS & ACHIEVEMENTS */}
+                    <div className="bg-white/95 dark:bg-[#0B0F19]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 sm:p-7 shadow-xl space-y-5">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                            <Trophy className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">
+                              Honors, Hackathons &amp; College Achievements
+                            </h3>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Highlight hackathons, coding contests, and college awards on your public portfolio.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddAchModal(true)}
+                          className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add Milestone</span>
+                        </button>
+                      </div>
+
+                      {profileAchievements.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {profileAchievements.map((ach: any, idx: number) => (
+                            <div
+                              key={idx}
+                              className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/60 flex items-start justify-between gap-3"
+                            >
+                              <div className="space-y-1 flex-1">
+                                <span className="text-[10px] font-mono font-bold uppercase text-amber-500">
+                                  {ach.issuer || 'Achievement'}
+                                </span>
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                                  {ach.title}
+                                </h4>
+                                {ach.description && (
+                                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                    {ach.description}
+                                  </p>
+                                )}
+                                {ach.proofUrl && (
+                                  <a
+                                    href={ach.proofUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-[10px] text-indigo-400 hover:underline inline-flex items-center gap-1 font-mono pt-1"
+                                  >
+                                    <span>Proof Link</span>
+                                    <ExternalLink className="w-2.5 h-2.5" />
+                                  </a>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setProfileAchievements((prev) => prev.filter((_, i) => i !== idx))}
+                                className="text-rose-400 hover:text-rose-300 p-1 rounded-lg hover:bg-rose-500/10 transition-colors"
+                                title="Remove Milestone"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-400 text-center py-4 bg-slate-50/50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                          No milestones added yet. Click &ldquo;Add Milestone&rdquo; to showcase your hackathons, coding streak badges, or club roles!
+                        </p>
+                      )}
+                    </div>
+
+                    {/* SECTION 6: INDEPENDENT & PERSONAL SHOWCASE PROJECTS */}
+                    <div className="bg-white/95 dark:bg-[#0B0F19]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 sm:p-7 shadow-xl space-y-5">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-teal-500/10 dark:bg-teal-500/15 text-teal-500 flex items-center justify-center border border-teal-500/20">
+                            <FolderGit2 className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">
+                              Independent &amp; Personal Showcase Projects
+                            </h3>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Showcase your personal hobby or college projects alongside official DevAscent capstones.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddProjModal(true)}
+                          className="px-3 py-1.5 rounded-xl bg-teal-500 hover:bg-teal-600 text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add Project</span>
+                        </button>
+                      </div>
+
+                      {profileProjects.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {profileProjects.map((proj: any, idx: number) => (
+                            <div
+                              key={idx}
+                              className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/60 flex items-start justify-between gap-3"
+                            >
+                              <div className="space-y-1.5 flex-1">
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                                  {proj.title}
+                                </h4>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                  {proj.description}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-2 pt-1">
+                                  {proj.liveDemoUrl && (
+                                    <a
+                                      href={proj.liveDemoUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-[10px] text-teal-400 hover:underline flex items-center gap-0.5"
+                                    >
+                                      <span>Demo</span>
+                                      <ExternalLink className="w-2.5 h-2.5" />
+                                    </a>
+                                  )}
+                                  {proj.githubRepoUrl && (
+                                    <a
+                                      href={proj.githubRepoUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-[10px] text-slate-400 hover:underline flex items-center gap-0.5"
+                                    >
+                                      <span>Repo</span>
+                                      <ExternalLink className="w-2.5 h-2.5" />
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setProfileProjects((prev) => prev.filter((_, i) => i !== idx))}
+                                className="text-rose-400 hover:text-rose-300 p-1 rounded-lg hover:bg-rose-500/10 transition-colors"
+                                title="Remove Project"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-400 text-center py-4 bg-slate-50/50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                          No personal projects added yet. Click &ldquo;Add Project&rdquo; to showcase your side-projects or semester assignments!
+                        </p>
+                      )}
+                    </div>
+
+                    {/* SECTION 7: SAVE ACTIONS & FOOTER */}
                     <div className="p-5 rounded-3xl bg-white/95 dark:bg-[#0B0F19]/90 border border-slate-200/80 dark:border-slate-800/80 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
                       <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs">
                         <Clock className="w-4 h-4 text-indigo-500" />
@@ -3122,6 +3434,230 @@ function DashboardContent() {
                           </div>
                         </div>
 
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ─── 4. ADD ACHIEVEMENT MODAL ─── */}
+                  {showAddAchModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+                      <div className="bg-slate-900 border border-amber-500/30 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl relative text-white">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                          <div className="flex items-center gap-2">
+                            <Trophy className="w-4 h-4 text-amber-400" />
+                            <h3 className="font-extrabold text-sm text-white">Add Honor or Hackathon</h3>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowAddAchModal(false)}
+                            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-3 text-xs">
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Title *</label>
+                            <input
+                              type="text"
+                              value={newAch.title}
+                              onChange={(e) => setNewAch({ ...newAch, title: e.target.value })}
+                              placeholder="e.g. Smart India Hackathon Finalist"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Organization / Issuer *</label>
+                            <input
+                              type="text"
+                              value={newAch.issuer}
+                              onChange={(e) => setNewAch({ ...newAch, issuer: e.target.value })}
+                              placeholder="e.g. College Coding Club / Government of India"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Date / Month</label>
+                            <input
+                              type="text"
+                              value={newAch.date}
+                              onChange={(e) => setNewAch({ ...newAch, date: e.target.value })}
+                              placeholder="e.g. Oct 2026"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Description</label>
+                            <textarea
+                              rows={2}
+                              value={newAch.description}
+                              onChange={(e) => setNewAch({ ...newAch, description: e.target.value })}
+                              placeholder="Brief 1-2 sentence description of your role or placement..."
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Proof URL / Certificate Link</label>
+                            <input
+                              type="url"
+                              value={newAch.proofUrl}
+                              onChange={(e) => setNewAch({ ...newAch, proofUrl: e.target.value })}
+                              placeholder="https://linkedin.com/... or Google Drive link"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono text-[11px]"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
+                          <button
+                            type="button"
+                            onClick={() => setShowAddAchModal(false)}
+                            className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!newAch.title.trim()) return;
+                              setProfileAchievements((prev) => [
+                                ...prev,
+                                {
+                                  id: `ach_${Date.now()}`,
+                                  title: newAch.title.trim(),
+                                  issuer: newAch.issuer.trim(),
+                                  date: newAch.date.trim(),
+                                  description: newAch.description.trim(),
+                                  proofUrl: newAch.proofUrl.trim(),
+                                },
+                              ]);
+                              setNewAch({ title: '', issuer: '', date: '', description: '', proofUrl: '' });
+                              setShowAddAchModal(false);
+                            }}
+                            className="px-5 py-2 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-xl transition-all shadow-md"
+                          >
+                            Add to Profile
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ─── 5. ADD PERSONAL PROJECT MODAL ─── */}
+                  {showAddProjModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+                      <div className="bg-slate-900 border border-teal-500/30 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl relative text-white">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                          <div className="flex items-center gap-2">
+                            <FolderGit2 className="w-4 h-4 text-teal-400" />
+                            <h3 className="font-extrabold text-sm text-white">Add Personal Project</h3>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowAddProjModal(false)}
+                            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-3 text-xs">
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Project Title *</label>
+                            <input
+                              type="text"
+                              value={newProj.title}
+                              onChange={(e) => setNewProj({ ...newProj, title: e.target.value })}
+                              placeholder="e.g. Algorithm Visualizer"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Description *</label>
+                            <textarea
+                              rows={2}
+                              value={newProj.description}
+                              onChange={(e) => setNewProj({ ...newProj, description: e.target.value })}
+                              placeholder="Brief description of what the system does and key problems solved..."
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Tech Stack (comma separated)</label>
+                            <input
+                              type="text"
+                              value={newProj.techStack}
+                              onChange={(e) => setNewProj({ ...newProj, techStack: e.target.value })}
+                              placeholder="e.g. React, TypeScript, Tailwind, Node.js"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono text-[11px]"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Live Demo URL</label>
+                            <input
+                              type="url"
+                              value={newProj.liveDemoUrl}
+                              onChange={(e) => setNewProj({ ...newProj, liveDemoUrl: e.target.value })}
+                              placeholder="https://myproject.vercel.app"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono text-[11px]"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">GitHub Repo URL</label>
+                            <input
+                              type="url"
+                              value={newProj.githubRepoUrl}
+                              onChange={(e) => setNewProj({ ...newProj, githubRepoUrl: e.target.value })}
+                              placeholder="https://github.com/shivan/algorithm-visualizer"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono text-[11px]"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
+                          <button
+                            type="button"
+                            onClick={() => setShowAddProjModal(false)}
+                            className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!newProj.title.trim()) return;
+                              const tags = newProj.techStack
+                                .split(',')
+                                .map((t) => t.trim())
+                                .filter(Boolean);
+                              setProfileProjects((prev) => [
+                                ...prev,
+                                {
+                                  id: `proj_${Date.now()}`,
+                                  title: newProj.title.trim(),
+                                  description: newProj.description.trim(),
+                                  techStack: tags,
+                                  liveDemoUrl: newProj.liveDemoUrl.trim(),
+                                  githubRepoUrl: newProj.githubRepoUrl.trim(),
+                                },
+                              ]);
+                              setNewProj({ title: '', description: '', liveDemoUrl: '', githubRepoUrl: '', techStack: '' });
+                              setShowAddProjModal(false);
+                            }}
+                            className="px-5 py-2 text-xs font-bold text-slate-950 bg-teal-500 hover:bg-teal-400 rounded-xl transition-all shadow-md"
+                          >
+                            Add to Profile
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}

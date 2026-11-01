@@ -56,4 +56,30 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   portfolioUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  headline?: string;
+
+  @IsOptional()
+  @IsString()
+  leetcodeUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  twitterUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  resumeUrl?: string;
+
+  @IsOptional()
+  skills?: any;
+
+  @IsOptional()
+  achievements?: any;
+
+  @IsOptional()
+  customProjects?: any;
 }

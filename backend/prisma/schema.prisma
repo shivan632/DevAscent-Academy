@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -27,7 +28,13 @@ model User {
   linkedinUrl            String?
   portfolioUrl           String?
   username               String?                 @unique
+  headline               String?
+  leetcodeUrl            String?
+  twitterUrl             String?
+  resumeUrl              String?
   skills                 String                  @default("[]")
+  achievements           Json?                   @default("[]")
+  customProjects         Json?                   @default("[]")
   portfolioPublic        Boolean                 @default(true)
   adminNote              String?
   lastLoginAt            DateTime?
