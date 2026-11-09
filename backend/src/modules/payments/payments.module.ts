@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
 import { CouponsModule } from '../coupons/coupons.module';
+import { ReferralsModule } from '../referrals/referrals.module';
 import { MailService } from '../../shared/mail.service';
 
 @Module({
@@ -23,6 +24,7 @@ import { MailService } from '../../shared/mail.service';
       inject: [ConfigService],
     }),
     CouponsModule,
+    ReferralsModule,
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService, MailService],

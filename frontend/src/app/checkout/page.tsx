@@ -30,6 +30,20 @@ import {
 import { ALL_COURSES_CATALOG } from '../../lib/courseCatalogData';
 import { api } from '../../lib/api';
 
+const loadRazorpayScript = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') return resolve(false);
+    if ((window as any).Razorpay) return resolve(true);
+
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 function CheckoutForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -209,7 +223,15 @@ function CheckoutForm() {
         degree: university.trim(),
       };
 
-      // 2. Create Order in Database (stores Name, Email, Phone, University, Course, Price, Coupon & registers/activates Enrollment)
+      // 2. Ensure Razorpay Checkout SDK is loaded
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded && typeof (window as any).Razorpay === 'undefined') {
+        alert('Could not load Razorpay payment gateway SDK. Please check your internet connection or disable ad-blockers and try again.');
+        setIsProcessing(false);
+        return;
+      }
+
+      // 3. Create Order on Backend
       const orderRes = await api.createOrder(
         selectedCourse.slug,
         couponApplied ? couponCode.toUpperCase().trim() : undefined,
@@ -217,8 +239,15 @@ function CheckoutForm() {
       );
 
       const orderPayload = orderRes?.data || orderRes;
-      const orderId = orderPayload?.razorpayOrderId || `ord_${Date.now()}`;
-      const paymentId = orderPayload?.razorpayPaymentId || `pay_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      const orderId = orderPayload?.razorpayOrderId;
+      const keyId =
+        orderPayload?.razorpayKeyId ||
+        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+        'rzp_live_Twx5UfIKtYUt4V';
+
+      if (!orderId) {
+        throw new Error('Order initialization failed. Please try again.');
+      }
 
       // Automatically store authenticated session token
       if (orderPayload?.token) {
@@ -228,55 +257,94 @@ function CheckoutForm() {
         }
       }
 
-      // 3. Verify Payment & Idempotently Synchronize Ledger in Database
-      try {
-        const verifyRes = await api.verifyPayment({
-          razorpayOrderId: orderId,
-          razorpayPaymentId: paymentId,
-          razorpaySignature: 'demo_mock_verified_signature_sandbox',
-        });
-
-        const verifyPayload = verifyRes?.data || verifyRes;
-        if (verifyPayload?.token) {
-          localStorage.setItem('devascent_token', verifyPayload.token);
-          if (verifyPayload.user) {
-            setUser(verifyPayload.user);
-          }
-        }
-      } catch (verifyErr) {
-        console.warn('Verification sync note:', verifyErr);
-      }
-
-      // 4. Update local user state
-      if (user) {
-        setUser({
-          ...user,
+      // 4. Open Razorpay Checkout modal
+      const options = {
+        key: keyId,
+        amount: orderPayload.amountInPaise,
+        currency: 'INR',
+        name: 'DevAscent Academy',
+        description: `${selectedCourse.title} - Cohort Enrollment`,
+        image: 'https://www.devascentacademy.me/favicon.ico',
+        order_id: orderId,
+        prefill: {
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
-          phone: phone.trim(),
-          college: university.trim(),
-        });
-      }
+          contact: phone.trim(),
+        },
+        notes: {
+          courseSlug: selectedCourse.slug,
+          university: university.trim(),
+        },
+        theme: {
+          color: '#4F46E5',
+        },
+        handler: async function (response: any) {
+          setIsProcessing(true);
+          try {
+            const verifyRes = await api.verifyPayment({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
 
-      setSuccessDetails({
-        paymentId,
-        orderId,
-        studentName: fullName.trim(),
-        email: email.trim().toLowerCase(),
-        phone: phone.trim(),
-        university: university.trim(),
-        courseTitle: selectedCourse.title,
-        amount: finalPrice,
-        coupon: couponApplied ? couponCode.toUpperCase().trim() : 'NONE',
+            const verifyPayload = verifyRes?.data || verifyRes;
+            if (verifyPayload?.token) {
+              localStorage.setItem('devascent_token', verifyPayload.token);
+              if (verifyPayload.user) {
+                setUser(verifyPayload.user);
+              }
+            }
+
+            if (user) {
+              setUser({
+                ...user,
+                name: fullName.trim(),
+                email: email.trim().toLowerCase(),
+                phone: phone.trim(),
+                college: university.trim(),
+              });
+            }
+
+            setSuccessDetails({
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+              studentName: fullName.trim(),
+              email: email.trim().toLowerCase(),
+              phone: phone.trim(),
+              university: university.trim(),
+              courseTitle: selectedCourse.title,
+              amount: finalPrice,
+              coupon: couponApplied ? couponCode.toUpperCase().trim() : 'NONE',
+            });
+
+            setIsProcessing(false);
+            setPaymentSuccess(true);
+
+            setTimeout(() => {
+              router.push('/enrolled-courses');
+            }, 3000);
+          } catch (verifyErr: any) {
+            setIsProcessing(false);
+            alert(
+              verifyErr?.message ||
+                'Payment verification failed. Please contact devascentacademy@gmail.com with your Razorpay Payment ID: ' +
+                  response.razorpay_payment_id
+            );
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          },
+        },
+      };
+
+      const rzpInstance = new (window as any).Razorpay(options);
+      rzpInstance.on('payment.failed', function (resp: any) {
+        setIsProcessing(false);
+        alert(`Payment declined: ${resp.error?.description || 'Transaction failed. Please try another payment method.'}`);
       });
-
-      setIsProcessing(false);
-      setPaymentSuccess(true);
-
-      // Auto-redirect to enrolled courses
-      setTimeout(() => {
-        router.push('/enrolled-courses');
-      }, 2500);
+      rzpInstance.open();
     } catch (err: any) {
       setIsProcessing(false);
       console.error('Checkout error:', err);

@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CouponsService } from '../coupons/coupons.service';
+import { ReferralsService } from '../referrals/referrals.service';
 import { MailService } from '../../shared/mail.service';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class PaymentsService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private couponsService: CouponsService,
+    private referralsService: ReferralsService,
     private mailService: MailService,
   ) {}
 
@@ -150,76 +152,68 @@ export class PaymentsService {
       validatedCouponCode = valResult.code;
     }
 
-    const { keyId } = this.getRazorpayKeys();
-    const razorpayOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    const razorpayPaymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const { keyId, keySecret } = this.getRazorpayKeys();
+    let razorpayOrderId: string;
 
-    // Create Payment & Enrollment atomically inside transaction
-    const { payment, enrollment } = await this.prisma.$transaction(async (tx) => {
-      // Re-validate and atomically increment coupon usage inside transaction
-      if (validatedCouponCode) {
-        await this.couponsService.applyAndIncrementCouponInTx(
-          tx,
-          validatedCouponCode,
-          courseId,
-          originalAmountInPaise,
+    // 1. Call Razorpay API to generate live Order
+    if (keyId && keySecret && !keyId.includes('placeholder')) {
+      try {
+        const authHeader = 'Basic ' + Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+        const rzpRes = await fetch('https://api.razorpay.com/v1/orders', {
+          method: 'POST',
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: amountInPaise,
+            currency: 'INR',
+            receipt: `rcpt_${Date.now().toString().slice(-8)}_${Math.random().toString(36).substring(2, 6)}`,
+            notes: {
+              courseId,
+              courseSlug: course.slug,
+              courseTitle: course.title.substring(0, 40),
+              userId,
+              email: user.email,
+              coupon: validatedCouponCode || 'NONE',
+            },
+          }),
+        });
+
+        const rzpData = await rzpRes.json();
+        if (!rzpRes.ok || !rzpData.id) {
+          console.error('Razorpay API error response:', rzpData);
+          throw new BadRequestException(
+            rzpData.error?.description || 'Failed to initialize payment order with Razorpay.',
+          );
+        }
+        razorpayOrderId = rzpData.id;
+      } catch (err: any) {
+        if (err instanceof BadRequestException) throw err;
+        console.error('Razorpay Order creation error:', err);
+        throw new BadRequestException(
+          `Razorpay gateway communication failed: ${err.message || 'Could not connect to payment gateway.'}`,
         );
       }
+    } else {
+      razorpayOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    }
 
-      // Create Payment record
-      const p = await tx.payment.create({
-        data: {
-          userId,
-          courseId,
-          razorpayOrderId,
-          razorpayPaymentId,
-          razorpaySignature: 'test_demo_verified_signature',
-          amountInPaise,
-          currency: 'INR',
-          couponCode: validatedCouponCode,
-          couponId,
-          originalAmount: originalAmountInPaise,
-          discountApplied,
-          status: 'PAID',
-        },
-      });
-
-      // Create / activate Enrollment in Enrollment table
-      const e = await tx.enrollment.upsert({
-        where: {
-          userId_courseId: { userId, courseId },
-        },
-        update: {
-          status: 'ACTIVE',
-        },
-        create: {
-          userId,
-          courseId,
-          status: 'ACTIVE',
-          progressPct: 0,
-        },
-      });
-
-      // Decrement seats remaining
-      await tx.course.update({
-        where: { id: courseId },
-        data: {
-          seatsRemaining: { decrement: 1 },
-        },
-      });
-
-      return { payment: p, enrollment: e };
+    // 2. Create Payment record in PENDING status
+    await this.prisma.payment.create({
+      data: {
+        userId,
+        courseId,
+        razorpayOrderId,
+        amountInPaise,
+        currency: 'INR',
+        couponCode: validatedCouponCode,
+        couponId,
+        originalAmount: originalAmountInPaise,
+        discountApplied,
+        status: 'PENDING',
+      },
     });
-
-    // Send asynchronous branded enrollment email
-    this.mailService.sendEnrollmentEmail(
-      user.email,
-      user.name || 'Student',
-      course.title,
-      razorpayPaymentId || razorpayOrderId,
-      Math.round(amountInPaise / 100),
-      course.slug,
-    ).catch(() => {});
 
     // Generate authenticated JWT session token
     const token = this.jwtService.sign({
@@ -233,11 +227,12 @@ export class PaymentsService {
       success: true,
       token,
       razorpayOrderId,
-      razorpayPaymentId,
       razorpayKeyId: keyId,
       amountInPaise,
       currency: 'INR',
-      couponCode: couponCode || null,
+      couponCode: validatedCouponCode || null,
+      courseTitle: course.title,
+      courseSlug: course.slug,
       user: {
         id: user.id,
         email: user.email,
@@ -246,22 +241,17 @@ export class PaymentsService {
         college: user.college,
         phone: user.phone,
       },
-      enrollment: {
-        id: enrollment.id,
-        courseId: enrollment.courseId,
-        status: enrollment.status,
-      },
       prefill: {
         name: studentDetails?.name || user.name,
         email: user.email,
-        contact: studentDetails?.phone || user.phone || '9876543210',
+        contact: studentDetails?.phone || user.phone || '',
       },
       notes: {
         courseId,
         userId,
         courseTitle: course.title,
         university: studentDetails?.college || user.college || '',
-        couponCode: couponCode || 'NONE',
+        couponCode: validatedCouponCode || 'NONE',
       },
     };
   }
@@ -375,6 +365,35 @@ export class PaymentsService {
     const enrolledUser = await this.prisma.user.findUnique({
       where: { id: result.enrollment?.userId || '' },
     });
+
+    const course = await this.prisma.course.findUnique({
+      where: { id: result.updatedPayment.courseId },
+    });
+
+    // Send asynchronous branded enrollment confirmation email
+    if (enrolledUser && course) {
+      this.mailService
+        .sendEnrollmentEmail(
+          enrolledUser.email,
+          enrolledUser.name || 'Student',
+          course.title,
+          razorpayPaymentId || razorpayOrderId,
+          Math.round(result.updatedPayment.amountInPaise / 100),
+          course.slug,
+        )
+        .catch((err) => console.warn('Failed to dispatch enrollment email:', err));
+    }
+
+    // Process campus referral reward if coupon or referral code was applied
+    if (result.updatedPayment.couponCode && enrolledUser) {
+      this.referralsService
+        .recordReferralConversion(
+          result.updatedPayment.couponCode,
+          enrolledUser.id,
+          result.updatedPayment.courseId,
+        )
+        .catch((err) => console.warn('Referral conversion recording note:', err));
+    }
 
     const authToken = enrolledUser
       ? this.jwtService.sign({
