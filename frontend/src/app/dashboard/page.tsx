@@ -207,7 +207,7 @@ function DashboardContent() {
   const [showAddAchModal, setShowAddAchModal] = useState(false);
   const [newAch, setNewAch] = useState({ title: '', issuer: '', date: '', description: '', proofUrl: '' });
   const [showAddProjModal, setShowAddProjModal] = useState(false);
-  const [newProj, setNewProj] = useState({ title: '', description: '', liveDemoUrl: '', githubRepoUrl: '', techStack: '' });
+  const [newProj, setNewProj] = useState({ title: '', description: '', liveDemoUrl: '', githubRepoUrl: '', techStack: '', imageUrl: '' });
 
   const PRESET_AVATARS = [
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
@@ -3239,6 +3239,11 @@ function DashboardContent() {
                               className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/60 flex items-start justify-between gap-3"
                             >
                               <div className="space-y-1.5 flex-1">
+                                {proj.imageUrl && (
+                                  <div className="w-full h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900/60 mb-2">
+                                    <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover" />
+                                  </div>
+                                )}
                                 <h4 className="text-xs font-bold text-slate-900 dark:text-white">
                                   {proj.title}
                                 </h4>
@@ -3621,6 +3626,17 @@ function DashboardContent() {
                               className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono text-[11px]"
                             />
                           </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-bold mb-1">Project Screenshot / Cover Image URL</label>
+                            <input
+                              type="url"
+                              value={newProj.imageUrl}
+                              onChange={(e) => setNewProj({ ...newProj, imageUrl: e.target.value })}
+                              placeholder="https://images.unsplash.com/... or direct image link"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono text-[11px]"
+                            />
+                          </div>
                         </div>
 
                         <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
@@ -3648,9 +3664,10 @@ function DashboardContent() {
                                   techStack: tags,
                                   liveDemoUrl: newProj.liveDemoUrl.trim(),
                                   githubRepoUrl: newProj.githubRepoUrl.trim(),
+                                  imageUrl: newProj.imageUrl.trim() || undefined,
                                 },
                               ]);
-                              setNewProj({ title: '', description: '', liveDemoUrl: '', githubRepoUrl: '', techStack: '' });
+                              setNewProj({ title: '', description: '', liveDemoUrl: '', githubRepoUrl: '', techStack: '', imageUrl: '' });
                               setShowAddProjModal(false);
                             }}
                             className="px-5 py-2 text-xs font-bold text-slate-950 bg-teal-500 hover:bg-teal-400 rounded-xl transition-all shadow-md"

@@ -588,8 +588,19 @@ export default function PortfolioClient({ initialData, handle }: PortfolioClient
                 customProjects.map((p: any, idx: number) => (
                   <div
                     key={p.id || idx}
-                    className="p-6 rounded-3xl bg-[#0D1222] border border-slate-800 hover:border-teal-500/50 transition-all space-y-4 shadow-lg"
+                    className="p-6 rounded-3xl bg-[#0D1222] border border-slate-800 hover:border-teal-500/50 transition-all space-y-4 shadow-lg group"
                   >
+                    {p.imageUrl && (
+                      <div className="relative w-full h-44 sm:h-56 rounded-2xl overflow-hidden border border-slate-800/90 bg-slate-950 mb-2">
+                        <img
+                          src={p.imageUrl}
+                          alt={p.title}
+                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-teal-400">
