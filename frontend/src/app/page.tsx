@@ -257,18 +257,27 @@ export default function LandingPage() {
               </div>
 
               {/* Title */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12]">
-                Become a Full-Stack Web Developer.{' '}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15]">
+                Engineer Your Ascent.{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 dark:from-indigo-400 dark:via-purple-400 dark:to-cyan-400">
-                  Build &amp; Ship 4 Production Apps
-                </span>{' '}
-                in 6 Weeks.
+                  Build Beyond the Classroom.
+                </span>
               </h1>
 
-              {/* Description */}
-              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-                From BCA/BTech fundamentals to production Next.js 15, NestJS, Neon PostgreSQL, Docker, and Razorpay payment integration. Weekly live code reviews, verifiable credentials, and 100% money-back guarantee.
+              {/* Subtitle / Tagline */}
+              <p className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight">
+                From Academic Foundations to Industry-Ready Engineering.
               </p>
+
+              {/* Description */}
+              <div className="space-y-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+                <p>
+                  DevAscent Academy is a project-driven technology learning platform designed for aspiring engineers and technology professionals pursuing BCA, MCA, and B.Tech degrees. We bridge the gap between academic knowledge and industry expectations through hands-on virtual internships, real-world engineering projects, structured technical training, and expert-led code reviews.
+                </p>
+                <p>
+                  Go beyond theoretical learning. Master modern technologies like Next.js, NestJS, and PostgreSQL, develop production-oriented applications, and earn verifiable credentials while building a professional portfolio that demonstrates your skills, experience, and potential.
+                </p>
+              </div>
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
