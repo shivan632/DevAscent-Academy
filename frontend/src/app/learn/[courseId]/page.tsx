@@ -45,11 +45,21 @@ export default async function LearnCourseRedirectPage({ params }: PageProps) {
       } else {
         // 2. Otherwise find the first unlocked topic that is not yet completed
         const activeTopic = topics.find((t: any) => t.isUnlocked && !t.isCompleted);
-        const targetTopic = activeTopic || topics.find((t: any) => t.isUnlocked) || topics[0];
-        if (targetTopic) {
-          targetUrl = `/learn/${courseSlug}/topic/${targetTopic.id}`;
-        } else if (video1) {
-          targetUrl = `/learn/${courseSlug}/video/${video1.id}`;
+        if (activeTopic) {
+          targetUrl = `/learn/${courseSlug}/topic/${activeTopic.id}`;
+        } else if (data?.capstone?.isUnlocked && !data?.capstone?.isSubmitted) {
+          // If all topics completed and capstone not submitted yet, route to project guidelines
+          targetUrl = `/learn/${courseSlug}/project`;
+        } else if (data?.capstone?.isSubmitted) {
+          // If capstone is already submitted, route to submission status page
+          targetUrl = `/learn/${courseSlug}/complete`;
+        } else {
+          const targetTopic = topics.find((t: any) => t.isUnlocked) || topics[0];
+          if (targetTopic) {
+            targetUrl = `/learn/${courseSlug}/topic/${targetTopic.id}`;
+          } else if (video1) {
+            targetUrl = `/learn/${courseSlug}/video/${video1.id}`;
+          }
         }
       }
     }

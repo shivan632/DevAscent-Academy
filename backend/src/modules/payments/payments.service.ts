@@ -129,7 +129,7 @@ export class PaymentsService {
       },
     });
 
-    if (existingEnrollment && existingEnrollment.status === 'ACTIVE') {
+    if (existingEnrollment && (existingEnrollment.status === 'ACTIVE' || existingEnrollment.status === 'COMPLETED')) {
       throw new BadRequestException('You are already enrolled in this cohort.');
     }
 

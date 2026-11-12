@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import { api } from '../../../lib/api';
+import MasterCertificate from '../../../components/MasterCertificate';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -148,9 +149,35 @@ export default function CertificateVerificationPage() {
                   </div>
                 </div>
 
-                <span className="font-mono text-xs bg-black/20 px-3 py-1.5 rounded-lg border border-white/20 self-start sm:self-center">
-                  ID: {searchCode.toUpperCase()}
-                </span>
+                <div className="flex flex-col sm:items-end gap-1.5 self-start sm:self-center">
+                  <span className="font-mono text-xs bg-black/20 px-3 py-1 rounded-lg border border-white/20">
+                    ID: {searchCode.toUpperCase()}
+                  </span>
+                  <span className="text-[10px] font-bold text-emerald-100 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/15">
+                    Govt. MSME: UDYAM-UP-03-0165933
+                  </span>
+                </div>
+              </div>
+
+              {/* Live Rendered Master Certificate */}
+              <div className="p-4 sm:p-8 bg-slate-900/50 border-b border-slate-200">
+                <MasterCertificate
+                  studentName={certData.recipient?.name || 'Student Name'}
+                  courseTitle={certData.course?.title || 'Full-Stack Software Engineering'}
+                  duration={certData.course?.duration || '08 Weeks'}
+                  issueDate={
+                    certData.course?.completedAt
+                      ? new Date(certData.course.completedAt).toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })
+                      : 'October 1, 2026'
+                  }
+                  certId={searchCode.toUpperCase()}
+                  sha256Hash={certData.hash || 'e5370db083db47569c4fdb4f5110c2ac6cf8bb4f46e53525cd006c4993000a'}
+                  theme="ivory"
+                />
               </div>
 
               {/* Credential Details */}

@@ -345,7 +345,7 @@ export default function LearnSidebar({
           );
         })}
 
-        {/* ─── WEB DEVELOPMENT PROJECT PDF LINK (ABOVE CAPSTONE) ─── */}
+        {/* ─── PROJECT SPECIFICATION SECTION ─── */}
         <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
           <div className="px-2 flex items-center justify-between">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${capstone?.isUnlocked ? 'text-cyan-400/90' : 'text-slate-500'}`}>
@@ -361,11 +361,14 @@ export default function LearnSidebar({
           </div>
 
           {capstone?.isUnlocked ? (
-            <a
-              href={capstone?.exercisePdfUrl || 'https://drive.google.com/file/d/1dtrV7i90kKfAumqe0kLSfgYdYFJmevbk/preview'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center justify-between p-2.5 rounded-xl border border-cyan-500/20 bg-gradient-to-r from-cyan-950/40 to-blue-950/30 hover:from-cyan-900/40 hover:to-blue-900/40 hover:border-cyan-500/40 text-slate-200 hover:text-cyan-200 transition-all shadow-sm shadow-cyan-950/20"
+            <Link
+              href={`/learn/${courseSlug}/project`}
+              onClick={onCloseMobile}
+              className={`group flex items-center justify-between p-2.5 rounded-xl border transition-all ${
+                currentPath.includes('/project')
+                  ? 'bg-cyan-500/15 border-cyan-500/50 text-white font-semibold shadow-sm ring-1 ring-cyan-500/30'
+                  : 'bg-slate-900/60 border-slate-800 hover:bg-slate-850 hover:border-slate-700 text-slate-300'
+              }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -373,15 +376,15 @@ export default function LearnSidebar({
                 </div>
                 <div className="min-w-0 flex flex-col">
                   <span className="text-xs font-semibold truncate text-cyan-100 group-hover:text-white">
-                    Web Development Project
+                    {course?.title ? `${course.title} Project` : 'Capstone Project'}
                   </span>
                   <span className="text-[10px] text-slate-400 group-hover:text-cyan-300/80 truncate">
-                    View PDF Guidelines
+                    View Specifications & PDF
                   </span>
                 </div>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-cyan-400/70 group-hover:text-cyan-300 shrink-0 ml-1 group-hover:translate-x-0.5 transition-transform" />
-            </a>
+              <ChevronRight className="w-3.5 h-3.5 text-cyan-400/70 group-hover:text-cyan-300 shrink-0 ml-1 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           ) : (
             <div
               className="flex items-center justify-between p-2.5 rounded-xl border border-slate-900 bg-slate-950/40 text-slate-600 opacity-60 cursor-not-allowed select-none"
@@ -393,7 +396,7 @@ export default function LearnSidebar({
                 </div>
                 <div className="min-w-0 flex flex-col">
                   <span className="text-xs font-medium truncate text-slate-500">
-                    Web Development Project
+                    {course?.title ? `${course.title} Project` : 'Capstone Project'}
                   </span>
                   <span className="text-[10px] text-slate-600 truncate">
                     Locked — Complete all topics & quizzes
@@ -413,14 +416,14 @@ export default function LearnSidebar({
             </span>
           </div>
 
-          {/* Capstone Project Guidelines Link */}
+          {/* Submit Capstone Link */}
           {capstone?.isUnlocked ? (
             <Link
-              href={capstone.url}
+              href={`/learn/${courseSlug}/complete`}
               onClick={onCloseMobile}
               className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
-                currentPath.includes('/project')
-                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-200 font-semibold'
+                currentPath.includes('/complete') || currentPath.includes('/submit')
+                  ? 'bg-amber-500/15 border-amber-500/50 text-white font-semibold ring-1 ring-amber-500/30'
                   : 'bg-slate-900/60 border-slate-800 hover:bg-slate-850 hover:border-slate-700 text-slate-300'
               }`}
             >
@@ -428,11 +431,17 @@ export default function LearnSidebar({
                 <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
                   <Award className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-medium truncate">Capstone Project</span>
+                <span className="text-xs font-medium truncate">Submit Capstone Form</span>
               </div>
-              <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                Ready
-              </span>
+              {capstone.isSubmitted ? (
+                <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                  {capstone.submissionStatus === 'APPROVED' ? '✅ Approved' : '⏳ Submitted'}
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                  Ready
+                </span>
+              )}
             </Link>
           ) : (
             <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-900 bg-slate-950/40 text-slate-600 opacity-60">
@@ -440,40 +449,11 @@ export default function LearnSidebar({
                 <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center shrink-0 text-slate-600 border border-slate-800/60">
                   <Lock className="w-3.5 h-3.5" />
                 </div>
-                <span className="text-xs font-medium truncate">Capstone Project</span>
+                <span className="text-xs font-medium truncate">Submit Capstone Form</span>
               </div>
               <span className="text-[10px] text-slate-600">🔒</span>
             </div>
           )}
-
-          {/* Submit Capstone Link */}
-          {capstone?.isUnlocked ? (
-            <Link
-              href={capstone.submitUrl}
-              onClick={onCloseMobile}
-              className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
-                currentPath.includes('/submit')
-                  ? 'bg-violet-500/15 border-violet-500/40 text-violet-200 font-semibold'
-                  : 'bg-slate-900/60 border-slate-800 hover:bg-slate-850 hover:border-slate-700 text-slate-300'
-              }`}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-lg bg-violet-500/20 text-violet-400 border border-violet-500/30 flex items-center justify-center shrink-0">
-                  <Send className="w-3.5 h-3.5" />
-                </div>
-                <span className="text-xs font-medium truncate">Submit Capstone</span>
-              </div>
-              {capstone.isSubmitted ? (
-                <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                  {capstone.submissionStatus === 'APPROVED' ? '✅ Approved' : '⏳ Submitted'}
-                </span>
-              ) : (
-                <span className="text-[10px] font-medium text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded-md">
-                  Submit
-                </span>
-              )}
-            </Link>
-          ) : null}
 
           {/* Verified Certificate Link */}
           {capstone?.isEligibleForCertificate ? (

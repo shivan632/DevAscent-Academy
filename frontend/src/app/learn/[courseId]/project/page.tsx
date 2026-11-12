@@ -403,10 +403,10 @@ export default function CapstoneProjectPage() {
 
           {isUnlocked ? (
             <Link
-              href={`/learn/${courseSlug}/submit`}
+              href={`/learn/${courseSlug}/complete`}
               className="inline-flex items-center gap-2 px-6 sm:px-8 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98]"
             >
-              <span>Submit Capstone Project</span>
+              <span>Proceed to Capstone Submission</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           ) : (

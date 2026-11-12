@@ -13,6 +13,10 @@ const PDFDocument = require('pdfkit');
 export class PdfService {
   private getLogoPath(): string | null {
     const candidates = [
+      path.resolve(__dirname, '../../assets/logo-bkd-removed.png'),
+      path.resolve(__dirname, '../assets/logo-bkd-removed.png'),
+      path.resolve(process.cwd(), 'assets/logo-bkd-removed.png'),
+      path.resolve(process.cwd(), 'backend/assets/logo-bkd-removed.png'),
       path.resolve(__dirname, '../../assets/logo.png'),
       path.resolve(__dirname, '../assets/logo.png'),
       path.resolve(process.cwd(), 'assets/logo.png'),
@@ -210,17 +214,19 @@ export class PdfService {
         .text('DEVASCENT ACADEMY', 0, 75, { align: 'center', characterSpacing: 3 });
 
       doc.fontSize(7).font('Helvetica-Bold').fillColor('#38BDF8')
-        .text('ACCREDITED TECHNOLOGY ENGINEERING BOARD', 0, 91, { align: 'center', characterSpacing: 1.8 });
+        .text('MSME RECOGNIZED • REG NO: UDYAM-UP-03-0165933 • GOVT. OF INDIA', 0, 91, { align: 'center', characterSpacing: 1.5 });
 
       // 7. Certificate Heading
-      doc.fontSize(20).font('Helvetica-Bold').fillColor('#FFFFFF')
-        .text('CERTIFICATE OF ACHIEVEMENT', 0, 106, { align: 'center', characterSpacing: 1.8 });
+      doc.fontSize(19).font('Helvetica-Bold').fillColor('#FFFFFF')
+        .text('CERTIFICATE OF INTERNSHIP', 0, 105, { align: 'center', characterSpacing: 1.8 });
+      doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#E5C07B')
+        .text('& TECHNICAL EXCELLENCE', 0, 123, { align: 'center', characterSpacing: 1.5 });
 
       // Decorative Line with "THIS IS PROUDLY PRESENTED TO"
-      doc.moveTo(W / 2 - 165, 133).lineTo(W / 2 - 100, 133).lineWidth(0.8).strokeColor('#D4AF37').stroke();
-      doc.fontSize(8).font('Helvetica-Bold').fillColor('#94A3B8')
-        .text('THIS IS PROUDLY PRESENTED TO', 0, 129, { align: 'center', characterSpacing: 2 });
-      doc.moveTo(W / 2 + 100, 133).lineTo(W / 2 + 165, 133).lineWidth(0.8).strokeColor('#D4AF37').stroke();
+      doc.moveTo(W / 2 - 165, 137).lineTo(W / 2 - 100, 137).lineWidth(0.8).strokeColor('#D4AF37').stroke();
+      doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#94A3B8')
+        .text('THIS IS PROUDLY PRESENTED TO', 0, 134, { align: 'center', characterSpacing: 2 });
+      doc.moveTo(W / 2 + 100, 137).lineTo(W / 2 + 165, 137).lineWidth(0.8).strokeColor('#D4AF37').stroke();
 
       // 8. Large Recipient Name (Centerpiece)
       doc.fontSize(32).font('Helvetica-Bold').fillColor('#F8FAFC')
@@ -283,7 +289,7 @@ export class PdfService {
         .text(`Credential ID: ${details.certId}`, metaX, qrY + 17);
 
       doc.fontSize(6.5).font('Helvetica').fillColor('#64748B')
-        .text('Security: SHA-256 Public Ledger Immutable Record', metaX, qrY + 31);
+        .text('Security: SHA-256 Public Ledger • MSME: UDYAM-UP-03-0165933', metaX, qrY + 31);
 
       doc.fontSize(7).font('Helvetica').fillColor('#38BDF8')
         .text(`Verify: ${verifyUrl}`, metaX, qrY + 44, { link: verifyUrl, width: 230 });

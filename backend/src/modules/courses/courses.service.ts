@@ -337,7 +337,7 @@ export class CoursesService {
       enrollment,
       application,
       submission,
-      isEnrolled: !!enrollment && enrollment.status === 'ACTIVE',
+      isEnrolled: !!enrollment && (enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED'),
     };
   }
 
@@ -512,7 +512,7 @@ export class CoursesService {
       ]);
 
       enrollment = enr;
-      isEnrolled = !!enrollment && enrollment.status === 'ACTIVE';
+      isEnrolled = !!enrollment && (enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED');
       currentUser = userDoc;
       submission = subDoc;
 
@@ -621,17 +621,19 @@ export class CoursesService {
     const v2Watched = video2 ? watchedAiVideoIds.has(video2.id) : true;
     const v3Watched = video3 ? watchedAiVideoIds.has(video3.id) : true;
 
+    const isCourseCompleted = enrollment?.status === 'COMPLETED';
+
     // Check module 1 completion (topics 1..5)
     const mod1Topics = processedTopics.filter((t) => t.moduleNumber === 1 || (t.globalSeq >= 1 && t.globalSeq <= 5));
-    const mod1Complete = mod1Topics.length > 0 && mod1Topics.every((t) => t.isCompleted && t.quizPassed);
+    const mod1Complete = isCourseCompleted || (mod1Topics.length > 0 && mod1Topics.every((t) => t.isCompleted && t.quizPassed));
 
     // Check module 2 completion (topics 6..10)
     const mod2Topics = processedTopics.filter((t) => t.moduleNumber === 2 || (t.globalSeq >= 6 && t.globalSeq <= 10));
-    const mod2Complete = mod1Complete && mod2Topics.length > 0 && mod2Topics.every((t) => t.isCompleted && t.quizPassed);
+    const mod2Complete = isCourseCompleted || (mod1Complete && mod2Topics.length > 0 && mod2Topics.every((t) => t.isCompleted && t.quizPassed));
 
     // Check module 3 completion (topics 11..15)
     const mod3Topics = processedTopics.filter((t) => t.moduleNumber === 3 || t.globalSeq >= 11);
-    const mod3Complete = mod2Complete && mod3Topics.length > 0 && mod3Topics.every((t) => t.isCompleted && t.quizPassed);
+    const mod3Complete = isCourseCompleted || (mod2Complete && mod3Topics.length > 0 && mod3Topics.every((t) => t.isCompleted && t.quizPassed));
 
     const aiVideosWithStatus = course.aiVideos.map((v) => {
       const isWatched = watchedAiVideoIds.has(v.id);
@@ -643,7 +645,10 @@ export class CoursesService {
         isUnlocked = v.order === 1;
         if (!isUnlocked) lockReason = 'Enroll in the course to unlock';
       } else {
-        if (v.order === 1) {
+        if (isCourseCompleted || isWatched) {
+          isUnlocked = true;
+          targetTopicSeq = v.order === 1 ? 1 : v.order === 2 ? 6 : 11;
+        } else if (v.order === 1) {
           isUnlocked = true;
           targetTopicSeq = 1;
         } else if (v.order === 2) {
@@ -687,7 +692,10 @@ export class CoursesService {
         isUnlocked = t.isFreePreview;
         if (!isUnlocked) lockReason = 'Enroll to access this lesson';
       } else {
-        if (t.globalSeq === 1) {
+        // PERMANENT UNLOCK: Any completed topic or course completion remains permanently unlocked for future study
+        if (isCourseCompleted || t.isCompleted) {
+          isUnlocked = true;
+        } else if (t.globalSeq === 1) {
           // Unlocks after Video 1 is watched
           if (video1 && !v1Watched) {
             isUnlocked = false;
@@ -742,8 +750,8 @@ export class CoursesService {
         }
       }
 
-      // Quiz unlocks strictly after its topic is completed
-      const quizUnlocked = isUnlocked && t.isCompleted;
+      // Quiz unlocks after topic completed OR if already passed/attempted OR if course completed
+      const quizUnlocked = isEnrolled && (isUnlocked && (t.isCompleted || t.quiz?.isPassed || (t.quiz && t.quiz.attemptsCount > 0) || isCourseCompleted));
       const quizTotalQ = t.quiz?.questionCount || 6;
       let quizScoreDisplay = '';
 
@@ -779,7 +787,10 @@ export class CoursesService {
     const completedTopicsCount = topicsWithStatus.filter((t) => t.isCompleted).length;
     const passedQuizzesCount = topicsWithStatus.filter((t) => t.quiz?.isPassed).length;
     const allTopicsPassed = totalTopicsCount > 0 && topicsWithStatus.every((t) => t.isCompleted && (t.quiz ? t.quiz.isPassed : true));
-    const isCapstoneUnlocked = isEnrolled && allTopicsPassed;
+    const isCapstoneUnlocked = isEnrolled && (allTopicsPassed || isCourseCompleted);
+
+    const projectPdfUrl = course.projectPdfUrl || 'https://drive.google.com/file/d/1dtrV7i90kKfAumqe0kLSfgYdYFJmevbk/preview';
+    const projectPdfTitle = course.projectPdfTitle || `${course.title} Project Guidelines`;
 
     const capstoneData = {
       isUnlocked: isCapstoneUnlocked,
@@ -789,8 +800,11 @@ export class CoursesService {
       submission: submission || null,
       isEligibleForCertificate: !!submission && submission.status === 'APPROVED',
       url: `/learn/${course.slug}/project`,
-      submitUrl: `/learn/${course.slug}/submit`,
-      exercisePdfUrl: 'https://drive.google.com/file/d/1dtrV7i90kKfAumqe0kLSfgYdYFJmevbk/preview',
+      submitUrl: `/learn/${course.slug}/complete`,
+      exercisePdfUrl: projectPdfUrl,
+      exercisePdfTitle: projectPdfTitle,
+      projectPdfUrl,
+      projectPdfTitle,
     };
 
     // Calculate Progress %
@@ -842,7 +856,7 @@ export class CoursesService {
     linearChain.push({
       type: 'project',
       id: 'capstone-project',
-      title: 'Capstone Project Guidelines',
+      title: projectPdfTitle,
       url: `/learn/${course.slug}/project`,
       isUnlocked: isCapstoneUnlocked,
     });
@@ -851,7 +865,7 @@ export class CoursesService {
       type: 'submit',
       id: 'capstone-submit',
       title: 'Submit Capstone & Claim Certificate',
-      url: `/learn/${course.slug}/submit`,
+      url: `/learn/${course.slug}/complete`,
       isUnlocked: isCapstoneUnlocked,
     });
 
@@ -1110,7 +1124,7 @@ export class CoursesService {
     }
 
     const maxAttempts = quizDoc.maxAttempts || 3;
-    const isUnlocked = topicItem ? topicItem.isCompleted : false;
+    const isUnlocked = curriculum.isEnrolled && (topicItem ? (topicItem.isCompleted || isPassed || curriculum.capstone?.isUnlocked || false) : false);
     const remainingAttempts = Math.max(0, maxAttempts - attemptsCount);
 
     return {
