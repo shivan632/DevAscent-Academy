@@ -96,7 +96,7 @@ export class PdfService {
     startedAt?: string;
     completedAt?: string;
   }): Promise<Buffer> {
-    // Format issue / completed date nicely (e.g. "15 March 2026")
+    // Format issue / completed date nicely (e.g. "12 November 2026")
     let formattedCompletedDate = details.completedAt || details.issuedAt;
     let formattedStartedDate = details.startedAt || '';
     try {
@@ -107,9 +107,9 @@ export class PdfService {
           month: 'long',
           year: 'numeric',
         });
-        // Default start date to 8 weeks prior if not explicitly provided
+        // Default start date to 4 weeks (28 days) prior if not explicitly provided
         if (!formattedStartedDate) {
-          const startDateObj = new Date(d.getTime() - 56 * 24 * 60 * 60 * 1000);
+          const startDateObj = new Date(d.getTime() - 28 * 24 * 60 * 60 * 1000);
           formattedStartedDate = startDateObj.toLocaleDateString('en-GB', {
             day: 'numeric',
             month: 'long',
@@ -122,13 +122,13 @@ export class PdfService {
     }
 
     if (!formattedStartedDate) {
-      formattedStartedDate = '15 January 2026';
+      formattedStartedDate = '17 September 2026';
     }
     if (!formattedCompletedDate) {
-      formattedCompletedDate = '15 March 2026';
+      formattedCompletedDate = '12 November 2026';
     }
 
-    const durationText = details.duration || '08 Weeks';
+    const durationText = details.duration || '4-Week / 40-Hour';
     const verifyUrl = details.verifyUrl
       ? details.verifyUrl.replace('https://www.devascentacademy.me', 'https://dev-ascent-academy.vercel.app')
       : `https://dev-ascent-academy.vercel.app/verify/${details.certId}`;
@@ -172,7 +172,7 @@ export class PdfService {
         const scaleX = W / 1024;
         const scaleY = H / 764;
 
-        // 1. Draw Master Ivory & Gold Filigree Base Template
+        // 1. Draw Master Ivory & Gold Filigree Base Template (lowest z-index)
         doc.image(templatePath, 0, 0, { width: W, height: H });
 
         // 2. Dynamic Credential ID in top-left blue badge
@@ -182,29 +182,43 @@ export class PdfService {
         doc.fontSize(8.5).font('Helvetica-Bold').fillColor('#1E3A8A')
           .text(details.certId, badgeX, badgeY, { width: badgeW, align: 'center', characterSpacing: 0.5 });
 
-        // 3. Dynamic Student Recipient Name (Centerpiece)
-        const nameY = 328 * scaleY;
+        // 3. Main Title: CERTIFICATE OF COMPLETION & TECHNICAL EXCELLENCE
+        const titleY1 = 168 * scaleY;
+        doc.fontSize(25).font('Times-Bold').fillColor('#0F172A')
+          .text('CERTIFICATE OF COMPLETION', 0, titleY1, { width: W, align: 'center', characterSpacing: 1.5 });
+
+        const titleY2 = 212 * scaleY;
+        doc.fontSize(12.5).font('Times-Bold').fillColor('#0F172A')
+          .text('& TECHNICAL EXCELLENCE', 0, titleY2, { width: W, align: 'center', characterSpacing: 1.2 });
+
+        // 4. "Presented To" Section
+        const presY = 274 * scaleY;
+        doc.fontSize(11).font('Times-Roman').fillColor('#475569')
+          .text('This certificate is proudly presented to', 0, presY, { width: W, align: 'center' });
+
+        // 5. Dynamic Student Recipient Name (Centerpiece)
+        const nameY = 326 * scaleY;
         doc.fontSize(38).font('Times-BoldItalic').fillColor('#0F172A')
           .text(details.recipientName, 0, nameY, { width: W, align: 'center' });
 
-        // 4. Citation Narrative
-        const citY = 444 * scaleY;
-        doc.fontSize(12).font('Times-Roman').fillColor('#1E293B')
-          .text(`for successfully completing an intensive ${durationText} Virtual Internship in`, 0, citY, { width: W, align: 'center' });
+        // 6. Dynamic Citation Narrative (The New Attractive Message)
+        const citY = 442 * scaleY;
+        doc.fontSize(11.5).font('Times-Roman').fillColor('#1E293B')
+          .text(`for successfully completing the rigorous ${durationText} production engineering curriculum in the`, 0, citY, { width: W, align: 'center' });
 
         doc.fontSize(14).font('Times-Bold').fillColor('#0F172A')
-          .text(`${details.courseTitle} at DevAscent Academy`, 0, citY + 16, { width: W, align: 'center' });
+          .text(`${details.courseTitle}`, 0, citY + 17, { width: W, align: 'center' });
 
-        doc.fontSize(12).font('Times-Roman').fillColor('#1E293B')
-          .text(`from ${formattedStartedDate} to ${formattedCompletedDate}.`, 0, citY + 33, { width: W, align: 'center' });
+        doc.fontSize(10.5).font('Times-Roman').fillColor('#1E293B')
+          .text(`at DevAscent Academy, demonstrating exceptional technical competency and project execution from ${formattedStartedDate} to ${formattedCompletedDate}.`, 0, citY + 34, { width: W, align: 'center' });
 
-        // 5. Dynamic QR Code in Pillar 1
+        // 7. Dynamic QR Code in Pillar 1
         const qrX = 136 * scaleX;
         const qrY = 546 * scaleY;
         const qrSize = 108 * scaleX;
         doc.image(qrBuffer, qrX, qrY, { width: qrSize, height: qrSize });
 
-        // 6. Authentic Signature in Pillar 4
+        // 8. Authentic Signature in Pillar 4
         if (signaturePath && fs.existsSync(signaturePath)) {
           const sigX = 755 * scaleX;
           const sigY = 552 * scaleY;
@@ -238,16 +252,16 @@ export class PdfService {
           doc.image(logoPath, W - 210, 32, { width: 36 });
         }
         doc.fontSize(13).font('Times-Bold').fillColor('#0F172A').text('DevAscent Academy', W - 165, 34);
-        doc.fontSize(7.5).font('Helvetica').fillColor('#64748B').text('Internships & Technical Board', W - 165, 50);
+        doc.fontSize(7.5).font('Helvetica').fillColor('#64748B').text('Courses & Technical Board', W - 165, 50);
 
         // Titles
-        doc.fontSize(22).font('Times-Bold').fillColor('#0F172A')
-          .text('CERTIFICATE OF INTERNSHIP', 0, 105, { align: 'center', characterSpacing: 1.5 });
-        doc.fontSize(10).font('Times-Bold').fillColor('#B8860B')
+        doc.fontSize(23).font('Times-Bold').fillColor('#0F172A')
+          .text('CERTIFICATE OF COMPLETION', 0, 105, { align: 'center', characterSpacing: 1.5 });
+        doc.fontSize(11).font('Times-Bold').fillColor('#0F172A')
           .text('& TECHNICAL EXCELLENCE', 0, 132, { align: 'center', characterSpacing: 1.2 });
 
-        doc.fontSize(9).font('Times-Roman').fillColor('#64748B')
-          .text('This is proudly presented to', 0, 160, { align: 'center' });
+        doc.fontSize(10).font('Times-Roman').fillColor('#475569')
+          .text('This certificate is proudly presented to', 0, 160, { align: 'center' });
 
         // Student Name
         doc.fontSize(36).font('Times-BoldItalic').fillColor('#0F172A')
@@ -257,12 +271,12 @@ export class PdfService {
         doc.moveTo(W / 2 - 120, 235).lineTo(W / 2 + 120, 235).lineWidth(1.2).strokeColor('#C5A059').stroke();
 
         // Citation
-        doc.fontSize(12).font('Times-Roman').fillColor('#1E293B')
-          .text(`for successfully completing an intensive ${durationText} Virtual Internship in`, 0, 255, { align: 'center' });
+        doc.fontSize(11.5).font('Times-Roman').fillColor('#1E293B')
+          .text(`for successfully completing the rigorous ${durationText} production engineering curriculum in the`, 0, 255, { align: 'center' });
         doc.fontSize(14).font('Times-Bold').fillColor('#0F172A')
-          .text(`${details.courseTitle} at DevAscent Academy`, 0, 273, { align: 'center' });
-        doc.fontSize(12).font('Times-Roman').fillColor('#1E293B')
-          .text(`from ${formattedStartedDate} to ${formattedCompletedDate}.`, 0, 292, { align: 'center' });
+          .text(`${details.courseTitle}`, 0, 273, { align: 'center' });
+        doc.fontSize(10.5).font('Times-Roman').fillColor('#1E293B')
+          .text(`at DevAscent Academy, demonstrating exceptional technical competency and project execution from ${formattedStartedDate} to ${formattedCompletedDate}.`, 0, 292, { align: 'center' });
 
         // 4 Pillars Footer
         const footY = H - 150;

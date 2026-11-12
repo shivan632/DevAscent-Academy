@@ -120,7 +120,7 @@ export default function MasterCertificate({
               DevAscent <span className="text-indigo-600 dark:text-indigo-400">Academy</span>
             </span>
             <span className="text-[9px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
-              Internships &amp; Technical Board
+              Courses &amp; Technical Board
             </span>
           </div>
         </div>
@@ -134,10 +134,10 @@ export default function MasterCertificate({
 
         {/* Title */}
         <h1
-          className="font-serif text-2xl sm:text-4xl md:text-5xl font-black tracking-wide text-slate-900 dark:text-white mt-1 drop-shadow-sm"
+          className="font-serif text-2xl sm:text-4xl md:5xl font-black tracking-wide text-slate-900 dark:text-white mt-1 drop-shadow-sm"
           style={{ fontFamily: "'Cinzel', 'Times New Roman', Georgia, serif" }}
         >
-          Certificate of Internship
+          Certificate of Completion
         </h1>
 
         <p className="text-[11px] sm:text-xs font-sans uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400 mt-0.5">
@@ -152,7 +152,7 @@ export default function MasterCertificate({
         </div>
 
         <p className="text-[10px] sm:text-xs font-sans tracking-[0.2em] uppercase text-slate-500 dark:text-slate-400">
-          This is proudly presented to
+          This certificate is proudly presented to
         </p>
 
         {/* Recipient Student Name */}
@@ -168,12 +168,9 @@ export default function MasterCertificate({
 
         {/* Citation Narrative */}
         <p className="max-w-2xl mx-auto text-xs sm:text-[13px] md:text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-sans mt-2">
-          for successfully completing an intensive <strong className="text-slate-900 dark:text-white font-bold">{duration}</strong> Virtual Internship in{' '}
+          for successfully completing the rigorous <strong className="text-slate-900 dark:text-white font-bold">{duration}</strong> production engineering curriculum in the{' '}
           <strong className="text-indigo-700 dark:text-indigo-400 font-bold">{courseTitle}</strong> at{' '}
-          <strong className="text-slate-900 dark:text-white">DevAscent Academy</strong> from {startDate} to {endDate}.
-        </p>
-        <p className="max-w-2xl mx-auto text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-sans mt-1">
-          The candidate demonstrated exemplary technical competency in production architectures, distributed systems, and capstone repository delivery.
+          <strong className="text-slate-900 dark:text-white">DevAscent Academy</strong>, demonstrating exceptional technical competency and project execution from {startDate} to {endDate}.
         </p>
       </div>
 
