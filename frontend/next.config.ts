@@ -31,12 +31,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    const atsBackend = (process.env.NEXT_PUBLIC_ATS_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
     return [
-      {
-        source: '/api/ats/:path*',
-        destination: `${atsBackend}/:path*`,
-      },
       {
         source: '/@:username',
         destination: '/u/:username',
