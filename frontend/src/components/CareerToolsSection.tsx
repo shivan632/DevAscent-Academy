@@ -43,7 +43,9 @@ export default function CareerToolsSection() {
     }
   };
 
-  const atsBaseUrl = (process.env.NEXT_PUBLIC_ATS_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+  const atsBaseUrl = process.env.NEXT_PUBLIC_ATS_API_URL && !process.env.NEXT_PUBLIC_ATS_API_URL.includes('localhost')
+    ? process.env.NEXT_PUBLIC_ATS_API_URL.replace(/\/$/, '')
+    : '/api/ats';
 
   const handleScan = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +80,11 @@ export default function CareerToolsSection() {
           throw new Error(json.detail || 'Could not parse resume results.');
         }
       } catch (err: any) {
-        setError(err.message || 'ATS scan failed. Please verify your connection.');
+        if (err.name === 'TypeError' || err.message === 'Failed to fetch') {
+          setError('ATS scoring engine is unreachable on port 8000. Start it by running: cd python && python main.py');
+        } else {
+          setError(err.message || 'ATS scan failed. Please verify your connection.');
+        }
       } finally {
         setLoading(false);
       }
@@ -109,7 +115,11 @@ export default function CareerToolsSection() {
           throw new Error(json.detail || 'Could not parse resume results.');
         }
       } catch (err: any) {
-        setError(err.message || 'ATS scan failed. Please try again.');
+        if (err.name === 'TypeError' || err.message === 'Failed to fetch') {
+          setError('ATS scoring engine is unreachable on port 8000. Start it by running: cd python && python main.py');
+        } else {
+          setError(err.message || 'ATS scan failed. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
