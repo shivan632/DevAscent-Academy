@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: devascent-ats-engine
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.5
+    healthCheckPath: /

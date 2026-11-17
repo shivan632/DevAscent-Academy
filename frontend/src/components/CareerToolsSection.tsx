@@ -43,6 +43,8 @@ export default function CareerToolsSection() {
     }
   };
 
+  const atsBaseUrl = (process.env.NEXT_PUBLIC_ATS_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+
   const handleScan = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -59,14 +61,14 @@ export default function CareerToolsSection() {
         formData.append('file', selectedFile);
         formData.append('target_role', targetRole);
 
-        const res = await fetch('http://localhost:8000/upload', {
+        const res = await fetch(`${atsBaseUrl}/upload`, {
           method: 'POST',
           body: formData,
         });
 
         if (!res.ok) {
           const errJson = await res.json().catch(() => null);
-          throw new Error(errJson?.detail || 'ATS service unreachable. Make sure the Python service is running on port 8000.');
+          throw new Error(errJson?.detail || 'ATS service unreachable. Make sure the Python service is running.');
         }
 
         const json = await res.json();
@@ -87,7 +89,7 @@ export default function CareerToolsSection() {
       }
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:8000/score', {
+        const res = await fetch(`${atsBaseUrl}/score`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

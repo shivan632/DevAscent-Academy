@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CacheService } from '../../shared/cache.service';
+import { CertificatesService } from '../certificates/certificates.service';
 
 function validateDriveUrl(url: string | null | undefined, fieldName = 'Lesson / PDF URL'): string | null {
   if (!url || !url.trim()) return null;
@@ -41,6 +42,7 @@ export class AdminService {
   constructor(
     private prisma: PrismaService,
     private cacheService: CacheService,
+    private certificatesService: CertificatesService,
   ) {}
 
   private async purgeCourseCache() {
@@ -838,6 +840,17 @@ export class AdminService {
       }),
     ]);
 
+    // Automatically issue verifiable certificate & dispatch confirmation email
+    try {
+      await this.certificatesService.issueAndEmailCertificate(
+        submission.userId,
+        submission.courseId,
+        'Distinction (A+)',
+      );
+    } catch (certErr: any) {
+      console.warn(`[AdminService] Automatic certificate issuance note for user ${submission.userId}: ${certErr?.message}`);
+    }
+
     return { success: true };
   }
 
@@ -876,6 +889,11 @@ export class AdminService {
   }
 
   async bulkApproveSubmissions(adminId: string, submissionIds: string[]) {
+    const submissions = await this.prisma.completionSubmission.findMany({
+      where: { id: { in: submissionIds }, status: 'PENDING' },
+      select: { userId: true, courseId: true },
+    });
+
     await this.prisma.$transaction([
       this.prisma.completionSubmission.updateMany({
         where: { id: { in: submissionIds }, status: 'PENDING' },
@@ -890,6 +908,20 @@ export class AdminService {
         },
       }),
     ]);
+
+    // Automatically issue certificates for all bulk approved students
+    for (const sub of submissions) {
+      try {
+        await this.certificatesService.issueAndEmailCertificate(
+          sub.userId,
+          sub.courseId,
+          'Distinction (A+)',
+        );
+      } catch (err: any) {
+        console.warn(`[AdminService] Bulk certificate issuance note for user ${sub.userId}: ${err?.message}`);
+      }
+    }
+
     return { success: true, count: submissionIds.length };
   }
 
