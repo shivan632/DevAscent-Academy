@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CourseJourney from '../components/CourseJourney';
+import CareerToolsSection from '../components/CareerToolsSection';
 import { useAuthStore } from '../lib/store/authStore';
 import {
   Rocket,
@@ -628,6 +630,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ─── Feature 1: Course Journey Timeline (8-Step Roadmap) ─── */}
+      <CourseJourney />
 
       {/* 4 Capstone Projects Showcase (Section 1: Production Portfolio) */}
       <section id="portfolio" className="py-20 bg-white dark:bg-[#090d16] border-y border-slate-200/80 dark:border-slate-800">
@@ -1373,6 +1378,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ─── Feature 2: Free ATS Checker & Diagnostic Section ─── */}
+      <CareerToolsSection />
 
       {/* FAQ Accordion (Section 4: Frequently Asked Questions) */}
       <section id="faqs" className="py-20 bg-white dark:bg-[#090d16] border-t border-slate-200/80 dark:border-slate-800">

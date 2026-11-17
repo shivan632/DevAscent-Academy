@@ -325,7 +325,20 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* 5. About Page Link */}
+              {/* 5. ATS Checker */}
+              <Link
+                href="/ats-checker"
+                className={`text-xs xl:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 py-1.5 px-3 rounded-xl ${
+                  isActive('/ats-checker') || isActive('/career-tools')
+                    ? 'text-cyan-600 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/70 border border-cyan-200/60 dark:border-cyan-500/30 font-semibold shadow-[0_0_12px_rgba(6,182,212,0.15)]'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <span>ATS Checker</span>
+              </Link>
+
+              {/* 6. About Page Link */}
               <Link
                 href="/about"
                 className={`text-xs xl:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 py-1.5 px-3 rounded-xl ${
@@ -602,6 +615,15 @@ export default function Navbar() {
                   >
                     <HelpCircle className="w-4 h-4 text-amber-500" />
                     <span>⭕ Help &amp; Support Desk</span>
+                  </Link>
+
+                  <Link
+                    href="/ats-checker"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/40"
+                  >
+                    <Sparkles className="w-4 h-4 text-cyan-400" />
+                    <span>⚡ ATS Checker (Free)</span>
                   </Link>
 
                   <Link

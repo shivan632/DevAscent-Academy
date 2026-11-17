@@ -1,0 +1,37 @@
+{
+  "categories": {
+    "languages": [
+      "python", "typescript", "javascript", "sql", "html", "css", "c++", "cpp", "java", "go", "rust", "bash", "shell", "c#"
+    ],
+    "ai_ml_deeplearning": [
+      "machine learning", "deep learning", "artificial intelligence", "ai", "ml", "nlp", "rag", "cnn", "neural networks",
+      "tensorflow", "keras", "scikit-learn", "sklearn", "pytorch", "genai", "llm", "large language models", "gemini",
+      "openrouter", "openai", "computer vision", "image recognition", "ocr", "sentiment analysis", "predictive analytics",
+      "medical imaging", "speech-to-text", "langchain"
+    ],
+    "data_engineering_analytics": [
+      "pandas", "numpy", "seaborn", "plotly", "matplotlib", "data visualization", "etl", "etl pipelines",
+      "data validation", "data preprocessing", "azure document intelligence", "text analytics", "tableau", "power bi"
+    ],
+    "frameworks_backend": [
+      "fastapi", "django", "flask", "nestjs", "node.js", "nodejs", "express", "express.js", "rest api", "restful",
+      "graphql", "websockets", "microservices", "sqlalchemy", "prisma", "orm"
+    ],
+    "frameworks_frontend": [
+      "react", "react.js", "reactjs", "next.js", "nextjs", "tailwind", "tailwindcss", "redux", "zustand", "html5", "css3", "bootstrap"
+    ],
+    "databases_cloud": [
+      "postgresql", "postgres", "mysql", "mongodb", "sqlite", "redis", "supabase", "firebase", "neon", "dynamodb",
+      "docker", "kubernetes", "git", "github", "ci/cd", "github actions", "aws", "azure", "microsoft azure", "gcp",
+      "vercel", "render", "streamlit", "streamlit cloud", "linux", "electron"
+    ],
+    "action_verbs": [
+      "developed", "built", "implemented", "designed", "optimized", "trained", "deployed", "classified", "engineered",
+      "architected", "automated", "integrated", "spearheaded", "processed", "scaled", "analyzed", "evaluated", "refactored",
+      "orchestrated", "migrated", "maintained", "collaborated", "managed", "created", "solved"
+    ],
+    "soft_skills": [
+      "problem solving", "communication", "team collaboration", "critical thinking", "agile", "code review", "mentoring"
+    ]
+  }
+}

@@ -324,6 +324,18 @@ export default function StudentSidebar({
         )}
 
         <Link
+          href="/ats-checker"
+          onClick={close}
+          className="w-full flex items-center justify-between p-2.5 rounded-2xl border border-cyan-500/25 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 font-semibold transition-all duration-200 group"
+        >
+          <div className="flex items-center gap-2.5">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform" />
+            <span>ATS Checker</span>
+          </div>
+          <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+
+        <Link
           href="/ai-studio"
           onClick={close}
           className="w-full flex items-center justify-between p-2.5 rounded-2xl border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/15 text-purple-700 dark:text-purple-300 font-medium transition-all duration-200 group"

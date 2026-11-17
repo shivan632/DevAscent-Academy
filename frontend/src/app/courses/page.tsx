@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import CourseJourney from '../../components/CourseJourney';
 import { api } from '../../lib/api';
 import {
   Code2,
@@ -148,6 +149,11 @@ export default function CourseDirectoryPage() {
                 </button>
               )}
             </div>
+          </div>
+
+          {/* ─── 8-Step Course Journey Roadmap ─── */}
+          <div className="rounded-3xl overflow-hidden border border-slate-800">
+            <CourseJourney />
           </div>
 
           {/* ─── Guarantee Strip ─── */}
