@@ -30,6 +30,7 @@ import {
   Layers,
   MapPin,
   FileCheck,
+  Loader2,
 } from 'lucide-react';
 
 // Sample resumes for 1-click test
@@ -182,6 +183,7 @@ export default function AtsCheckerPage() {
   const [targetRole, setTargetRole] = useState('aiml');
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(1);
+  const [loadingProgress, setLoadingProgress] = useState(24);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
   const [dragOver, setDragOver] = useState(false);
@@ -229,13 +231,15 @@ export default function AtsCheckerPage() {
     setError('');
     setLoading(true);
     setLoadingStep(1);
+    setLoadingProgress(18);
 
     const stepInterval = setInterval(() => {
-      setLoadingStep((prev) => {
-        if (prev < 4) return prev + 1;
+      setLoadingStep((prev) => (prev < 5 ? prev + 1 : prev));
+      setLoadingProgress((prev) => {
+        if (prev < 92) return Math.min(94, prev + 18);
         return prev;
       });
-    }, 400);
+    }, 500);
 
     try {
       let res: Response;
@@ -312,9 +316,9 @@ export default function AtsCheckerPage() {
   const candidateName = result?.metadata?.candidate_name || 'CANDIDATE';
   const candidateSlug = candidateName.toLowerCase().replace(/[^a-z0-9]/g, '-');
 
-  // Parse Rate & Penalty stats
-  const parseRate = result?.parse_rate || 90;
-  const parseMissed = result?.parse_rate_missed || 10;
+  // Parse Rate & Penalty stats (guarantee 0 is not converted to 10 by falsy checks)
+  const parseRate = typeof result?.parse_rate === 'number' ? result.parse_rate : 100;
+  const parseMissed = typeof result?.parse_rate_missed === 'number' ? result.parse_rate_missed : Math.max(0, 100 - parseRate);
   const contentScore = result?.category_scores?.content ?? 62;
   const issuesCount = result?.deductions?.length || 3;
 
@@ -544,94 +548,304 @@ export default function AtsCheckerPage() {
         )}
 
         {/* ════════════════════════════════════════════════════════════════════════════════
-            STATE 2: LOADING PROGRESSION VIEW (CYBER DARK)
+            STATE 2: PROCESSING TRACK VIEW (MATCHING IMAGE 1 DESIGN)
         ════════════════════════════════════════════════════════════════════════════════ */}
         {loading && (
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div className="bg-[#0F1420] rounded-3xl p-6 sm:p-10 shadow-2xl border border-white/10 space-y-6 relative overflow-hidden backdrop-blur-xl">
               
-              {/* Left Score Card Skeleton */}
-              <div className="md:col-span-4 bg-[#0F1420] rounded-3xl p-6 shadow-2xl border border-white/10 flex flex-col items-center space-y-4">
-                <h3 className="text-base font-bold text-white">Your Score</h3>
-                
-                {/* Skeleton Gauge */}
-                <div className="w-40 h-20 overflow-hidden relative flex items-end justify-center">
-                  <svg viewBox="0 0 160 85" className="w-40 h-20">
-                    <path
-                      d="M 20 75 A 60 60 0 0 1 140 75"
-                      fill="none"
-                      stroke="#1E293B"
-                      strokeWidth="12"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M 20 75 A 60 60 0 0 1 140 75"
-                      fill="none"
-                      stroke="#334155"
-                      strokeWidth="12"
-                      strokeDasharray="188"
-                      strokeDashoffset="90"
-                      strokeLinecap="round"
-                      className="animate-pulse"
-                    />
-                    <circle cx="80" cy="75" r="3" fill="#64748B" />
-                  </svg>
-                </div>
+              {/* Subtle Grid Pattern Overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none opacity-20"
+                style={{
+                  backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px)`,
+                  backgroundSize: '40px 40px',
+                }}
+              />
 
-                {/* Skeleton Category Pills */}
-                <div className="w-full space-y-2.5 pt-2">
-                  {['CONTENT', 'SECTION', 'ATS ESSENTIALS', 'TAILORING'].map((cat, idx) => (
-                    <div key={idx} className="flex justify-between items-center text-xs text-slate-400 font-medium">
-                      <span>{cat}</span>
-                      <span className="w-8 h-3.5 bg-slate-800 rounded-full animate-pulse" />
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  disabled
-                  className="w-full py-2.5 rounded-xl bg-slate-800 text-slate-500 text-xs font-bold cursor-not-allowed mt-2 border border-white/5"
-                >
-                  Unlock Full Report
-                </button>
+              {/* Top Header */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 relative z-10">
+                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  Plotting your course...
+                </h2>
+                <span className="text-xs sm:text-sm font-mono font-medium text-slate-400">
+                  {loadingProgress}% &bull; usually 3–5 seconds
+                </span>
               </div>
 
-              {/* Right Checklist Box */}
-              <div className="md:col-span-8 bg-[#0F1420] rounded-3xl p-8 sm:p-10 shadow-2xl border border-white/10 space-y-6">
-                {[
-                  { step: 1, label: 'Parsing your resume' },
-                  { step: 2, label: 'Analyzing your experience' },
-                  { step: 3, label: 'Extracting your skills' },
-                  { step: 4, label: 'Generating recommendations' },
-                ].map(({ step, label }) => {
-                  const isDone = loadingStep >= step;
-                  const isCurrent = loadingStep === step;
+              {/* Interactive Curved Trajectory SVG Canvas */}
+              <div className="relative w-full bg-[#0B0F19]/80 rounded-2xl border border-white/10 p-4 sm:p-6 overflow-hidden z-10 shadow-inner">
+                {/* Micro-stars / Coordinate Dots */}
+                <div className="absolute top-6 left-12 w-1 h-1 bg-slate-500 rounded-full opacity-60" />
+                <div className="absolute top-12 left-1/3 w-1.5 h-1.5 bg-slate-400 rounded-full opacity-50" />
+                <div className="absolute bottom-8 left-1/4 w-1 h-1 bg-slate-500 rounded-full opacity-40" />
+                <div className="absolute top-8 right-1/4 w-1.5 h-1.5 bg-slate-400 rounded-full opacity-60" />
+                <div className="absolute bottom-10 right-1/3 w-1 h-1 bg-slate-500 rounded-full opacity-50" />
+                <div className="absolute top-4 right-16 w-1 h-1 bg-slate-400 rounded-full opacity-70" />
 
-                  return (
-                    <div key={step} className="flex items-center gap-4 transition-all">
-                      <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-colors ${
-                          isDone
-                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                            : 'border-2 border-slate-700 text-slate-500'
-                        }`}
-                      >
-                        {isDone ? <Check className="w-4 h-4 stroke-[3]" /> : step}
-                      </div>
-                      <span
-                        className={`text-base sm:text-lg font-semibold ${
-                          isDone
-                            ? 'text-white'
-                            : isCurrent
-                            ? 'text-cyan-400 animate-pulse'
-                            : 'text-slate-500'
-                        }`}
-                      >
-                        {label}
-                      </span>
-                    </div>
-                  );
-                })}
+                <svg viewBox="0 0 900 230" className="w-full h-auto overflow-visible select-none">
+                  <defs>
+                    <linearGradient id="trackGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#0284c7" />
+                      <stop offset="50%" stopColor="#38bdf8" />
+                      <stop offset="100%" stopColor="#f97316" />
+                    </linearGradient>
+                    <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="4" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                    <filter id="orangeGlow" x="-30%" y="-30%" width="160%" height="160%">
+                      <feGaussianBlur stdDeviation="6" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+
+                  {/* Connecting Trajectory Curve */}
+                  <path
+                    d="M 60 170 C 240 160, 520 120, 820 48"
+                    fill="none"
+                    stroke="#1E293B"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M 60 170 C 240 160, 520 120, 820 48"
+                    fill="none"
+                    stroke="url(#trackGradient)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray="950"
+                    strokeDashoffset={950 - (950 * loadingProgress) / 100}
+                    className="transition-all duration-700 ease-out"
+                  />
+
+                  {/* Node 1: you (Start) */}
+                  <g className="cursor-pointer">
+                    <circle cx="60" cy="170" r="16" fill="rgba(2, 132, 199, 0.2)" />
+                    <circle cx="60" cy="170" r="10" fill="#0284c7" stroke="#38bdf8" strokeWidth="2" filter="url(#cyanGlow)" />
+                    <circle cx="60" cy="170" r="4" fill="#ffffff" />
+                    <text x="60" y="202" fill="#38bdf8" fontSize="12" fontFamily="monospace" textAnchor="middle" fontWeight="bold">
+                      you
+                    </text>
+                  </g>
+
+                  {/* Node 2: securing cv */}
+                  <g>
+                    <circle
+                      cx="185"
+                      cy="154"
+                      r="12"
+                      fill={loadingStep >= 2 ? '#0284c7' : '#0B0F19'}
+                      stroke={loadingStep >= 1 ? '#38bdf8' : '#334155'}
+                      strokeWidth="2"
+                    />
+                    {loadingStep >= 2 ? (
+                      <path d="M 180 154 L 184 158 L 191 150" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    ) : (
+                      <circle cx="185" cy="154" r="3" fill="#64748b" />
+                    )}
+                    <text x="185" y="180" fill={loadingStep >= 1 ? '#cbd5e1' : '#64748b'} fontSize="11" fontFamily="monospace" textAnchor="middle">
+                      securing cv
+                    </text>
+                  </g>
+
+                  {/* Node 3: reading inputs */}
+                  <g>
+                    <circle
+                      cx="315"
+                      cy="134"
+                      r="12"
+                      fill={loadingStep >= 3 ? '#0284c7' : '#0B0F19'}
+                      stroke={loadingStep >= 2 ? '#38bdf8' : '#334155'}
+                      strokeWidth="2"
+                    />
+                    {loadingStep >= 3 ? (
+                      <path d="M 310 134 L 314 138 L 321 130" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    ) : (
+                      <circle cx="315" cy="134" r="3" fill="#64748b" />
+                    )}
+                    <text x="315" y="160" fill={loadingStep >= 2 ? '#cbd5e1' : '#64748b'} fontSize="11" fontFamily="monospace" textAnchor="middle">
+                      reading inputs
+                    </text>
+                  </g>
+
+                  {/* Node 4: matching (Active Centerpiece) */}
+                  <g>
+                    {loadingStep === 3 && (
+                      <circle cx="450" cy="110" r="20" fill="none" stroke="#38bdf8" strokeWidth="1.5" className="animate-ping opacity-75" />
+                    )}
+                    <circle
+                      cx="450"
+                      cy="110"
+                      r="13"
+                      fill={loadingStep >= 4 ? '#0284c7' : '#0B0F19'}
+                      stroke={loadingStep >= 3 ? '#38bdf8' : '#334155'}
+                      strokeWidth="2.5"
+                      filter={loadingStep === 3 ? 'url(#cyanGlow)' : undefined}
+                    />
+                    {loadingStep >= 4 ? (
+                      <path d="M 445 110 L 449 114 L 456 106" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    ) : loadingStep === 3 ? (
+                      <circle cx="450" cy="110" r="5" fill="#38bdf8" className="animate-pulse" />
+                    ) : (
+                      <circle cx="450" cy="110" r="3" fill="#64748b" />
+                    )}
+                    <text x="450" y="136" fill={loadingStep >= 3 ? '#38bdf8' : '#64748b'} fontSize="11" fontFamily="monospace" textAnchor="middle" fontWeight={loadingStep === 3 ? 'bold' : 'normal'}>
+                      matching
+                    </text>
+                  </g>
+
+                  {/* Node 5: building path */}
+                  <g>
+                    {loadingStep === 4 && (
+                      <circle cx="585" cy="85" r="18" fill="none" stroke="#38bdf8" strokeWidth="1.5" className="animate-ping opacity-75" />
+                    )}
+                    <circle
+                      cx="585"
+                      cy="85"
+                      r="12"
+                      fill={loadingStep >= 5 ? '#0284c7' : '#0B0F19'}
+                      stroke={loadingStep >= 4 ? '#38bdf8' : '#334155'}
+                      strokeWidth="2"
+                    />
+                    {loadingStep >= 5 ? (
+                      <path d="M 580 85 L 584 89 L 591 81" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    ) : loadingStep === 4 ? (
+                      <circle cx="585" cy="85" r="4" fill="#38bdf8" className="animate-pulse" />
+                    ) : (
+                      <circle cx="585" cy="85" r="3" fill="#64748b" />
+                    )}
+                    <text x="585" y="110" fill={loadingStep >= 4 ? '#cbd5e1' : '#64748b'} fontSize="11" fontFamily="monospace" textAnchor="middle">
+                      building path
+                    </text>
+                  </g>
+
+                  {/* Node 6: interview prep */}
+                  <g>
+                    {loadingStep === 5 && (
+                      <circle cx="705" cy="65" r="18" fill="none" stroke="#38bdf8" strokeWidth="1.5" className="animate-ping opacity-75" />
+                    )}
+                    <circle
+                      cx="705"
+                      cy="65"
+                      r="12"
+                      fill={loadingStep > 5 ? '#0284c7' : '#0B0F19'}
+                      stroke={loadingStep >= 5 ? '#38bdf8' : '#334155'}
+                      strokeWidth="2"
+                    />
+                    {loadingStep > 5 ? (
+                      <path d="M 700 65 L 704 69 L 711 61" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    ) : (
+                      <circle cx="705" cy="65" r="3" fill={loadingStep === 5 ? '#38bdf8' : '#64748b'} />
+                    )}
+                    <text x="705" y="90" fill={loadingStep >= 5 ? '#cbd5e1' : '#64748b'} fontSize="11" fontFamily="monospace" textAnchor="middle">
+                      interview prep
+                    </text>
+                  </g>
+
+                  {/* Node 7: the job (Beacon Target) */}
+                  <g>
+                    <circle cx="820" cy="48" r="22" fill="none" stroke="#f97316" strokeWidth="1" opacity="0.4" className="animate-pulse" />
+                    <circle cx="820" cy="48" r="15" fill="rgba(249, 115, 22, 0.25)" />
+                    <circle cx="820" cy="48" r="9" fill="#f97316" stroke="#fdba74" strokeWidth="2" filter="url(#orangeGlow)" />
+                    <text x="820" y="22" fill="#f97316" fontSize="12" fontFamily="monospace" textAnchor="middle" fontWeight="bold">
+                      the job
+                    </text>
+                  </g>
+                </svg>
+              </div>
+
+              {/* Processing Track Stages Checklist Box (Matching Image 1) */}
+              <div className="bg-[#141B2D]/90 rounded-2xl p-6 sm:p-7 border border-white/10 space-y-3.5 z-10 relative font-mono text-sm sm:text-base">
+                
+                {/* Stage 1: Securing CV */}
+                <div className="flex items-center gap-3">
+                  {loadingStep >= 2 ? (
+                    <Check className="w-4 h-4 text-cyan-400 stroke-[3] shrink-0" />
+                  ) : (
+                    <Loader2 className="w-4 h-4 text-cyan-400 animate-spin shrink-0" />
+                  )}
+                  <span className={loadingStep >= 2 ? 'text-white font-bold' : 'text-cyan-300 font-bold'}>
+                    Securing CV
+                  </span>
+                </div>
+
+                {/* Stage 2: Reading inputs */}
+                <div className="flex items-center gap-3">
+                  {loadingStep >= 3 ? (
+                    <Check className="w-4 h-4 text-cyan-400 stroke-[3] shrink-0" />
+                  ) : loadingStep === 2 ? (
+                    <Loader2 className="w-4 h-4 text-cyan-400 animate-spin shrink-0" />
+                  ) : (
+                    <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
+                  )}
+                  <span className={loadingStep >= 3 ? 'text-white font-bold' : loadingStep === 2 ? 'text-cyan-300 font-bold' : 'text-slate-500'}>
+                    Reading inputs
+                  </span>
+                </div>
+
+                {/* Stage 3: Matching */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4">
+                  <div className="flex items-center gap-3">
+                    {loadingStep >= 4 ? (
+                      <Check className="w-4 h-4 text-cyan-400 stroke-[3] shrink-0" />
+                    ) : loadingStep === 3 ? (
+                      <Loader2 className="w-4 h-4 text-cyan-400 animate-spin shrink-0" />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
+                    )}
+                    <span className={loadingStep >= 4 ? 'text-white font-bold' : loadingStep === 3 ? 'text-cyan-300 font-bold' : 'text-slate-500'}>
+                      Matching
+                    </span>
+                  </div>
+                  {loadingStep === 3 && (
+                    <span className="text-xs sm:text-sm text-slate-400 pl-7 sm:pl-0 font-normal font-sans">
+                      Resume workspace is comparing your evidence with this target.
+                    </span>
+                  )}
+                </div>
+
+                {/* Stage 4: Building path */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4">
+                  <div className="flex items-center gap-3">
+                    {loadingStep >= 5 ? (
+                      <Check className="w-4 h-4 text-cyan-400 stroke-[3] shrink-0" />
+                    ) : loadingStep === 4 ? (
+                      <Loader2 className="w-4 h-4 text-cyan-400 animate-spin shrink-0" />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
+                    )}
+                    <span className={loadingStep >= 5 ? 'text-white font-bold' : loadingStep === 4 ? 'text-cyan-300 font-bold' : 'text-slate-500'}>
+                      Building path
+                    </span>
+                  </div>
+                  {loadingStep === 4 && (
+                    <span className="text-xs sm:text-sm text-slate-400 pl-7 sm:pl-0 font-normal font-sans">
+                      Mapping ATS role alignment matrix and scoring pillars.
+                    </span>
+                  )}
+                </div>
+
+                {/* Stage 5: Interview prep */}
+                <div className="flex items-center gap-3">
+                  {loadingStep > 5 ? (
+                    <Check className="w-4 h-4 text-cyan-400 stroke-[3] shrink-0" />
+                  ) : loadingStep === 5 ? (
+                    <Loader2 className="w-4 h-4 text-cyan-400 animate-spin shrink-0" />
+                  ) : (
+                    <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
+                  )}
+                  <span className={loadingStep === 5 ? 'text-cyan-300 font-bold' : 'text-slate-500'}>
+                    Interview prep
+                  </span>
+                </div>
+
+              </div>
+
+              {/* Footer Stage Auto-Save Notice */}
+              <div className="flex items-center gap-2 text-xs text-slate-400 pt-2 z-10 relative">
+                <FileText className="w-3.5 h-3.5 text-slate-400" />
+                <span>You can close this window. Verified stages are saved automatically.</span>
               </div>
 
             </div>
@@ -877,33 +1091,43 @@ export default function AtsCheckerPage() {
                       <div className="relative pt-6">
                         {/* Pin Marker on the boundary */}
                         <div
-                          className="absolute top-0 -translate-x-1/2 flex flex-col items-center"
+                          className="absolute top-0 -translate-x-1/2 flex flex-col items-center transition-all duration-700"
                           style={{ left: `${parseRate}%` }}
                         >
-                          <span className="text-cyan-400 text-xs animate-bounce">📍</span>
+                          <span className={parseRate === 100 ? "text-emerald-400 text-xs" : "text-cyan-400 text-xs animate-bounce"}>
+                            {parseRate === 100 ? "✓" : "📍"}
+                          </span>
                         </div>
 
                         {/* Two-segment Progress Bar */}
                         <div className="h-3.5 w-full bg-slate-800 rounded-full overflow-hidden flex shadow-inner">
                           {/* Read segment in green */}
                           <div
-                            className="bg-emerald-500 h-full rounded-l-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                            className={`bg-emerald-500 h-full ${parseMissed === 0 ? 'rounded-full' : 'rounded-l-full'} shadow-[0_0_10px_rgba(16,185,129,0.5)] transition-all duration-700`}
                             style={{ width: `${parseRate}%` }}
                           />
-                          {/* Missed segment in dark red with red stripes */}
-                          <div
-                            className="h-full bg-red-500/30 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_4px,transparent_4px,transparent_8px)]"
-                            style={{ width: `${parseMissed}%` }}
-                          />
+                          {/* Missed segment in dark red with red stripes - ONLY IF parseMissed > 0 */}
+                          {parseMissed > 0 && (
+                            <div
+                              className="h-full bg-red-500/30 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_4px,transparent_4px,transparent_8px)] transition-all duration-700"
+                              style={{ width: `${parseMissed}%` }}
+                            />
+                          )}
                         </div>
                       </div>
 
                       <div className="flex justify-between items-center text-[11px] font-bold">
                         <span className="text-emerald-400">{parseRate}% read by the ATS</span>
-                        <span className="text-red-400">{parseMissed}% missed</span>
+                        {parseMissed > 0 ? (
+                          <span className="text-red-400">{parseMissed}% missed</span>
+                        ) : (
+                          <span className="text-emerald-400 flex items-center gap-1 font-mono">
+                            <Check className="w-3.5 h-3.5 stroke-[3]" /> 0% missed &bull; Optimal Parse Rate
+                          </span>
+                        )}
                       </div>
 
-                      {/* Hard Parse Penalty Notice */}
+                      {/* Hard Parse Penalty Notice - ONLY IF parseRate < 100 */}
                       {parseRate < 100 && (
                         <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/30 text-xs text-red-200 space-y-1">
                           <p className="font-bold flex items-center gap-1.5 text-red-300">
@@ -911,13 +1135,21 @@ export default function AtsCheckerPage() {
                             <span>Parse Rate Penalty Applied:</span>
                           </p>
                           <p className="text-[11px] text-slate-300 leading-relaxed">
-                            We couldn&apos;t read {parseMissed}% of your resume because of formatting and plain-text link labels. Your final ATS score is capped at {parseRate}/100 until these links and headers are corrected.
+                            {result?.parse_rate_reason || `We couldn't read ${parseMissed}% of your resume because of formatting and plain-text link labels.`}
                           </p>
                         </div>
                       )}
 
                       <h4 className="text-center text-sm sm:text-base font-extrabold text-white pt-1">
-                        The missing {parseMissed}% of your resume isn&apos;t your experience &mdash; it&apos;s your template &amp; link formatting.
+                        {parseRate === 100 ? (
+                          <span className="text-emerald-400">
+                            Your resume template &amp; structure are 100% readable by Applicant Tracking Systems.
+                          </span>
+                        ) : (
+                          <span>
+                            The missing {parseMissed}% of your resume isn&apos;t your experience &mdash; it&apos;s your template &amp; link formatting.
+                          </span>
+                        )}
                       </h4>
                     </div>
 
@@ -956,10 +1188,17 @@ export default function AtsCheckerPage() {
 
                       {/* Warning Strip or Success Strip */}
                       {previewMode === 'original' ? (
-                        <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/30 text-red-300 text-xs font-bold text-center flex items-center justify-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-                          <span>⚠ {parseMissed}% may be missed by the ATS due to plain text link labels (&quot;LinkedIn, Portfolio, GitHub&quot;)</span>
-                        </div>
+                        parseRate < 100 ? (
+                          <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/30 text-red-300 text-xs font-bold text-center flex items-center justify-center gap-2">
+                            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+                            <span>⚠ {parseMissed}% may be missed by the ATS due to plain text link labels (&quot;LinkedIn, Portfolio, GitHub&quot;)</span>
+                          </div>
+                        ) : (
+                          <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2">
+                            <Check className="w-4 h-4 text-emerald-400 stroke-[3] shrink-0" />
+                            <span>✓ 100% Parsed: Document structure, section headers, and hyperlinks are fully indexed by automated ATS parsers.</span>
+                          </div>
+                        )
                       ) : (
                         <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2">
                           <Check className="w-4 h-4 text-emerald-400 stroke-[3] shrink-0" />

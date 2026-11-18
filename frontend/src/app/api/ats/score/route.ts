@@ -44,6 +44,11 @@ export async function POST(req: NextRequest) {
           if (!json.data.deductions) {
             json.data.deductions = tsResult.deductions;
           }
+          if (typeof json.data.parse_rate !== 'number') {
+            json.data.parse_rate = tsResult.parse_rate;
+            json.data.parse_rate_missed = tsResult.parse_rate_missed;
+            json.data.parse_rate_reason = tsResult.parse_rate_reason;
+          }
           return NextResponse.json(json);
         }
       }

@@ -205,11 +205,34 @@ class ATSEngine:
         else:
             executive_summary += "Core requirements are met; adding live deployment URLs and production metrics will elevate this to an elite screening bracket."
 
+        # ATS Parse Rate Calculation (100% when proper links/sections exist, only deduct if real formatting defects)
+        parse_rate = 100
+        parse_rate_reason = "All sections, headers, and profile links parsed with 100% readability."
+        has_github_word = "github" in resume_text.lower()
+        has_linkedin_word = "linkedin" in resume_text.lower()
+        has_full_github = len(metadata.get("github_urls", [])) > 0
+        has_full_linkedin = len(metadata.get("linkedin_urls", [])) > 0
+
+        # Only penalize if candidate wrote plain words like 'GitHub, LinkedIn' without providing full URLs
+        if (has_github_word or has_linkedin_word) and not (has_full_github or has_full_linkedin):
+            parse_rate -= 10
+            parse_rate_reason = "Plain text link labels (e.g. 'LinkedIn, Portfolio, GitHub') without complete URLs cannot be indexed by automated ATS parsers."
+
+        detected_sections = [s.lower() for s in metadata.get("detected_sections", [])]
+        if not any(s in ["experience", "projects", "education", "internship", "skills"] for s in detected_sections):
+            parse_rate -= 10
+
+        parse_rate = max(50, min(100, parse_rate))
+        parse_rate_missed = 100 - parse_rate
+
         return {
             "score": final_score,
             "grade": grade,
             "grade_label": grade_label,
             "executive_summary": executive_summary,
+            "parse_rate": parse_rate,
+            "parse_rate_missed": parse_rate_missed,
+            "parse_rate_reason": parse_rate_reason,
             "target_role": {
                 "key": role_key,
                 "title": job_config.get("title", role_key),
