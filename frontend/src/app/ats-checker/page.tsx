@@ -968,115 +968,147 @@ export default function AtsCheckerPage() {
                       )}
 
                       {/* Rendered Live Resume Document Card (Dark Parchment) */}
-                      <div className="bg-[#141B2D] rounded-2xl border border-white/10 shadow-2xl p-6 sm:p-8 space-y-4 font-sans text-slate-200 max-w-2xl mx-auto">
+                      {(() => {
+                        const activeSections = previewMode === 'optimized'
+                          ? (result.optimized_sections || result.parsed_sections)
+                          : (result.parsed_sections || result.optimized_sections);
                         
-                        {/* Header */}
-                        <div className="text-center space-y-1.5 pb-4 border-b border-white/10">
-                          <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide uppercase">
-                            {candidateName}
-                          </h3>
-                          <p className="text-xs text-slate-300 font-mono">
-                            {result.metadata?.email || 'shivrom.2020@gmail.com'} &bull;{' '}
-                            {result.metadata?.phone || '+91-9935806722'} &bull;{' '}
-                            {previewMode === 'optimized' ? (
-                              <span className="text-cyan-400 font-bold underline">
-                                linkedin.com/in/{candidateSlug} | github.com/{candidateSlug} | devascentacademy.me
-                              </span>
-                            ) : (
-                              <span className="text-red-400 underline decoration-red-400/60">
-                                LinkedIn, Portfolio, GitHub
-                              </span>
-                            )}
-                          </p>
-                        </div>
+                        const expList = activeSections?.experience && activeSections.experience.length > 0
+                          ? activeSections.experience
+                          : [];
+                        const projList = activeSections?.projects && activeSections.projects.length > 0
+                          ? activeSections.projects
+                          : [];
+                        const skillsList = activeSections?.skills && activeSections.skills.length > 0
+                          ? activeSections.skills
+                          : [];
+                        const acadList = activeSections?.academics && activeSections.academics.length > 0
+                          ? activeSections.academics
+                          : [];
 
-                        {/* Professional Summary */}
-                        <div className="space-y-1">
-                          <h4 className="text-xs font-black uppercase text-cyan-400 tracking-wider">
-                            PROFESSIONAL SUMMARY
-                          </h4>
-                          <p className="text-xs text-slate-300 leading-relaxed">
-                            {previewMode === 'optimized' ? (
-                              <span>
-                                Proven software engineer with verified production experience developing judicial analytics platforms, automated ETL pipelines, and scalable microservices. Proficient in <strong className="text-white">Python, SQL, Pandas, TensorFlow, and REST APIs</strong> with hands-on containerized deployments.
-                              </span>
-                            ) : (
-                              <span>
-                                AI/ML enthusiast with hands-on experience in Machine Learning, NLP, predictive analytics, and Full-Stack Development. Skilled in Python, Deep Learning, and building scalable solutions.
-                              </span>
-                            )}
-                          </p>
-                        </div>
-
-                        {/* Experience */}
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-black uppercase text-cyan-400 tracking-wider">
-                            EXPERIENCE
-                          </h4>
-                          
-                          <div className="space-y-1.5 text-xs">
-                            <div className="flex justify-between font-bold text-white">
-                              <span>Data Scientist Intern &mdash; <span className="text-indigo-400">Clinch Soft Bridge</span></span>
-                              <span className="text-slate-400 font-normal">Jan 2026 &ndash; Feb 2026</span>
+                        return (
+                          <div className="bg-[#141B2D] rounded-2xl border border-white/10 shadow-2xl p-6 sm:p-8 space-y-5 font-sans text-slate-200 max-w-2xl mx-auto">
+                            
+                            {/* Header */}
+                            <div className="text-center space-y-1.5 pb-4 border-b border-white/10">
+                              <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide uppercase">
+                                {activeSections?.candidate_name || candidateName}
+                              </h3>
+                              <p className="text-xs text-slate-300 font-mono">
+                                {activeSections?.email || result.metadata?.email || 'candidate@example.com'} &bull;{' '}
+                                {activeSections?.phone || result.metadata?.phone || '+91-9935806722'}
+                                {activeSections?.location ? ` • ${activeSections.location}` : ''}
+                              </p>
+                              <div className="text-xs font-mono pt-0.5">
+                                {previewMode === 'optimized' ? (
+                                  <span className="text-cyan-400 font-bold">
+                                    {activeSections?.raw_links?.join(' | ') || `linkedin.com/in/${candidateSlug} | github.com/${candidateSlug} | devascentacademy.me`}
+                                  </span>
+                                ) : (
+                                  <span className="text-red-400 underline decoration-red-400/60">
+                                    {result.parsed_sections?.raw_links?.join(', ') || 'LinkedIn, Portfolio, GitHub'}
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
-                            {previewMode === 'optimized' ? (
-                              <ul className="list-disc list-inside space-y-1 text-slate-300 pl-1">
-                                <li>
-                                  <strong className="text-emerald-400">Architected</strong> an AI-driven judicial analytics platform using <strong className="text-white">Python, Azure Document Intelligence, and MySQL</strong> to process <strong className="text-cyan-300">10,000+ High Court transcripts</strong>.
-                                </li>
-                                <li>
-                                  <strong className="text-emerald-400">Engineered</strong> automated ETL pipelines in <strong className="text-white">Python &amp; Pandas</strong> for OCR document ingestion, <strong className="text-cyan-300">reducing processing latency by 40%</strong>.
-                                </li>
-                                <li>
-                                  <strong className="text-emerald-400">Optimized</strong> transcript processing REST APIs handling <strong className="text-cyan-300">15,000+ case records</strong> with sub-second retrieval.
-                                </li>
-                              </ul>
-                            ) : (
-                              <ul className="list-disc list-inside space-y-1 text-slate-400 pl-1">
-                                <li>
-                                  Developed an AI-driven judicial analytics platform using Python, Azure Document Intelligence, NLP, and MySQL.
-                                </li>
-                                <li>
-                                  Built automated ETL pipelines for OCR-based document ingestion and structured storage in MySQL.
-                                </li>
-                                <li>
-                                  Optimized transcript processing workflows using REST APIs.
-                                </li>
-                              </ul>
+                            {/* Professional Summary */}
+                            <div className="space-y-1">
+                              <h4 className="text-xs font-black uppercase text-cyan-400 tracking-wider">
+                                PROFESSIONAL SUMMARY
+                              </h4>
+                              <p className="text-xs text-slate-300 leading-relaxed">
+                                {activeSections?.summary || result.executive_summary}
+                              </p>
+                            </div>
+
+                            {/* Experience */}
+                            {expList.length > 0 && (
+                              <div className="space-y-3">
+                                <h4 className="text-xs font-black uppercase text-cyan-400 tracking-wider">
+                                  EXPERIENCE
+                                </h4>
+                                {expList.map((exp: any, eIdx: number) => (
+                                  <div key={eIdx} className="space-y-1 text-xs">
+                                    <div className="flex justify-between font-bold text-white">
+                                      <span>
+                                        {exp.role} &mdash; <span className="text-indigo-400">{exp.company}</span>
+                                      </span>
+                                      <span className="text-slate-400 font-normal">{exp.dates}</span>
+                                    </div>
+                                    <ul className="list-disc list-inside space-y-1 text-slate-300 pl-1 leading-relaxed">
+                                      {exp.bullets.map((b: string, bIdx: number) => (
+                                        <li key={bIdx}>{b}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                ))}
+                              </div>
                             )}
-                          </div>
-                        </div>
 
-                        {/* Projects */}
-                        <div className="space-y-1.5">
-                          <h4 className="text-xs font-black uppercase text-cyan-400 tracking-wider">
-                            PROJECTS
-                          </h4>
-                          <div className="text-xs space-y-1">
-                            <span className="font-bold text-white block">
-                              FlashNotes &ndash; AI Learning Platform{' '}
-                              {previewMode === 'optimized' ? (
-                                <span className="text-cyan-400 font-mono font-semibold">[Live Demo: https://flashnotes.streamlit.app]</span>
-                              ) : (
-                                <span className="text-slate-500 font-normal">(GitHub, Project, Streamlit)</span>
-                              )}
-                            </span>
-                            <p className="text-slate-300 pl-1">
-                              {previewMode === 'optimized' ? (
-                                <span>
-                                  Engineered full-stack AI platform utilizing React.js, FastAPI, and Supabase with RAG implementation, supporting <strong className="text-cyan-300">500+ active users</strong> deployed on Vercel and Render.
-                                </span>
-                              ) : (
-                                <span>
-                                  Full-stack AI learning platform using React.js, FastAPI, Supabase, and Streamlit with RAG implementation via OpenRouter and Gemini APIs.
-                                </span>
-                              )}
-                            </p>
-                          </div>
-                        </div>
+                            {/* Projects */}
+                            {projList.length > 0 && (
+                              <div className="space-y-3">
+                                <h4 className="text-xs font-black uppercase text-cyan-400 tracking-wider">
+                                  PROJECTS
+                                </h4>
+                                {projList.map((proj: any, pIdx: number) => (
+                                  <div key={pIdx} className="text-xs space-y-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-bold text-white block">{proj.title}</span>
+                                      {proj.tags && proj.tags.length > 0 && (
+                                        <span className="text-[10px] text-cyan-400 font-mono">
+                                          ({proj.tags.join(', ')})
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-slate-300 pl-1 leading-relaxed">{proj.description}</p>
+                                    {proj.bullets && proj.bullets.length > 1 && (
+                                      <ul className="list-disc list-inside space-y-0.5 text-slate-400 pl-2">
+                                        {proj.bullets.slice(1).map((b: string, pbIdx: number) => (
+                                          <li key={pbIdx}>{b}</li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
 
-                      </div>
+                            {/* Academics */}
+                            {acadList.length > 0 && (
+                              <div className="space-y-1">
+                                <h4 className="text-xs font-black uppercase text-cyan-400 tracking-wider">
+                                  ACADEMICS
+                                </h4>
+                                {acadList.map((acad: string, aIdx: number) => (
+                                  <p key={aIdx} className="text-xs text-slate-300">{acad}</p>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Skills */}
+                            {skillsList.length > 0 && (
+                              <div className="space-y-1.5">
+                                <h4 className="text-xs font-black uppercase text-cyan-400 tracking-wider">
+                                  SKILLS
+                                </h4>
+                                <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                  {skillsList.map((sk: string, sIdx: number) => (
+                                    <span
+                                      key={sIdx}
+                                      className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-mono border border-white/5"
+                                    >
+                                      {sk}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                          </div>
+                        );
+                      })()}
                     </div>
 
                   </div>

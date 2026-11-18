@@ -22,26 +22,42 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     let extractedText = '';
 
-    // 1. If an external Python service URL is explicitly configured, try forwarding
-    const pythonUrl = process.env.NEXT_PUBLIC_ATS_API_URL;
-    if (pythonUrl && !pythonUrl.includes('localhost') && !pythonUrl.includes('127.0.0.1')) {
-      try {
-        const forwardForm = new FormData();
-        forwardForm.append('file', file);
-        forwardForm.append('target_role', targetRole);
+    // 1. If Python service is available (local or remote), try forwarding with timeout
+    const pythonUrl = process.env.NEXT_PUBLIC_ATS_API_URL || 'http://127.0.0.1:8000';
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1800);
+      const forwardForm = new FormData();
+      forwardForm.append('file', file);
+      forwardForm.append('target_role', targetRole);
 
-        const upstreamRes = await fetch(`${pythonUrl.replace(/\/$/, '')}/upload`, {
-          method: 'POST',
-          body: forwardForm,
-        });
+      const upstreamRes = await fetch(`${pythonUrl.replace(/\/$/, '')}/upload`, {
+        method: 'POST',
+        body: forwardForm,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
 
-        if (upstreamRes.ok) {
-          const json = await upstreamRes.json();
+      if (upstreamRes.ok) {
+        const json = await upstreamRes.json();
+        if (json.success && json.data) {
+          // Augment with rich RAG structured sections if not already provided
+          const rawPreview = json.extracted_text_preview || '';
+          const tsResult = evaluateResume(rawPreview, targetRole);
+          if (!json.data.parsed_sections) {
+            json.data.parsed_sections = tsResult.parsed_sections;
+          }
+          if (!json.data.optimized_sections) {
+            json.data.optimized_sections = tsResult.optimized_sections;
+          }
+          if (!json.data.deductions) {
+            json.data.deductions = tsResult.deductions;
+          }
           return NextResponse.json(json);
         }
-      } catch (upstreamErr) {
-        console.warn('[ATS Proxy] Upstream Python service unreachable, using native serverless engine:', upstreamErr);
       }
+    } catch {
+      // Python service offline or timed out; fall back seamlessly to native serverless extraction
     }
 
     // 2. High-Fidelity PDF & DOCX Native Extraction

@@ -17,23 +17,38 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. If upstream Python service URL is configured, try forwarding
-    const pythonUrl = process.env.NEXT_PUBLIC_ATS_API_URL;
-    if (pythonUrl && !pythonUrl.includes('localhost') && !pythonUrl.includes('127.0.0.1')) {
-      try {
-        const upstreamRes = await fetch(`${pythonUrl.replace(/\/$/, '')}/score`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resume_text: resumeText, target_role: targetRole }),
-        });
+    // 1. Try forwarding to Python ATS Engine (Local or Remote) with graceful fallback
+    const pythonUrl = process.env.NEXT_PUBLIC_ATS_API_URL || 'http://127.0.0.1:8000';
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1800);
+      const upstreamRes = await fetch(`${pythonUrl.replace(/\/$/, '')}/score`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resume_text: resumeText, target_role: targetRole }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
 
-        if (upstreamRes.ok) {
-          const json = await upstreamRes.json();
+      if (upstreamRes.ok) {
+        const json = await upstreamRes.json();
+        if (json.success && json.data) {
+          // Augment with rich RAG structured sections if not already provided
+          const tsResult = evaluateResume(resumeText, targetRole);
+          if (!json.data.parsed_sections) {
+            json.data.parsed_sections = tsResult.parsed_sections;
+          }
+          if (!json.data.optimized_sections) {
+            json.data.optimized_sections = tsResult.optimized_sections;
+          }
+          if (!json.data.deductions) {
+            json.data.deductions = tsResult.deductions;
+          }
           return NextResponse.json(json);
         }
-      } catch (upstreamErr) {
-        console.warn('[ATS Proxy] Upstream Python service unreachable, falling back to built-in engine:', upstreamErr);
       }
+    } catch {
+      // Python service offline or timed out; fall back seamlessly to built-in TypeScript engine
     }
 
     // 2. Evaluate with Built-in TypeScript Engine

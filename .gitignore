@@ -35,6 +35,8 @@ scratch_test_db.js
 # OS files
 .DS_Store
 Thumbs.db
+__pycache__/
+*.pyc
 
 # Agentic skills repository & local tools
 agentic-awesome-skills/

@@ -71,13 +71,12 @@ class ResumePreprocessor:
             }
 
         lines = [line.strip() for line in raw_text.splitlines() if line.strip()]
-        candidate_name = lines[0] if lines else "Candidate"
-        # If line 0 contains an email or phone, look for a cleaner name token
-        if "@" in candidate_name or any(c.isdigit() for c in candidate_name):
-            for l in lines[:3]:
-                if "@" not in l and not any(c.isdigit() for c in l) and len(l) < 40:
-                    candidate_name = l
-                    break
+        candidate_name = "Candidate"
+        for l in lines[:6]:
+            cleaned = re.sub(r"[^a-zA-Z\s\.\-]", "", l).strip()
+            if 2 <= len(cleaned) <= 50 and not any(kw in cleaned.lower() for kw in ["resume", "curriculum", "vitae", "summary", "profile", "contact", "phone", "email", "skills", "experience", "target"]):
+                candidate_name = cleaned
+                break
 
         github_urls = self.URL_GITHUB_PATTERN.findall(raw_text)
         linkedin_urls = self.URL_LINKEDIN_PATTERN.findall(raw_text)

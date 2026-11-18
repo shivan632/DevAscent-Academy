@@ -46,8 +46,11 @@ def extract_text_from_file(content_bytes: bytes, filename: str) -> str:
                     pages_text.append(extracted)
             text = "\n\n".join(pages_text)
         except Exception as e:
-            # Fallback to byte decoding if PDF reader encounters unusual binary stream
-            text = content_bytes.decode("latin-1", errors="ignore")
+            text = ""
+
+        # Sanitize binary artifacts / control codes
+        import re
+        text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", " ", text)
 
     elif fname.endswith(".docx"):
         try:
