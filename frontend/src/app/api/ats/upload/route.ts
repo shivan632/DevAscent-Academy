@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     let extractedText = '';
 
-    // 1. If an external Python service URL is explicitly configured, forward there
+    // 1. If an external Python service URL is explicitly configured, try forwarding
     const pythonUrl = process.env.NEXT_PUBLIC_ATS_API_URL;
     if (pythonUrl && !pythonUrl.includes('localhost') && !pythonUrl.includes('127.0.0.1')) {
       try {
@@ -40,27 +40,23 @@ export async function POST(req: NextRequest) {
           return NextResponse.json(json);
         }
       } catch (upstreamErr) {
-        console.warn('[ATS Proxy] Upstream Python service unreachable, falling back to built-in engine:', upstreamErr);
+        console.warn('[ATS Proxy] Upstream Python service unreachable, using native serverless engine:', upstreamErr);
       }
     }
 
-    // 2. Built-in Native Extraction on Vercel Serverless
+    // 2. High-Fidelity PDF & DOCX Native Extraction
     if (filename.endsWith('.pdf')) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const pdfParse = require('pdf-parse');
-        const pdfData = await pdfParse(buffer);
-        extractedText = pdfData.text || '';
-      } catch (pdfErr) {
-        console.warn('[ATS Parse] pdf-parse fallback to raw buffer string:', pdfErr);
-        // Fallback: extract text tokens directly from buffer
-        const raw = buffer.toString('latin1');
-        const streamMatches = raw.match(/\(([^()]+)\)/g);
-        if (streamMatches) {
-          extractedText = streamMatches.map((s) => s.slice(1, -1)).join(' ');
+        const { extractText } = await import('unpdf');
+        const uint8 = new Uint8Array(buffer);
+        const unpdfRes = await extractText(uint8);
+        if (Array.isArray(unpdfRes.text)) {
+          extractedText = unpdfRes.text.join('\n\n');
         } else {
-          extractedText = raw;
+          extractedText = unpdfRes.text || '';
         }
+      } catch (unpdfErr) {
+        console.warn('[ATS Parse] unpdf extraction error:', unpdfErr);
       }
     } else if (filename.endsWith('.docx')) {
       try {
@@ -69,19 +65,22 @@ export async function POST(req: NextRequest) {
         const docResult = await mammoth.extractRawText({ buffer });
         extractedText = docResult.value || '';
       } catch (docxErr) {
-        console.warn('[ATS Parse] mammoth fallback:', docxErr);
+        console.warn('[ATS Parse] mammoth docx extraction error:', docxErr);
         extractedText = buffer.toString('utf-8');
       }
     } else {
-      // .txt or generic stream
+      // .txt or generic text format
       extractedText = buffer.toString('utf-8');
     }
 
-    if (!extractedText || extractedText.trim().length < 20) {
+    // Sanitize extracted text: strip non-printable binary bytes and control codes
+    extractedText = extractedText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, ' ').trim();
+
+    if (!extractedText || extractedText.length < 20) {
       return NextResponse.json(
         {
           success: false,
-          detail: 'Could not extract readable text from the document. Please ensure the file contains selectable text.',
+          detail: 'Could not extract readable text from the document. Please ensure the PDF has selectable text and is not a scanned image.',
         },
         { status: 400 }
       );

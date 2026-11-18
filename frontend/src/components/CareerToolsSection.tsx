@@ -70,7 +70,7 @@ export default function CareerToolsSection() {
 
         if (!res.ok) {
           const errJson = await res.json().catch(() => null);
-          throw new Error(errJson?.detail || 'ATS service unreachable. Make sure the Python service is running.');
+          throw new Error(errJson?.detail || 'ATS evaluation failed. Please verify the resume format.');
         }
 
         const json = await res.json();
@@ -81,7 +81,7 @@ export default function CareerToolsSection() {
         }
       } catch (err: any) {
         if (err.name === 'TypeError' || err.message === 'Failed to fetch') {
-          setError('ATS scoring engine is unreachable on port 8000. Start it by running: cd python && python main.py');
+          setError('Unable to reach ATS evaluation service. Please verify your connection.');
         } else {
           setError(err.message || 'ATS scan failed. Please verify your connection.');
         }
@@ -105,7 +105,7 @@ export default function CareerToolsSection() {
         });
 
         if (!res.ok) {
-          throw new Error('ATS scoring server unreachable. Make sure the Python service is running on port 8000.');
+          throw new Error('ATS scoring server encountered an error.');
         }
 
         const json = await res.json();
@@ -116,7 +116,7 @@ export default function CareerToolsSection() {
         }
       } catch (err: any) {
         if (err.name === 'TypeError' || err.message === 'Failed to fetch') {
-          setError('ATS scoring engine is unreachable on port 8000. Start it by running: cd python && python main.py');
+          setError('Unable to reach ATS evaluation service. Please verify your connection.');
         } else {
           setError(err.message || 'ATS scan failed. Please try again.');
         }
@@ -371,42 +371,63 @@ export default function CareerToolsSection() {
               /* Results View inside Modal */
               <div className="space-y-5">
                 {/* Score Banner */}
-                <div className="rounded-2xl bg-gradient-to-r from-cyan-950/70 to-slate-900 border border-cyan-500/30 p-5 flex items-center justify-between gap-4">
-                  <div>
+                <div className="rounded-2xl bg-gradient-to-r from-cyan-950/70 via-slate-900 to-indigo-950/70 border border-cyan-500/30 p-5 flex items-center justify-between gap-4">
+                  <div className="space-y-1">
                     <span className="text-[11px] uppercase font-bold text-cyan-400 tracking-wider">
                       Role: {result.target_role?.title}
                     </span>
-                    <h4 className="text-2xl font-black text-white mt-0.5">
+                    <h4 className="text-2xl font-black text-white">
                       ATS Score: <span className="text-cyan-400">{result.score}/100</span>
                     </h4>
                     <p className="text-xs text-slate-300">
                       Grade: <strong className="text-emerald-400 font-bold">{result.grade}</strong> ({result.grade_label})
                     </p>
+                    {result.metadata?.candidate_name && (
+                      <p className="text-xs text-slate-400">
+                        Candidate: <strong className="text-white">{result.metadata.candidate_name}</strong>
+                      </p>
+                    )}
                   </div>
-                  <div className="w-16 h-16 rounded-full border-4 border-cyan-500 flex items-center justify-center font-black text-xl text-white shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-                    {result.score}%
+                  <div className="w-16 h-16 rounded-full border-4 border-cyan-500 flex flex-col items-center justify-center font-black text-lg text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] shrink-0 bg-slate-950">
+                    <span>{result.score}%</span>
+                    <span className="text-[9px] font-mono text-cyan-400">MATCH</span>
                   </div>
                 </div>
 
-                {/* Executive Summary */}
-                {result.executive_summary && (
-                  <p className="text-xs text-slate-300 bg-[#1E293B]/70 p-3 rounded-xl border border-slate-700/80 leading-relaxed">
-                    {result.executive_summary}
+                {/* Recruiter Verdict */}
+                <div className="p-4 rounded-xl bg-[#1E293B]/70 border border-slate-700/80 space-y-1.5">
+                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider block">
+                    Recruiter Verdict:
+                  </span>
+                  <p className="text-xs text-slate-200 leading-relaxed">
+                    {result.verdict || result.executive_summary}
                   </p>
-                )}
+                </div>
 
-                {/* Missing Elements */}
-                {result.missing_points?.length > 0 && (
-                  <div>
-                    <h5 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5" />
-                      <span>Missing Points &amp; Gaps:</span>
+                {/* Why You Lost Points (Fixable Issues) */}
+                {result.deductions && result.deductions.length > 0 && (
+                  <div className="space-y-2.5">
+                    <h5 className="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded bg-red-950/80 border border-red-500/40 text-red-400 flex items-center justify-center text-[10px] font-black">
+                        ✕
+                      </span>
+                      <span>Why You Lost Points (The Fixable Issues):</span>
                     </h5>
                     <div className="space-y-2">
-                      {result.missing_points.slice(0, 2).map((mp: any, idx: number) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-red-950/30 border border-red-500/30 text-xs">
-                          <strong className="text-white block">{mp.title}</strong>
-                          <span className="text-slate-300 text-[11px]">{mp.description}</span>
+                      {result.deductions.map((d: any, idx: number) => (
+                        <div key={idx} className="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-xs space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white">{idx + 1}. {d.title}</span>
+                            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-300">
+                              {d.penalty}
+                            </span>
+                          </div>
+                          <p className="text-slate-300 text-[11px]">
+                            <strong>Issue:</strong> {d.issue}
+                          </p>
+                          <div className="mt-1 p-2 rounded bg-black/40 border border-slate-800 text-[11px] font-mono text-cyan-300 break-words">
+                            <strong>Fix:</strong> {d.fix}
+                          </div>
                         </div>
                       ))}
                     </div>

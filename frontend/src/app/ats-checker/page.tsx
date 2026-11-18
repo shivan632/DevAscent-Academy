@@ -154,7 +154,7 @@ export default function AtsCheckerPage() {
 
         if (!res.ok) {
           const errJson = await res.json().catch(() => null);
-          throw new Error(errJson?.detail || 'ATS scoring engine unreachable. Ensure the service is running.');
+          throw new Error(errJson?.detail || 'ATS scoring engine encountered an error. Please try again.');
         }
 
         const json = await res.json();
@@ -165,7 +165,7 @@ export default function AtsCheckerPage() {
         }
       } catch (err: any) {
         if (err.name === 'TypeError' || err.message === 'Failed to fetch') {
-          setError('ATS scoring engine is unreachable on port 8000. Start it by running: cd python && python main.py');
+          setError('Unable to reach ATS evaluation service. Please verify your connection and try again.');
         } else {
           setError(err.message || 'ATS evaluation failed. Please check the file.');
         }
@@ -190,7 +190,7 @@ export default function AtsCheckerPage() {
 
         if (!res.ok) {
           const errJson = await res.json().catch(() => null);
-          throw new Error(errJson?.detail || 'ATS service unreachable on port 8000.');
+          throw new Error(errJson?.detail || 'ATS evaluation service error.');
         }
 
         const json = await res.json();
@@ -201,7 +201,7 @@ export default function AtsCheckerPage() {
         }
       } catch (err: any) {
         if (err.name === 'TypeError' || err.message === 'Failed to fetch') {
-          setError('ATS scoring engine is unreachable on port 8000. Start it by running: cd python && python main.py');
+          setError('Unable to reach ATS evaluation service. Please verify your connection.');
         } else {
           setError(err.message || 'ATS scan failed. Please verify your connection.');
         }
@@ -497,18 +497,51 @@ export default function AtsCheckerPage() {
                   </div>
                 </div>
 
-                {/* 2. Executive Recruiter Summary */}
-                {result.executive_summary && (
-                  <div className="p-4 sm:p-5 rounded-2xl bg-[#141B2D]/90 border border-slate-700/80">
-                    <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">
-                      <Sparkles className="w-4 h-4" />
-                      <span>Executive Recruiter Summary</span>
-                    </div>
-                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
-                      {result.executive_summary}
-                    </p>
+                {/* 2. Executive Recruiter Verdict Banner */}
+                <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#121A2F] via-[#0F172A] to-[#0A1020] border border-cyan-500/30 shadow-lg relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+                  
+                  <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">
+                    <Sparkles className="w-4 h-4 text-cyan-400" />
+                    <span>Executive Recruiter Verdict</span>
                   </div>
-                )}
+
+                  <p className="text-sm sm:text-base text-slate-100 font-medium leading-relaxed mb-3">
+                    <span className="font-bold text-cyan-300">Verdict: </span>
+                    {result.verdict || result.executive_summary}
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                    Here is the exact breakdown of why you got this score and how to fix it.
+                  </p>
+
+                  {/* Candidate Attributes Pill Strip */}
+                  <div className="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-2 text-[11px] font-mono text-slate-400">
+                    <span className="px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/80 text-white font-sans font-semibold">
+                      Candidate: <span className="text-cyan-300">{result.metadata?.candidate_name || 'Candidate'}</span>
+                    </span>
+                    {result.metadata?.detected_degree && (
+                      <span className="px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/80">
+                        Degree: <span className="text-slate-200">{result.metadata.detected_degree}</span>
+                      </span>
+                    )}
+                    {result.metadata?.email && (
+                      <span className="px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/80">
+                        ✉ {result.metadata.email}
+                      </span>
+                    )}
+                    {result.metadata?.phone && (
+                      <span className="px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/80">
+                        📞 {result.metadata.phone}
+                      </span>
+                    )}
+                    {result.metadata?.word_count && (
+                      <span className="px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/80">
+                        📄 {result.metadata.word_count} words
+                      </span>
+                    )}
+                  </div>
+                </div>
 
                 {/* 3. 4-Pillar Score Breakdown */}
                 <div>
@@ -607,28 +640,64 @@ export default function AtsCheckerPage() {
                   </div>
                 )}
 
-                {/* 5. Missing Points Identification */}
-                {result.missing_points?.length > 0 && (
-                  <div>
-                    <h4 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-red-400" />
-                      <span>Identified Gaps &amp; Deductions ({result.missing_points.length})</span>
+                {/* 5. Why You Lost Points (The Fixable Issues) */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm sm:text-base font-bold text-red-400 uppercase tracking-wider flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-lg bg-red-950/80 border border-red-500/40 text-red-400 flex items-center justify-center text-xs font-black">
+                        ✕
+                      </span>
+                      <span>Why You Lost Points (The Fixable Issues)</span>
                     </h4>
-                    <div className="space-y-3">
-                      {result.missing_points.map((mp: any, idx: number) => (
-                        <div key={idx} className="p-3.5 rounded-xl bg-red-950/20 border border-red-500/30 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-300 border border-red-500/30">
-                              {mp.type}
+                    {result.deductions && result.deductions.length > 0 && (
+                      <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-red-950/50 border border-red-500/40 text-red-300">
+                        {result.deductions.length} Actionable Penalties
+                      </span>
+                    )}
+                  </div>
+
+                  {result.deductions && result.deductions.length > 0 ? (
+                    <div className="space-y-3.5">
+                      {result.deductions.map((d: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="p-4 sm:p-5 rounded-2xl bg-[#131A2E]/90 border border-red-500/30 hover:border-red-500/50 transition-colors space-y-3"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <h5 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                              <span className="text-slate-400 font-mono text-xs">{idx + 1}.</span>
+                              <span>{d.title}</span>
+                            </h5>
+                            <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-red-500/20 text-red-300 border border-red-500/40 shrink-0">
+                              {d.penalty}
                             </span>
-                            <span className="text-xs sm:text-sm font-bold text-white">{mp.title}</span>
                           </div>
-                          <p className="text-xs text-slate-300 pl-1">{mp.description}</p>
+
+                          <div className="space-y-2.5 text-xs sm:text-sm pl-3 sm:pl-4 border-l-2 border-slate-700">
+                            <div>
+                              <span className="text-slate-400 font-semibold mr-1.5">• Issue:</span>
+                              <span className="text-slate-200 leading-relaxed">{d.issue}</span>
+                            </div>
+                            <div className="space-y-1.5 pt-1">
+                              <div>
+                                <span className="text-emerald-400 font-semibold mr-1.5">• Fix:</span>
+                                <span className="text-slate-300 leading-relaxed">Apply this recommendation:</span>
+                              </div>
+                              <div className="p-3 rounded-xl bg-black/50 border border-slate-800 font-mono text-xs text-cyan-300 leading-relaxed break-words select-all">
+                                {d.fix}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
+                      <span>Zero formatting penalties detected! Your resume follows elite ATS guidelines.</span>
+                    </div>
+                  )}
+                </div>
 
                 {/* 6. Actionable Correction Points Roadmap */}
                 {result.correction_points?.length > 0 && (
