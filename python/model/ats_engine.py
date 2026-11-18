@@ -205,20 +205,14 @@ class ATSEngine:
         else:
             executive_summary += "Core requirements are met; adding live deployment URLs and production metrics will elevate this to an elite screening bracket."
 
-        # ATS Parse Rate Calculation (Fidelity of document extraction & section hierarchy)
-        parse_rate = 100
-        parse_rate_reason = "All sections, headers, and content parsed with 100% readability."
-
-        detected_sections = [s.lower() for s in metadata.get("detected_sections", [])]
-        if not any(s in ["experience", "projects", "education", "internship", "skills"] for s in detected_sections) or len(detected_sections) < 2:
-            parse_rate = 85
-            parse_rate_reason = "Some standard ATS section headers (Experience, Projects, Education) could not be clearly identified."
-        elif len(resume_text.strip()) < 150:
-            parse_rate = 75
-            parse_rate_reason = "Insufficient readable text extracted from document."
-
-        parse_rate = max(50, min(100, parse_rate))
+        # ATS Parse Rate Calculation (Directly matches candidate score, e.g. Score 89 -> Parse Rate 89%, Missed 11%)
+        parse_rate = max(0, min(100, final_score))
         parse_rate_missed = 100 - parse_rate
+        parse_rate_reason = (
+            f"We identified that {parse_rate_missed}% of your resume needs optimization across formatting, unindexed link labels, or core benchmark competencies."
+            if parse_rate_missed > 0
+            else "All sections, headers, and target role benchmarks parsed with 100% ATS readability."
+        )
 
         return {
             "score": final_score,

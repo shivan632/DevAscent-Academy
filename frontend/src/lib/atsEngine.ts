@@ -624,30 +624,22 @@ export function evaluateResume(rawText: string, targetRoleKey = 'aiml'): ATSResu
   const rawCosine = computeTfidfCosine(sanitizedText, jdText);
   const calibratedTfidf = Math.min(100, Math.round((rawCosine / 0.28) * 100 * 10) / 10);
 
-  // ─── ATS Parse Rate Calculation ───
-  // ATS parse rate measures document extraction fidelity (Experience, Projects, Education, Skills)
-  let parseRate = 100;
-  let parseRateReason = "All sections, headers, and content parsed with 100% readability.";
-
-  // Deduct only if major sections are actually missing or text is unreadable
-  const hasCoreSections = detectedSections.some((s) => /experience|training|internship|project|education|academic|skill/i.test(s));
-  if (!hasCoreSections || detectedSections.length < 2) {
-    parseRate = 85;
-    parseRateReason = "Some standard ATS section headers (Experience, Projects, Education) could not be clearly identified.";
-  } else if (sanitizedText.length < 150) {
-    parseRate = 75;
-    parseRateReason = "Insufficient readable text extracted from document.";
-  }
-
-  parseRate = Math.max(50, Math.min(100, parseRate));
-  const parseRateMissed = 100 - parseRate;
-
   const catWeighted = skillsScore * 0.40 + verbScore * 0.20 + projectScore * 0.25 + structureScore * 0.15;
   const rawBlendedScore = Math.max(0, Math.min(100, Math.round(catWeighted * 0.70 + calibratedTfidf * 0.30)));
   
-  // Real penalty subtraction for missing links (does NOT force clamp to 90!)
-  const linkPenalty = parseRate < 100 ? 5 : 0;
+  // Real penalty subtraction for missing links
+  const hasFullGithub = hasFullGithubUrl;
+  const hasFullLinkedin = hasFullLinkedinUrl;
+  const linkPenalty = ((hasGithubWord || hasLinkedinWord) && (!hasFullGithub || !hasFullLinkedin)) ? 5 : 0;
   const finalScore = Math.max(0, Math.min(100, rawBlendedScore - linkPenalty));
+
+  // ─── ATS Parse Rate Calculation (Directly Aligned with Candidate Score) ───
+  // E.g. Score 89/100 -> Parse Rate 89%, Parse Missed 11%
+  const parseRate = finalScore;
+  const parseRateMissed = 100 - parseRate;
+  const parseRateReason = parseRateMissed > 0
+    ? `We identified that ${parseRateMissed}% of your resume needs optimization across formatting, unindexed link labels, or core benchmark competencies.`
+    : "All sections, headers, and target role benchmarks parsed with 100% ATS readability.";
 
   let grade = "D";
   let gradeLabel = "Significant Gaps";

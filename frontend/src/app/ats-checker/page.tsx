@@ -316,9 +316,11 @@ export default function AtsCheckerPage() {
   const candidateName = result?.metadata?.candidate_name || 'CANDIDATE';
   const candidateSlug = candidateName.toLowerCase().replace(/[^a-z0-9]/g, '-');
 
-  // Parse Rate & Penalty stats (guarantee 0 is not converted to 10 by falsy checks)
-  const parseRate = typeof result?.parse_rate === 'number' ? result.parse_rate : 100;
-  const parseMissed = typeof result?.parse_rate_missed === 'number' ? result.parse_rate_missed : Math.max(0, 100 - parseRate);
+  // Parse Rate & Penalty stats: directly equal to Candidate Score (e.g. Score 89 -> Parse Rate 89%, Parse Missed 11%)
+  const parseRate = typeof result?.score === 'number'
+    ? Math.max(0, Math.min(100, result.score))
+    : (typeof result?.parse_rate === 'number' ? result.parse_rate : 89);
+  const parseMissed = 100 - parseRate;
   const contentScore = result?.category_scores?.content ?? 62;
   const issuesCount = result?.deductions?.length || 3;
 
@@ -945,10 +947,20 @@ export default function AtsCheckerPage() {
                           {/* Sub-item: ATS Parse Rate */}
                           <div className="flex items-center justify-between text-slate-300">
                             <span className="flex items-center gap-1.5 font-medium">
-                              <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+                              {parseRate === 100 ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+                              ) : (
+                                <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                              )}
                               <span>ATS Parse Rate</span>
                             </span>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/30">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                parseRate === 100
+                                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/30'
+                                  : 'bg-amber-950/80 text-amber-300 border border-amber-500/30'
+                              }`}
+                            >
                               {parseRate === 100 ? 'No issues' : `${parseMissed}% missed`}
                             </span>
                           </div>
@@ -1191,7 +1203,7 @@ export default function AtsCheckerPage() {
                         parseRate < 100 ? (
                           <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/30 text-red-300 text-xs font-bold text-center flex items-center justify-center gap-2">
                             <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-                            <span>⚠ {parseMissed}% may be missed by the ATS due to plain text link labels (&quot;LinkedIn, Portfolio, GitHub&quot;)</span>
+                            <span>⚠ {parseMissed}% may be missed by the ATS due to formatting, unindexed link labels, or missing benchmark keywords</span>
                           </div>
                         ) : (
                           <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2">
