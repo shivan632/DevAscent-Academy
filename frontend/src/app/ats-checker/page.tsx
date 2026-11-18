@@ -40,7 +40,7 @@ const SAMPLE_RESUMES = {
     role: 'python',
     text: `PRAKHAR SRIVASTAVA
 prakharsrivastava019@gmail.com    +91-9792486222    Prayagraj, India
-LinkedIn    Portfolio   Github
+https://linkedin.com/in/prakhar-srivastava | https://github.com/prakharsrivastava019
 
 PROFESSIONAL SUMMARY
 Highly motivated Python developer with a strong foundation in AI, Machine Learning, and Deep Learning. Currently learning React and FastAPI and eager to apply skills to build intelligent solutions.
@@ -70,7 +70,7 @@ Certified in Web Development (Acmegrade)`,
     name: 'Shivan Mishra (AI/ML & Data Science)',
     role: 'aiml',
     text: `SHIVAN MISHRA
-shivrom.2020@gmail.com +91-9935806722 LinkedIn, Portfolio, GitHub
+shivrom.2020@gmail.com +91-9935806722 | https://linkedin.com/in/shivan-mishra | https://github.com/shivan632 | https://devascentacademy.me
 
 PROFESSIONAL SUMMARY
 AI/ML enthusiast with hands-on experience in Machine Learning, NLP, predictive analytics, and Full-Stack Development. Skilled in Python, Deep Learning, and building scalable AI-powered solutions.

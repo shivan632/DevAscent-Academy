@@ -625,15 +625,20 @@ export function evaluateResume(rawText: string, targetRoleKey = 'aiml'): ATSResu
   const calibratedTfidf = Math.min(100, Math.round((rawCosine / 0.28) * 100 * 10) / 10);
 
   // ─── ATS Parse Rate Calculation ───
+  // ATS parse rate measures document extraction fidelity (Experience, Projects, Education, Skills)
   let parseRate = 100;
-  let parseRateReason = "All sections and link targets parsed with 100% readability.";
-  if ((hasGithubWord || hasLinkedinWord) && (!hasFullGithubUrl || !hasFullLinkedinUrl)) {
-    parseRate -= 10;
-    parseRateReason = "Plain text link labels (e.g. 'LinkedIn, Portfolio, GitHub') without complete URLs cannot be indexed by automated ATS parsers.";
+  let parseRateReason = "All sections, headers, and content parsed with 100% readability.";
+
+  // Deduct only if major sections are actually missing or text is unreadable
+  const hasCoreSections = detectedSections.some((s) => /experience|training|internship|project|education|academic|skill/i.test(s));
+  if (!hasCoreSections || detectedSections.length < 2) {
+    parseRate = 85;
+    parseRateReason = "Some standard ATS section headers (Experience, Projects, Education) could not be clearly identified.";
+  } else if (sanitizedText.length < 150) {
+    parseRate = 75;
+    parseRateReason = "Insufficient readable text extracted from document.";
   }
-  if (!detectedSections.some((s) => s.toLowerCase().includes('experience') || s.toLowerCase().includes('training') || s.toLowerCase().includes('project'))) {
-    parseRate -= 10;
-  }
+
   parseRate = Math.max(50, Math.min(100, parseRate));
   const parseRateMissed = 100 - parseRate;
 
