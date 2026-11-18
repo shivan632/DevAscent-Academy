@@ -14,6 +14,9 @@ export interface ATSResult {
   grade_label: string;
   verdict: string;
   executive_summary: string;
+  parse_rate: number;
+  parse_rate_missed: number;
+  parse_rate_reason: string;
   target_role: {
     key: string;
     title: string;
@@ -27,6 +30,7 @@ export interface ATSResult {
     recommended_checklist: Array<{ skill: string; status: 'matched' | 'missing'; level: string }>;
   };
   category_scores: {
+    content: number;
     technical_skills: number;
     action_verbs: number;
     project_evidence: number;
@@ -294,8 +298,24 @@ export function evaluateResume(rawText: string, targetRoleKey = 'aiml'): ATSResu
   const rawCosine = computeTfidfCosine(sanitizedText, jdText);
   const calibratedTfidf = Math.min(100, Math.round((rawCosine / 0.28) * 100 * 10) / 10);
 
+  // ─── ATS Parse Rate Calculation & Penalty ───
+  let parseRate = 100;
+  let parseRateReason = "All sections and link targets parsed with 100% readability.";
+  if ((hasGithubWord || hasLinkedinWord) && (!hasFullGithubUrl || !hasFullLinkedinUrl)) {
+    parseRate -= 10;
+    parseRateReason = "Plain text link labels (e.g. 'LinkedIn, Portfolio, GitHub') without complete URLs cannot be indexed by automated ATS parsers.";
+  }
+  if (!detectedSections.some(s => s.toLowerCase().includes('experience') || s.toLowerCase().includes('training') || s.toLowerCase().includes('project'))) {
+    parseRate -= 10;
+  }
+  parseRate = Math.max(50, Math.min(100, parseRate));
+  const parseRateMissed = 100 - parseRate;
+
   const catWeighted = skillsScore * 0.40 + verbScore * 0.20 + projectScore * 0.25 + structureScore * 0.15;
-  const finalScore = Math.max(0, Math.min(100, Math.round(catWeighted * 0.70 + calibratedTfidf * 0.30)));
+  const rawBlendedScore = Math.max(0, Math.min(100, Math.round(catWeighted * 0.70 + calibratedTfidf * 0.30)));
+  
+  // Hard cap / penalty if parse rate is less than 100%
+  const finalScore = parseRate < 100 ? Math.min(rawBlendedScore, parseRate) : rawBlendedScore;
 
   let grade = "D";
   let gradeLabel = "Significant Gaps";
@@ -407,6 +427,10 @@ export function evaluateResume(rawText: string, targetRoleKey = 'aiml'): ATSResu
     action: d.fix,
   }));
 
+  // Category content score accurately reflecting deductions count
+  const contentIssuesCount = deductions.length;
+  const contentScore = Math.max(35, Math.min(100, Math.round(100 - contentIssuesCount * 13)));
+
   // Executive summary
   const topSkills = [...foundReq, ...foundRec].slice(0, 5).map((s) => s.toUpperCase());
   const skillsStr = topSkills.length > 0 ? topSkills.join(', ') : "general technical skills";
@@ -423,6 +447,9 @@ export function evaluateResume(rawText: string, targetRoleKey = 'aiml'): ATSResu
     grade_label: gradeLabel,
     verdict,
     executive_summary: executiveSummary,
+    parse_rate: parseRate,
+    parse_rate_missed: parseRateMissed,
+    parse_rate_reason: parseRateReason,
     target_role: {
       key: roleKey,
       title: jobConfig.title,
@@ -436,6 +463,7 @@ export function evaluateResume(rawText: string, targetRoleKey = 'aiml'): ATSResu
       recommended_checklist: recChecklist,
     },
     category_scores: {
+      content: contentScore,
       technical_skills: skillsScore,
       action_verbs: verbScore,
       project_evidence: projectScore,
