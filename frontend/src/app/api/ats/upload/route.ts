@@ -22,11 +22,11 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     let extractedText = '';
 
-    // 1. If Python service is available (local or remote), try forwarding with timeout
+    // 1. If Python service is available (local or remote), try forwarding with 5s timeout
     const pythonUrl = process.env.NEXT_PUBLIC_ATS_API_URL || 'http://127.0.0.1:8000';
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1800);
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
       const forwardForm = new FormData();
       forwardForm.append('file', file);
       forwardForm.append('target_role', targetRole);

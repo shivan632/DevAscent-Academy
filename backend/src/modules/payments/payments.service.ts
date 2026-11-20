@@ -161,6 +161,7 @@ export class PaymentsService {
         const authHeader = 'Basic ' + Buffer.from(`${keyId}:${keySecret}`).toString('base64');
         const rzpRes = await fetch('https://api.razorpay.com/v1/orders', {
           method: 'POST',
+          signal: AbortSignal.timeout(8000),
           headers: {
             Authorization: authHeader,
             'Content-Type': 'application/json',
@@ -328,13 +329,21 @@ export class PaymentsService {
         }
       }
 
-      const updatedPayment = await tx.payment.update({
-        where: { razorpayOrderId },
+      // Atomic transition from PENDING to PAID to prevent race conditions with webhooks
+      const transitionResult = await tx.payment.updateMany({
+        where: {
+          razorpayOrderId,
+          status: { not: 'PAID' },
+        },
         data: {
           status: 'PAID',
           razorpayPaymentId,
           razorpaySignature,
         },
+      });
+
+      const updatedPayment = await tx.payment.findUnique({
+        where: { razorpayOrderId },
       });
 
       const enrollment = await tx.enrollment.upsert({
@@ -352,14 +361,20 @@ export class PaymentsService {
         },
       });
 
-      await tx.course.update({
-        where: { id: payment.courseId },
-        data: {
-          seatsRemaining: { decrement: 1 },
-        },
-      });
+      // ONLY decrement seats if this execution transitioned the payment to PAID (prevents double seat decrement)
+      if (transitionResult.count > 0) {
+        await tx.course.updateMany({
+          where: {
+            id: payment.courseId,
+            seatsRemaining: { gt: 0 },
+          },
+          data: {
+            seatsRemaining: { decrement: 1 },
+          },
+        });
+      }
 
-      return { updatedPayment, enrollment };
+      return { updatedPayment: updatedPayment || payment, enrollment };
     });
 
     const enrolledUser = await this.prisma.user.findUnique({
@@ -454,10 +469,13 @@ export class PaymentsService {
         });
 
         // Strict idempotency: only execute once if not yet PAID
-        if (payment && payment.status !== 'PAID') {
+        if (payment) {
           await this.prisma.$transaction(async (tx) => {
-            await tx.payment.update({
-              where: { razorpayOrderId: orderId },
+            const transitionResult = await tx.payment.updateMany({
+              where: {
+                razorpayOrderId: orderId,
+                status: { not: 'PAID' },
+              },
               data: { status: 'PAID', razorpayPaymentId: paymentId },
             });
 
@@ -473,12 +491,18 @@ export class PaymentsService {
               },
             });
 
-            await tx.course.update({
-              where: { id: payment.courseId },
-              data: {
-                seatsRemaining: { decrement: 1 },
-              },
-            });
+            // ONLY decrement seats if this webhook call won the transition race
+            if (transitionResult.count > 0) {
+              await tx.course.updateMany({
+                where: {
+                  id: payment.courseId,
+                  seatsRemaining: { gt: 0 },
+                },
+                data: {
+                  seatsRemaining: { decrement: 1 },
+                },
+              });
+            }
           });
         }
       }

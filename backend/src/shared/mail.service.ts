@@ -98,7 +98,12 @@ export class MailService {
       }
     }
 
-    this.logger.log(`[SIMULATED EMAIL] To: ${toEmail} | OTP: ${otpCode}`);
+    if (process.env.NODE_ENV === 'production') {
+      this.logger.error(`❌ All email delivery channels (Resend and SMTP) failed for ${toEmail}`);
+      return false;
+    }
+
+    this.logger.log(`[SIMULATED EMAIL DEV ONLY] To: ${toEmail} | OTP: ${otpCode}`);
     return true;
   }
 

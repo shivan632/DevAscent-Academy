@@ -112,7 +112,14 @@ async def upload_resume_endpoint(
     target_role: str = Form("aiml")
 ):
     try:
+        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB limit
         content_bytes = await file.read()
+        if len(content_bytes) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail="File size exceeds maximum allowed limit (10MB). Please upload a smaller document."
+            )
+
         extracted_text = extract_text_from_file(content_bytes, file.filename)
 
         if len(extracted_text) < 20:

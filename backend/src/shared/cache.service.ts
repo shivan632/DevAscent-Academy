@@ -77,6 +77,19 @@ export class CacheService {
    */
   async set(key: string, value: any, ttlSeconds = 600): Promise<void> {
     const expiresAt = Date.now() + ttlSeconds * 1000;
+
+    // Bound L1 cache size to max 2,000 entries to prevent unbounded memory growth
+    if (this.memoryCache.size >= 2000) {
+      this.sweepExpired();
+      if (this.memoryCache.size >= 2000) {
+        let count = 0;
+        for (const k of this.memoryCache.keys()) {
+          this.memoryCache.delete(k);
+          if (++count >= 200) break;
+        }
+      }
+    }
+
     this.memoryCache.set(key, { value, expiresAt });
 
     if (this.redisUrl && this.redisToken) {

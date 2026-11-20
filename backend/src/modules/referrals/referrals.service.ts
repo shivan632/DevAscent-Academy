@@ -182,24 +182,33 @@ export class ReferralsService {
       throw new BadRequestException('Requested payout exceeds your wallet balance');
     }
 
-    // Deduct from wallet immediately & create payout request
-    const [payout] = await this.prisma.$transaction([
-      this.prisma.payoutRequest.create({
+    // Deduct from wallet immediately & create payout request atomically
+    const payout = await this.prisma.$transaction(async (tx) => {
+      // Atomic conditional decrement to guard against concurrent double-spend race condition
+      const updateResult = await tx.user.updateMany({
+        where: {
+          id: userId,
+          walletBalancePaise: { gte: withdrawAmount },
+        },
+        data: {
+          walletBalancePaise: { decrement: withdrawAmount },
+          payoutUpiId: cleanUpi,
+        },
+      });
+
+      if (updateResult.count === 0) {
+        throw new BadRequestException('Insufficient wallet balance or concurrent withdrawal request detected.');
+      }
+
+      return tx.payoutRequest.create({
         data: {
           userId,
           amountPaise: withdrawAmount,
           upiId: cleanUpi,
           status: 'PENDING',
         },
-      }),
-      this.prisma.user.update({
-        where: { id: userId },
-        data: {
-          walletBalancePaise: { decrement: withdrawAmount },
-          payoutUpiId: cleanUpi,
-        },
-      }),
-    ]);
+      });
+    });
 
     return payout;
   }
